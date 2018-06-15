@@ -8,10 +8,13 @@ Term | Definition
 <a name="Edge">Edge</a> | .
 <a name="Edge weight">Edge weight</a> | Travel time a vehicle needs to traverse the edge (road).
 <a name="Heuristic Algorithm">Heuristic Algorithm</a> | .
+<a name="Heuristic - Freeflow">Heuristic - Freeflow</a> | .
+<a name="Heuristic - Predicted path">Heuristic - Predicted path</a> | .
 <a name="Predicted congestions">Predicted congestions</a> | Use functions as edge weights.
 <a name="Realtime congestions">Realtime congestions</a> | Use realtime travel time.
 <a name="Road graph data">Road graph data</a> | .
 <a name="Time-dependent routing">Time-dependent routing</a> | The earliest arrival problem in road networks with time-dependent functions as edge weights.
+<a name="Time-independent routing">Time-independent routing</a> |
 <a name="Time dependent sampling">Time dependent sampling</a> | .
 <a name="Time dependent routing (Dynamic)">Time dependent routing (Dynamic)</a> | Takes into account both predicted congestions using historic data as well as realtime congestions.
 <a name="Time-dependent scalars">Time-dependent scalars</a> | .
