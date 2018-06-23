@@ -1,2 +1,2 @@
 # ols-router
-BC Advanced Route Planner
+BC Route Planner NG
