@@ -2,6 +2,7 @@
 # Technical Terms
 Term | Definition
 ----: | -----------
+<a name="Bidirectional Search">Bidirectional Search</a> | Searching a road graph to find the shortest path by performing two simultaneous searches. The first search forward the starting point, and the second search backwards from the target location/node.
 <a name="Customizable Contraction Hierarchies">Customizable Contraction Hierarchies</a> | A technique to extend Contraction hierarchies to support changing road conditions and user preferences. Preprocessing is divided into three phases. In the first expensive phase, short cuts are computed based solely on the topology of the road network. In the second, much less expensive phase, short cuts are computed based on updated road conditions (e.g., road or lane closures, traffic congestion). In the third phase, short cuts are computed based on user preferences.
 <a name="Contraction Hierarchies">Contraction Hierarchies</a> | A preprocessing technique to speed up shortest route calculation over large road networks. During preprocessing, short cuts are added to the road network and nodes are ordered to reflect the depth of the shortcuts. Edge weights are static when computing short-cut weights. 
 <a name="Earliest Arrival Problems">Earliest Arrival Problems</a> | .
