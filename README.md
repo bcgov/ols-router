@@ -16,4 +16,6 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 ## Draft System Architecture
 The BC Route Planner NG is a web service (aka API) running behind an API Gateway which provides security, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres so that service will never be interrupted during rollout of a new release or during a data centre failure.
 
+After a cold restart, the Road Watcher will read in the static road network into an in-memory datastore then update it from real-time sources on a periodic schedule (e.g., every five minutes).
+
 ![](https://github.com/bcgov/ols-router/blob/master/BC%20Route%20Planner%20NG%20Architecture.png)
