@@ -5,5 +5,7 @@ In year 1 (2018-19), the BC Route Planner NG will support time-dependent routing
 
 ## To dig further
 [Current project plan for this year](https://github.com/bcgov/ols-router/milestones)
+
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
-[Draft Integrated Transportation Network Data Model Gaps] 
+
+[Draft Integrated Transportation Network Data Model Gaps](https://github.com/bcgov/ols-router/blob/master/ITN-Data-Mode-Gaps.md) 
