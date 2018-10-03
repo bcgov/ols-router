@@ -3,5 +3,7 @@ BC Route Planner NG is a three year project of the Province of British Columbia 
 
 In year 1 (2018-19), the BC Route Planner NG will support time-dependent routing including historic traffic congestion, road incidents and closures, road construction, and ferry schedules. In year 2, support for truck routing will be added. Truck routing takes vehicle dimensions and road restrictions into account. Year 3 will be focussed on performance engineering and incorporating new data sources. 
 
-For more details on this year's project plan, see https://github.com/bcgov/ols-router/milestones
-For proposed year 1 Route Planner release notes see 
+## To dig further
+[Current project plan for this year](https://github.com/bcgov/ols-router/milestones)
+[Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
+[Draft Integrated Transportation Network Data Model Gaps] 
