@@ -13,4 +13,5 @@ Year 3 (2020-2021) will be focussed on incorporating user-requested enhancements
 
 [Draft Integrated Transportation Network Data Model Gaps](https://github.com/bcgov/ols-router/blob/master/ITN-Data-Mode-Gaps.md)
 
-[Draft System Architecture](https://github.com/bcgov/ols-router/blob/master/BC%20Route%20Planner%20NG%20Architecture.png)
+## Draft System Architecture
+![](https://github.com/bcgov/ols-router/blob/master/BC%20Route%20Planner%20NG%20Architecture.png)
