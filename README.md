@@ -1,5 +1,5 @@
 # ols-router
-BC Route Planner NG is a three year project of the Province of British Columbia to develop a state-of-the art route planner. The BC Route Planner NG is a key component of the free and open DataBC Location Services Platform.
+BC Route Planner NG is a three year project of the Province of British Columbia to develop a state-of-the art route planner. The BC Route Planner NG is a vital component of the free and open DataBC Location Services Platform.
 
 In year 1 (2018-19), the project will investigate the feasibility of honouring many complex routing constraints including support time-dependent routing including historic traffic congestion, road incidents and closures, road construction, and ferry schedules. The first release will include those components for which there is insufficient or no real data so that developers can start integrating the route planner into their new applications as soon as possible. Tackling data issues is beyond the scope of this project and their resolution may be many months away. The performance goal of the first release is under two seconds for a single, two-point, oversized truck route.
 
