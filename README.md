@@ -5,7 +5,6 @@ In year 1 (2018-19), the project will investigate the feasibility of honouring m
 
 In year 2, support for truck routing, a road watcher, and new data sources will be added. Truck routing takes vehicle dimensions and road restrictions into account. Year 3 will be focussed on refinement performance engineering. 
 
-## To dig further
 [Current project plan for this year](https://github.com/bcgov/ols-router/milestones)
 
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
