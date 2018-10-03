@@ -16,4 +16,4 @@
 |12|Grade restrictions not supported (e.g., 9% grade)|?|?
 |13|No road closed flag.|?|?
 |14|Road ramp doesn't have an associated slope property so can't tell if a truck is allowed to turn onto it from a sharp angle (e.g., < 70 degrees).|?|?
-|15|Only one of four weights is represented in ITN.|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle. Recommend treating current weight  property as GVW and adding other three weights.|?
+|15|Only one of four truck weights is represented in ITN.|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle. Recommend treating current weight  property as GVW and adding other three weights.|?
