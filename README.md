@@ -16,6 +16,6 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 ## Draft System Architecture
 The BC Route Planner NG is a web service (aka API) running behind an API Gateway. Kong, our API Gateway, is an NGINX plugin tht provides security, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres so that service will never be interrupted during rollout of a new release or during a data centre failure.
 
-On startup, the Road Watcher will read in the latest static road network into an in-memory datastore then update it from real-time sources on a periodic schedule (e.g., every five minutes). The Road Watcher will be restarted on a schedule that keeps up with road network change (e.g., every week).
+On startup, the Road Watcher will read in the latest static road network into an in-memory live road network. The Road Watcher will then update the live road network from real-time APIs on a periodic schedule (e.g., every five minutes). The Road Watcher will be restarted on a schedule that keeps up with road network change (e.g., every week).
 
 ![](https://github.com/bcgov/ols-router/blob/master/BC%20Route%20Planner%20NG%20Architecture.png)
