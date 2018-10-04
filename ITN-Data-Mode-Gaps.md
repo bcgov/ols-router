@@ -9,7 +9,7 @@
 |5|Multiple intersections can’t be associated with a single traffic control|Multiple intersection traversal costs are incurred (e.g., 3 times instead of once in the case of a left-turn at a divided road traffic light|Add the concept of a traffic control and a one:many relationship between a traffic control and an intersection
 |6|One-ways not consistently used for turn lanes and ramps|Without a one-way, extra turn-restrictions are required|Make data consistent
 |7|Truck turn restrictions not supported|Needed for truck routing|Can add support in model or in Router road prep
-|8|Tight maneuvres (S-curves) not supported.|Needed for truck routing| Add hasTightTurn property to road segment
+|8|Tight maneuvres (S-curves) not supported.|Needed for truck routing| Add hasTightTurns property to road segment
 |9|Overweight corridors not supported|A road segment can only belong to one designated truck route but overweight corridors run on designated routes.|?
 |10|Traffic congestion on road segments not supported|Needed for support of historic and real-time traffic congestion|?
 |11|Seasonal load restrictions not supported|0. Four weights are potentially involved: GVW, Single Axle, Tandem Axle, and Tridem Axle<br>1. Weight is supported but not a seasonal load factor.<br>2. Each jurisdiction may have its own max GVW<br>3. Need to associate load factor with an effective time-period|?
