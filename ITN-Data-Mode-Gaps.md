@@ -15,5 +15,5 @@
 |11|Seasonal load restrictions not supported|0. Four weights are potentially involved: GVW, Single Axle, Tandem Axle, and Tridem Axle|1. Weight is supported but not a seasonal load factor.<br>2. Each jurisdiction may have its own max GVW<br>3. Need to associate load factor with an effective time-period|?
 |12|Grade restrictions not supported (e.g., 9% grade)|Can't avoid steep grades in routes for big rigs|?
 |13|No road closed flag.|?|?
-|14|Road ramp doesn't have an associated slope property so can't tell if a truck is allowed to turn onto it from a sharp angle (e.g., < 70 degrees).|?|?
+|14|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
 |15|Only one of four truck weights is represented in ITN.|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle. Recommend treating current weight  property as GVW and adding other three weights.|?
