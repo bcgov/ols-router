@@ -16,7 +16,7 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 ## Draft Phase 1 System Architecture
 The BC Route Planner NG is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
 
-On startup, a Route Planner node will read the latest static road network into a cached road network. Route Planner nodes will be restarted monthly when updated ITN data is received and prepared for use in routing. Historic traffic congestion, road events, and ferry schedules are all cooked data designed solely for proof-of-concept.
+On startup, a Route Planner node will read the latest static road network into a cached road network. Route Planner nodes will be restarted monthly when updated ITN data is received and prepared for use. Historic traffic congestion, road events, and ferry schedules are all cooked data designed solely for proof-of-concept.
 
 ![](https://github.com/bcgov/ols-router/blob/master/BC-RPNG-Phase-1-Architecture.png)
 
