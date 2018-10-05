@@ -13,5 +13,5 @@
 |9|Seasonal load restrictions not supported|1. Seasonal load restrictions may involve axle weight load factor, noOverweight and noOverSize flags, geometric extent, and an effective time-period<br>2. Each district or region may have its own maximum GVW|Add a seasonal load restriction feature that is tied to the appropriate district or region.
 |10|Grade restrictions not supported (e.g., 9% grade)|Can't avoid steep grades in routes for big rigs|?
 |11|No road closed flag.|?|?
-|12|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
+|12|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can safely turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
 |13|Only one of four truck weights is represented in ITN.|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle. Recommend treating current weight  property as GVW and adding other three weights.|?
