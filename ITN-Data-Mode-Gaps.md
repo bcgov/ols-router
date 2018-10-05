@@ -10,7 +10,7 @@
 |6|Tight maneuvres (S-curves) not supported.|Needed for truck routing| Add hasTightTurns property to road segment
 |7|Overweight corridors not supported|A road segment can only belong to one designated truck route but overweight corridors run on designated routes.|?
 |8|Traffic congestion on road segments not supported|Needed for support of historic and real-time traffic congestion|?
-|9|Seasonal load restrictions not supported|0. Four load factors may be involved, one for each type of weight: GVW, Single Axle, Tandem Axle, and Tridem Axle<br>1. Weight is supported but not a seasonal load factor.<br>2. Each jurisdiction may have its own max GVW<br>3. Need to associate load factor with an effective time-period|?
+|9|Seasonal load restrictions not supported|1. Seasonal load restrictions may involve axle weight load factor, noOverweight and noOverSize flags, geometric extent, and an effective time-period<br>2. Each district or region may have its own maximum GVW|Add a seasonal load restriction feature that is tied to the appropriate district or region.
 |10|Grade restrictions not supported (e.g., 9% grade)|Can't avoid steep grades in routes for big rigs|?
 |11|No road closed flag.|?|?
 |12|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
