@@ -1,5 +1,6 @@
 | Feature | ITN Feature Count | OSM Feature Count
 |----------|:------------------:|:------------------:|
+|speed limits|?|? (13,067 km)
 |one-ways|26,224|? (5,908 km)
 |stop signs|82,052|1,181
 |traffic lights|17,230|4,853
