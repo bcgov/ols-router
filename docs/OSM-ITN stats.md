@@ -16,5 +16,5 @@ Here is a comparison of key feature counts between ITN and OSM as of Oct 15, 201
 |Named road segments|10|?|96,000 km
 |truck route segments|343|?
 |height restrictions|946|?
-|weight (GVW) restrictions|9|?
+|weight restrictions|9|?
 |width restrictions|0|?
