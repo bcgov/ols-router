@@ -1,3 +1,7 @@
+Here is a comparison of some key features in ITN and OSM as of Oct 15, 2018 <BR><BR>
+
+
+
 | Feature | ITN Feature Count | OSM Feature Count | OSM Feature Distance (in km) |
 |----------|:------------------:|:------------------:|:------------------:|
 |speed limits|432,829|?|13,067 km
