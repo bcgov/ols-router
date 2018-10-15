@@ -1,4 +1,4 @@
-Here is a comparison of some key feature contains between ITN and OSM as of Oct 15, 2018 <BR><BR>
+Here is a comparison of key feature counts between ITN and OSM as of Oct 15, 2018 <BR><BR>
 
 
 
