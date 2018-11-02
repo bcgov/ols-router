@@ -1,7 +1,7 @@
 # BC Route Planner NG
 BC Route Planner NG is a three year project of the Province of British Columbia to develop a state-of-the art route planner. The BC Route Planner NG is a vital component of the free and open DataBC Location Services Platform.
 
-In year 1 (2018-19), we will investigate the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, road incidents and closures, road construction, and ferry schedules. The first release will not exclude those components for which there is insufficient or no real data so that a stable API will be available for developers sooner than later. Creating and managing data sources is out of scope of this project. Getting data custodians to get usable data APIs in place is not expected for many months. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck.
+In year 1 (2018-19), we will investigate the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, road incidents and closures, road construction, and ferry schedules. The first release will not exclude those components for which there is insufficient or no real data so that a stable API will be available for developers sooner than later. Creating and managing data sources is out of scope of this project. Getting data custodians to get usable data APIs in place is not expected for many months. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck. 
 
 In year 2 (2019-2020), we will add support for truck routing, a road watcher and new data sources. Truck routing takes vehicle dimensions and road restrictions into account. The road watcher will keep the cached road network in-synch with real-time events like accidents, wildfire, and mudslides.
 
@@ -12,6 +12,9 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
 
 [Draft Integrated Transportation Network Data Model Gaps](https://github.com/bcgov/ols-router/blob/master/docs/ITN-Data-Mode-Gaps.md)
+
+[Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
+
 
 ## Draft Phase 1 System Architecture
 The BC Route Planner NG is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
