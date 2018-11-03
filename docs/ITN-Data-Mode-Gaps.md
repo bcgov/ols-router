@@ -1,4 +1,4 @@
-# ITN Data Model Gaps Draft
+# ITN Data Model Gaps
 
 |Issue Id| Issue                        | Implications                 | Recommendation
 |---|------------------------------|------------------------------|-------------------------------------------------------------------|
