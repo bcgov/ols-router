@@ -1,8 +1,8 @@
-# ITN Data Model Gaps Draft v0.1
+# ITN Data Model Gaps Draft
 
 |Issue Id| Issue                        | Implications                 | Recommendation
 |---|------------------------------|------------------------------|-------------------------------------------------------------------|
-|1|Turn restrictions model time periods implicitly as AM,PM,and AMPM | 1. Exact interval on turn restriction is lost in source conversion from interval to AM/PM designation. Both 1600-1730 and 1600-1800 become PM <br>2. Can’t represent all-day restrictions such as 0600-1800 which is an example from a No Left Turn restriction from Violet to Interurban |
+|1|Turn restrictions model time periods implicitly as AM,PM,and AMPM | 1. Exact interval on turn restriction is lost in source conversion from interval to AM/PM designation. Both 1600-1730 and 1600-1800 become PM <br>2. Can’t represent all-day restrictions such as 0600-1800 which is an example from a No Left Turn restriction from Violet to Interurban | Change from implicit to explicit (24hr) time intervals
 |2|Turn restrictions specify turn directions which may be ambiguous|1. There may be two left turns from a given road segment end which makes No Left Turn ambiguous<br>2. There may be no straight through which makes No Straight Through ambiguous|Adopt Edge-Node-Edge model
 |3|Multiple intersections can’t be associated with a single traffic control|Multiple intersection traversal costs are incurred (e.g., 3 times instead of once in the case of a left-turn at a divided road traffic light|Add the concept of a traffic control and a one:many relationship between a traffic control and an intersection
 |4|One-ways not consistently used for turn lanes and ramps|Without a one-way, extra turn-restrictions are required|Make data consistent
