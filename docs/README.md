@@ -17,12 +17,16 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 ## RPNG Year 1 Capability Matrix
 
-Feature               | Disabled by Default | Code Production Ready | Data Needed           |Data Quality          |
+Feature               | Disabled by Default | Feature Quality | Data Needed           |Data Quality          |
 ----------------------|--------------------|-----------------------|-----------------------|----------------------|
-Start time|No|Yes|||
-Time-dependent turn-restrictions|Yes|Yes|time-dependent turn restrictions|Poor
-Time independent turn restrictions|No|Yes|Implicit restrictions (e.g., No U-turns, No-Left on divided merge)<br> signed restrictions (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
-Correct-side routing|No|Yes|Road geometry, address ranges|Excellent|
+Start time|No|Good|||
+Time-dependent turn-restrictions|Yes|Good|time-dependent turn restrictions|Poor
+Time independent turn restrictions|No|Good|Implicit restrictions (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> signed restrictions (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
+Correct-side routing|No|Good|Road geometry, address ranges|Excellent|
+Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|turn cost estimates by turn type (left,right,straight), traffic impactor (yield, stop, light), intersection approach/departure (slowing down,speeding up)| acceptable
+
+Designated truck routes|No|Good|designated truck routes (both municipal and provincial), height/weight corridors| Poor; only a handful of truck route segments in Ft St John
+
 
 
 ## Draft Phase 1 System Architecture
