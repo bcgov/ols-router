@@ -24,7 +24,6 @@ Time-dependent turn-restrictions|Yes|Good|time-dependent turn restrictions|Poor
 Time independent turn restrictions|No|Good|Implicit restrictions (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> signed restrictions (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
 Correct-side routing|No|Good|Road geometry, address ranges|Excellent|
 Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|turn cost estimates by turn type (left,right,straight), traffic impactor (yield, stop, light), intersection approach/departure (slowing down,speeding up)| acceptable
-
 Designated truck routes|No|Good|designated truck routes (both municipal and provincial), height/weight corridors| Poor; only a handful of truck route segments in Ft St John
 
 
