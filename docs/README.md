@@ -18,7 +18,7 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 ## RPNG Year 1 Feature Matrix
 
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
-|----------------------|---------|------------------|-----------------------|----------------------|
+|----------------------|:---------:|------------------|-----------------------|----------------------|
 Correct-side routing|No|Good|Road geometry from ITN and address ranges from BC Address Geocoder|Excellent|
 Time independent turn restrictions|No|Good|Implicit restrictions (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> Signed restrictions from ITN (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
 Start time|Yes|Good|All time-dependent data|variable|
@@ -26,6 +26,7 @@ Time-dependent turn-restrictions|Yes|Good|Time-dependent turn restrictions from 
 Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable
 Designated truck routes|Yes|Good|Designated truck routes from ITN| Poor; only a handful of truck route segments in Ft St John
 Scheduled Road Events|Yes|Suitable for demo only| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
+Historic traffic congestion|Yes|Good|historic traffic data for each road segment in urban areas|Poor; just fake data for demos
 
 Note: Features can be enabled/disabled on a per route planner request basis.
 
