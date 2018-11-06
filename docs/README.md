@@ -15,7 +15,7 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
 
-## RPNG Year 1 Feature Matrix
+## Route Planner NG Year 1 Feature Matrix
 
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
 |----------------------|:---------:|------------------|-----------------------|----------------------|
@@ -27,6 +27,7 @@ Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided
 Designated truck routes|Yes|Good|Designated truck routes from ITN| Poor; only a handful of truck route segments in Ft St John
 Scheduled Road Events|Yes|Suitable for demo only| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
 Historic traffic congestion|Yes|Good|historic traffic data for each road segment in urban areas|Poor; just fake data for demos
+Hard road restrictions|Yes|Good|road mininum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
 
 Note: Features can be enabled/disabled on a per route planner request basis.
 
