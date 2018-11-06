@@ -15,6 +15,15 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
 
+## RPNG Year 1 Capability Matrix
+
+Feature               | Disabled by Default | Code Production Ready | Data Needed           |Data Quality          |
+----------------------|--------------------|-----------------------|-----------------------|----------------------|
+Start time|No|Yes|||
+Time-dependent turn-restrictions|Yes|Yes|time-dependent turn restrictions|Poor
+Time independent turn restrictions|No|Yes|Implicit restrictions (e.g., No U-turns, No-Left on divided merge)<br> signed restrictions (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
+Correct-side routing|No|Yes|Road geometry, address ranges|Excellent|
+
 
 ## Draft Phase 1 System Architecture
 The BC Route Planner NG is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
