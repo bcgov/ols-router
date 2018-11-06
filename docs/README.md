@@ -19,9 +19,9 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
 |----------------------|---------|------------------|-----------------------|----------------------|
-Start time|No|Good|All time-dependent data|variable|
-Time-dependent turn-restrictions|Yes|Good|time-dependent turn restrictions|Poor
 Time independent turn restrictions|No|Good|Implicit restrictions (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> signed restrictions (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
+Start time|Yes|Good|All time-dependent data|variable|
+Time-dependent turn-restrictions|Yes|Good|time-dependent turn restrictions|Poor
 Correct-side routing|No|Good|Road geometry, address ranges|Excellent|
 Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable
 Designated truck routes|No|Good|designated truck routes (both municipal and provincial), height/weight corridors| Poor; only a handful of truck route segments in Ft St John
