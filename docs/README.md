@@ -28,6 +28,7 @@ Designated truck routes|Yes|Good|Designated truck routes from ITN| Poor; only a 
 Scheduled Road Events|Yes|Suitable for demo only| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
 Historic traffic congestion|Yes|Good|historic traffic data for each road segment in urban areas|Poor; just fake data for demos
 Hard road restrictions|Yes|Good|road mininum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
+Ferry schedules|Yes|Good|Ferry schedules from GTFS|Suitable for demo only; BC Ferries doesn't provide GTFS so we created GTFS file for winter schedules of two ferry routes
 
 Note: Features can be enabled/disabled on a per route planner request basis.
 
