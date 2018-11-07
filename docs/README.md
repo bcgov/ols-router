@@ -20,7 +20,7 @@ In Year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
 |----------------------|:---------:|------------------|-----------------------|----------------------|
 Correct-side routing|No|Good|Road geometry from ITN and address ranges from BC Address Geocoder|Excellent|
-Time independent turn restrictions|No|Good|Implicit restrictions (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> Signed restrictions from ITN (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
+Time independent turn restrictions|No|Good|[Implicit restrictions](https://www.mapbox.com/mapping/mapping-for-navigation/implicit-restrictions/) (e.g., No U-turns, No-Left on divided merge, too tight for trucks)<br> Signed restrictions from ITN (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
 Start time|Yes|Good|All time-dependent data|variable|
 Time-dependent turn-restrictions|Yes|Good|Time-dependent turn restrictions from ITN|Poor
 Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable
