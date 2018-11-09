@@ -16,3 +16,4 @@
 |12|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can safely turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
 |13|Only one of four truck weights is represented in ITN.|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle. Recommend treating current weight  property as GVW and adding other three weights.|?
 |14|No time-dependent max speed property|Can't represent school zone speed limits which are only in force during school hours| ?
+|15|NO implicit flag in turn restrictions| Can't distinguish implicit restrictions from signed turn-restrictions|Needed for QA|
