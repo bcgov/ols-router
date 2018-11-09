@@ -3,9 +3,9 @@ BC Route Planner NG is a three year project of the Province of British Columbia 
 
 In year 1 (2018-19), we will investigate the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, road incidents and closures, road construction, and ferry schedules. The first release will not exclude those components for which there is insufficient or no real data so that a stable API will be available for developers sooner than later. Creating and managing data sources is out of scope of this project. Getting data custodians to get usable data APIs in place is not expected for many months. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck. 
 
-In year 2 (2019-2020), we will add support for truck routing, a road watcher and new data sources. Truck routing takes vehicle dimensions and road restrictions into account. The road watcher will keep the cached road network in-synch with real-time events like accidents, wildfire, and mudslides.
+In year 2 (2019-2020), we will add support for truck routing, a road watcher and new data sources. Truck routing takes vehicle dimensions and road restrictions into account. The road watcher will keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides
 
-In Year 3 (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
+In year 3 (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
