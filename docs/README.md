@@ -20,15 +20,15 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
 |----------------------|:---------:|------------------|-----------------------|----------------------|
 Correct-side routing|No|Good|Road geometry from ITN and address ranges from BC Address Geocoder|Excellent|
-Time independent turn restrictions|No|Good|[Implicit restrictions](https://www.mapbox.com/mapping/mapping-for-navigation/implicit-restrictions/)<br>Signed restrictions from ITN (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: unknown
+Time independent turn restrictions|No|Demo only due to poor data|[Implicit restrictions](https://www.mapbox.com/mapping/mapping-for-navigation/implicit-restrictions/)<br>Signed restrictions from ITN (e.g., road signage observed)|Implicit restrictions: high<br> Signed restrictions: poor
 Start time|Yes|Good|All time-dependent data|variable|
-Time-dependent turn-restrictions|Yes|Good|Time-dependent turn restrictions from ITN|Poor
-Turn costs|Yes|Useful but not tuned for realism and double penalizing in divided intersections|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable
-Designated truck routes|Yes|Good|Designated truck routes from ITN| Poor; only a handful of truck route segments in Ft St John
-Scheduled Road Events|Yes|Suitable for demo only| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
-Historic traffic congestion|Yes|Good|historic traffic data for each road segment in urban areas|Poor; just fake data for demos
-Hard road restrictions|Yes|Good|road mininum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
-Ferry schedules|Yes|Good|Ferry schedules from GTFS|Suitable for demo only; BC Ferries doesn't provide GTFS so we created GTFS file for winter schedules of two ferry routes
+Time-dependent turn-restrictions|Yes|Demo only due to poor data|Time-dependent turn restrictions from ITN|Poor
+Turn costs|Yes|Demo only - not tuned for realism and double penalizing in divided intersections|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable
+Designated truck routes|Yes|Demo only; Support for a single type of designated route, not multiple types (e.g., weight corridor, height corridor, hazardous material, evacuation)|Designated truck routes from ITN| Poor; only a handful of truck route segments in Ft St John
+Scheduled Road Events|Yes|Demo only; no real-time event monitoring, only full road closure events, not lane closures or info events| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
+Historic traffic congestion|Yes|Demo only due to fake data|historic traffic data for each road segment in urban areas|Poor; just fake data for demos
+Hard road restrictions|Yes|Demo only; no support for height/weight restrictions by lane or rig type|road mininum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
+Ferry schedules|Yes|Demo only due to fake data; loads ferry schedules from GTFS files|Suitable for demo only; BC Ferries doesn't provide GTFS so we created GTFS file for winter schedules of two ferry routes
 
 Note: Features can be enabled/disabled on a per route planner request basis.
 
