@@ -1,6 +1,6 @@
 # RouterNG, Status Report #4
-Date: 2018-08-14
-Sprint: 2
+Date: 2018-08-14<br>
+Sprint: 2<br>
 Prepared by: Graeme Leeming, *Refractions Research Inc.*
 ## Overview
 The first sprint has now been completed. The basic framework was extended to model a simple version of (precalculated) intersection costs and to support time independent turn restrictions. Further testing has assisted with refining the approach, and also to identify a few bugs.
