@@ -9,6 +9,8 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
+[Project Status 2018-07-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-1.md)
+
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
 
 [Draft Integrated Transportation Network Data Model Gaps](https://github.com/bcgov/ols-router/blob/master/docs/ITN-Data-Mode-Gaps.md)
@@ -31,9 +33,6 @@ Hard road restrictions|Yes|Demo only; no support for height/weight restrictions 
 Ferry schedules|Yes|Demo only due to fake data; loads ferry schedules from GTFS files|Suitable for demo only; BC Ferries doesn't provide GTFS so we created GTFS file for winter schedules of two ferry routes
 
 Note: Features can be enabled/disabled on a per route planner request basis.
-
-Project Status Reports
-[Status Report #1](https://github.com/bcgov/ols-router/docs/rpng-status-1.md)
 
 ## Draft Phase 1 System Architecture
 The BC Route Planner NG is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
