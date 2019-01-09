@@ -9,15 +9,19 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
-Project status as of [2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-12.md), [2018-12-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-11.md), [2018-11-30](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-10.md),[2018-11-16](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-9.md),
-[Project status as of 2018-10-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-8.md)<br>
-[Project status as of 2018-10-10](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-7.md)<br>
-[Project status as of 2018-09-20](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-6.md)<br>
-[Project status as of 2018-09-06](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-5.md)<br>
-[Project status as of 2018-08-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-4.md)<br>
-[Project status as of 2018-07-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-3.md)<br>
-[Project status as of 2018-07-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-2.md)<br>
-[Project status as of 2018-06-15](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-1.md)<br>
+Project status as of:<br>
+[2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-12.md)<br>
+[2018-12-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-11.md)<br>
+[2018-11-30](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-10.md)<br>
+[2018-11-16](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-9.md)<br>
+[2018-10-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-8.md)<br>
+[2018-10-10](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-7.md)<br>
+[2018-09-20](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-6.md)<br>
+[2018-09-06](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-5.md)<br>
+[2018-08-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-4.md)<br>
+[2018-07-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-3.md)<br>
+[2018-07-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-2.md)<br>
+[2018-06-15](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-1.md)<br>
 
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
 
