@@ -32,6 +32,9 @@ Ferry schedules|Yes|Demo only due to fake data; loads ferry schedules from GTFS 
 
 Note: Features can be enabled/disabled on a per route planner request basis.
 
+Project Status Reports
+[Status Report #1](https://github.com/bcgov/ols-router/docs/rpng-status-1.md)
+
 ## Draft Phase 1 System Architecture
 The BC Route Planner NG is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes will be deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
 
