@@ -1,6 +1,6 @@
 # RouterNG, Status Report #3
 Date: 2018-07-26<br>
-Sprint 1<br>
+Sprint: 1<br>
 Prepared by: Graeme Leeming, *Refractions Research Inc.*
 ## Overview
 We are now approaching the end of the third week of our five-week first sprint. The basic Router NG implementation has been extended to accommodate unwanted classes and flow patterns. Beyond the data filters, several built-in functions from GraphHopper (e.g. directions) and extended features (e.g. round trip, optimize order, nearest stop) needed to be ported/reimplemented. At this time, the functionality of the Router NG application now matches that of the Route Planner in production.
