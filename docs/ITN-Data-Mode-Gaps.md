@@ -9,8 +9,8 @@
 |5|Truck turn restrictions not supported|Needed for truck routing|Can add support in model or in Router road prep
 |6|Tight maneuvres (S-curves) not supported.|Needed for truck routing| Add hasTightTurns property to road segment
 |7|Overweight corridors not supported|A road segment can only belong to one designated truck route but overweight corridors run on designated routes.|?
-|8|Traffic congestion on road segments not supported|Needed for support of historic and real-time traffic congestion|?
-|9|Seasonal load restrictions not supported|1. Seasonal load restrictions may involve axle weight load factor, noOverweight and noOverSize flags, geometric extent, and an effective time-period<br>2. Each district or region may have its own maximum GVW|Add a seasonal load restriction feature that is tied to the appropriate district or region.
+|8|Traffic congestion on road segments not supported|Needed for support of historic and real-time traffic congestion| Since this data will likely not be crowd-sourced in the foreseeable future, provide traffic congestion through another web service (e.g., WFS). 
+|9|Seasonal load restrictions not supported|1. Seasonal load restrictions may involve axle weight load factor, noOverweight and noOverSize flags, geometric extent, and an effective time-period<br>2. Each district or region may have its own maximum GVW| Don't extend data model. This data can't be crowd-sourced so should be made available through another web service (e.g., OGC WFS).
 |10|Grade restrictions not supported (e.g., 9% grade)|Can't avoid steep grades in routes for big rigs|?
 |11|No road closed flag.|?|?
 |12|Road ramp doesn't have an associated slope property| Insufficient information to determine if a truck can safely turn onto a given road ramp from a sharp angle (e.g., less than seventy degrees)|Add slope property to road ramps
