@@ -26,6 +26,16 @@
     <springframework.security.version>5.1.2.RELEASE</springframework.security.version>
   </properties>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.2.2</version>
+      </plugin>
+    </plugins>
+  </build>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -52,12 +62,12 @@
     <dependency>                                    
 	  <groupId>org.slf4j</groupId>                
 	  <artifactId>jcl-over-slf4j</artifactId>     
-	  <version>1.7.5</version>  
+	  <version>1.7.25</version>  
 	</dependency>
     <dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-log4j12</artifactId>
-	  <version>1.7.5</version>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.11.1</version>
     </dependency>
     <dependency>
 	  <groupId>commons-io</groupId>
@@ -160,7 +170,7 @@
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
-            <version>1.6.8</version>
+            <version>1.7.1</version>
             <executions>
               <execution>
                 <id>redeploy</id>
@@ -197,14 +207,4 @@
       </build>
     </profile>
   </profiles>
-  
-   <dependencyManagement>
-   	<dependencies>
-   		<dependency>
-   			<groupId>com.oracle</groupId>
-   			<artifactId>ojdbc6</artifactId>
-   			<version>11.2.0.3</version>
-   		</dependency>
-   	</dependencies>
-   </dependencyManagement>
 </project>

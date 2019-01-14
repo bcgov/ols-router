@@ -40,11 +40,6 @@
       <artifactId>jts-core</artifactId>
       <version>1.14.0</version>
     </dependency>
-    <!-- dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>9.1-901.jdbc4</version>
-    </dependency -->
     <dependency>
         <groupId>net.sf.trove4j</groupId>
         <artifactId>trove4j</artifactId>
@@ -58,7 +53,7 @@
     <dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.5</version>
+	  <version>1.7.25</version>
     </dependency>
     <dependency>
       <groupId>commons-dbcp</groupId>
