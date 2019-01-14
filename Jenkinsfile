@@ -1,59 +1,78 @@
-node ('master'){
-    def server = Artifactory.server 'prod'
-    def rtMaven = Artifactory.newMavenBuild()
-    def buildInfo
-    
-    stage ('SCM prepare'){
-        deleteDir()
-        checkout([$class: 'GitSCM', branches: [[name: '${gitTag}']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'WipeWorkspace']], gitTool: 'Default', submoduleCfg: [], userRemoteConfigs: [[url: '${gitRepo}']]])
-        withMaven(jdk: 'jdk', maven: 'm3') {
-            sh 'mvn versions:set -DnewVersion="${mvnTag}" -DgenerateBackupPoms=false'
-        }
+pipeline {
+    agent any
+    parameters {
+    string(defaultValue: 'https://github.com/bcgov/ols-router.git', description: 'Source Code Repo URL', name: 'gitRepo')
+    string(defaultValue: 'dev', description: 'Git Branch or Tag Name', name: 'gitBranch')
+    string(defaultValue: '', description: 'Version Tag will be used by Arctifactory', name: 'mvnTag', trim: false)
+    string(defaultValue: 'clean install -Pk8s -Dmaven.test.skip=true', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
     }
+    stages {
+        stage ('code checkout') {
+            steps {
+                git branch: '${gitBranch}', url: "${gitRepo}"
+            }
+        }
 
-    stage ('Sonar Scan'){
-        tool name: 'appqa', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-        withSonarQubeEnv('SonarQube'){      
-        withMaven(jdk: 'jdk', maven: 'm3') {
-          sh 'mvn clean package -Dmaven.test.skip=true sonar:sonar'
-          def props = readProperties file: 'target/sonar/report-task.txt'
-          echo "properties=${props}"
-          env.sonarServerUrl=props['serverUrl']
-          env.SONAR_CE_TASK_URL=props['ceTaskUrl']
-          def ceTask
-            timeout(time: 1, unit: 'MINUTES') {
-              waitUntil {
-                sh 'curl -u $sonarToken $SONAR_CE_TASK_URL -o ceTask.json'
-                ceTask = readJSON file: 'ceTask.json'
-                echo ceTask.toString()
-                return "SUCCESS".equals(ceTask["task"]["status"])
+        stage('build && SonarQube analysis') {
+        environment {
+        scannerHome = tool 'appqa'
+        }    
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    withMaven(maven:'m3') {
+                        sh 'mvn clean package sonar:sonar'
+                    }
                 }
-             }
-           env.qualityGateUrl = env.sonarServerUrl + "/api/qualitygates/project_status?analysisId=" + ceTask["task"]["analysisId"]
-           sh 'curl -u $sonarToken $qualityGateUrl -o qualityGate.json'
-           def qualitygate = readJSON file: 'qualityGate.json'
-           echo qualitygate.toString()
-           if ("ERROR".equals(qualitygate["projectStatus"]["status"])) {
-              error  "Quality Gate failure"
-             }
-           echo  "Quality Gate success"
-            } 
+            }
+        }
+        stage("Quality Gate") {
+            steps {
+                timeout(time: 1, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage ('Artifactory configuration') {
+            steps {
+                rtServer (
+                    id: "prod"
+                )
+
+                rtMavenDeployer (
+                    id: "MAVEN_DEPLOYER",
+                    serverId: "prod",
+                    releaseRepo: "libs-release-local",
+                    snapshotRepo: "libs-snapshot-local"
+                )
+
+                rtMavenResolver (
+                    id: "MAVEN_RESOLVER",
+                    serverId: "prod",
+                    releaseRepo: "libs-release",
+                    snapshotRepo: "libs-snapshot"
+                )
+            }
+        }
+
+        stage ('Exec Maven') {
+            steps {
+                rtMavenRun (
+                    tool: "m3",
+                    pom: 'pom.xml',
+                    goals: '${mvnGoal}',
+                    deployerId: "MAVEN_DEPLOYER",
+                    resolverId: "MAVEN_RESOLVER"
+                )
+            }
+        }
+
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "prod"
+                )
+            }
         }
     }
-
-    stage ('Artifactory configuration'){
-        rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
-        rtMaven.resolver releaseRepo: 'repo', snapshotRepo: 'repo', server: server
-        rtMaven.deployer.deployArtifacts = true // Disable artifacts deployment during Maven run
-        buildInfo = Artifactory.newBuildInfo()
-    }
-
-    stage ('Maven Install'){
-        rtMaven.run pom: 'pom.xml', goals: '${mvnGoal}', buildInfo: buildInfo
-    }
-
-    stage('Publish build info') {
-        server.publishBuildInfo buildInfo
-    }
- }
 }
