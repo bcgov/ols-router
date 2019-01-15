@@ -4,11 +4,11 @@
  */
 package ca.bc.gov.ols.router.process;
 
-import ca.bc.gov.app.router.data.WeeklyTimeRange;
-import ca.bc.gov.app.router.data.enumTypes.End;
-import ca.bc.gov.app.router.data.enumTypes.TrafficImpactor;
-import ca.bc.gov.app.router.data.enumTypes.TravelDirection;
-import ca.bc.gov.app.router.data.enumTypes.TurnTimeCode;
+import ca.bc.gov.ols.router.data.WeeklyTimeRange;
+import ca.bc.gov.ols.router.data.enumTypes.End;
+import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
+import ca.bc.gov.ols.router.data.enumTypes.TurnTimeCode;
 
 public class RpStreetEnd implements Comparable<RpStreetEnd> {
 	
