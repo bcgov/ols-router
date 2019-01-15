@@ -5,6 +5,8 @@ metadata:
 parameters:
   - name: PROJ_NAME
     required: true
+  - name: MVN_GOAL
+    required: true
   - name: SITE_REPO
     required: true
   - name: REPO_BRANCH
@@ -37,6 +39,8 @@ objects:
           value: ${REPO_BRANCH}
         - name: REPO
           value: ${SITE_REPO}
+        - name: GOAL
+          value: ${MVN_GOAL}          
         from:
           kind: ImageStreamTag
           name: maven:3-jdk-11

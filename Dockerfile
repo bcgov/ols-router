@@ -3,8 +3,8 @@ MAINTAINER leo.lou@gov.bc.ca
 
 RUN apt-get update && apt-get install -y git \
  && git clone -b ${BRANCH} ${REPO} /SRC \
- && cd /SRC && mvn clean package -Pk8s \
+ && cd /SRC && mvn ${GOAL} \
  && mv /SRC/*/target/*.war / \
  && ls /*.war
- 
+
 CMD ["tail", "-f", "/dev/null"]
