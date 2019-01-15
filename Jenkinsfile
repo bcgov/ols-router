@@ -40,19 +40,19 @@ pipeline {
                   def ocDir = tool "oc3.11"
                   withEnv(["PATH+OC=${ocDir}"]) {    
                   openshift.withCluster() {
-                  def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}" )
-                  openshift.delete( models )
-                  def created = openshift.create( models )
-                      def bc = openshift.selector( 'bc', [build: '${pn}'] )
-                  def statusv = openshift.raw( 'status', '-v' )
-                  echo "Cluster status: ${statusv.out}"
-                  def buildSelector = bc.startBuild()
-                  buildSelector.logs('-f')
-                  def result = buildSelector.logs('-f')
-                  def logsString = result.actions[0].out
-                  def logsErr = result.actions[0].err
-                  echo "The logs operation require ${result.actions.size()} oc interactions"
-                  echo "Logs executed: ${result.actions[0].cmd}"
+                    def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}" )
+                    openshift.delete( models )
+                    def created = openshift.create( models )
+                    def bc = openshift.selector( 'bc', [build: '${pn}'] )
+                    def statusv = openshift.raw( 'status', '-v' )
+                    echo "Cluster status: ${statusv.out}"
+                    def buildSelector = bc.startBuild()
+                    buildSelector.logs('-f')
+                    def result = buildSelector.logs('-f')
+                    def logsString = result.actions[0].out
+                    def logsErr = result.actions[0].err
+                    echo "The logs operation require ${result.actions.size()} oc interactions"
+                    echo "Logs executed: ${result.actions[0].cmd}"
             }
           }
         }
