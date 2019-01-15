@@ -5,7 +5,7 @@ pipeline {
     string(defaultValue: 'dev', description: 'Git Branch or Tag Name', name: 'gitBranch')
     string(defaultValue: 'ols-router', description: 'Project Name', name: 'pn', trim: false)    
     string(defaultValue: '', description: 'Version Tag will be used by Arctifactory', name: 'mvnTag', trim: false)
-    string(defaultValue: 'clean install -Pk8s -Dmaven.test.skip=true', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
+    string(defaultValue: 'clean package -Pk8s', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
     }
     stages {
         stage ('code checkout') {
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     withMaven(maven:'m3') {
-                        sh 'mvn clean package sonar:sonar'
+                        sh 'mvn ${mvnGoal} sonar:sonar'
                     }
                 }
             }
