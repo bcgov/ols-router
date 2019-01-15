@@ -40,7 +40,7 @@ pipeline {
                   def ocDir = tool "oc3.11"
                   withEnv(["PATH+OC=${ocDir}"]) {    
                   openshift.withCluster() {
-                    def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}" )
+                    def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}", "MVN_GOAL=${mvnGoal}" )
                     openshift.delete( models )
                     def created = openshift.create( models )
                     def bc = openshift.selector( 'bc', [build: 'ols-router'] )
