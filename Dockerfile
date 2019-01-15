@@ -5,7 +5,7 @@ RUN apt-get update && apt-get install -y git \
  && git clone -b ${BRANCH} ${REPO} /SRC \
  && cd /SRC && mvn ${GOAL} \
  && mv /SRC/*/target/*.war / \
- && chmod o+r $(ls /*.war)
+ && chmod o+r $(ls /*.war) \
+ && alias distbin="ls /*.war"
 
-ENV DISTBIN=$(ls /*.war)
 CMD ["tail", "-f", "/dev/null"]
