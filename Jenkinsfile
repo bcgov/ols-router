@@ -19,9 +19,7 @@ pipeline {
         }    
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    withMaven(maven:'m3') {
-                        sh 'mvn clean package sonar:sonar'
-                    }
+                sh "${scannerHome}/bin/sonar-scanner"
                 }
             }
         }
