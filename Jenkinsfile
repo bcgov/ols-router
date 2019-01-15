@@ -34,7 +34,7 @@ pipeline {
             }
         }
 
-       stage ('create build config') {
+       stage ('create docker sidecar image') {
             steps {
                 script {
                   def ocDir = tool "oc3.11"
