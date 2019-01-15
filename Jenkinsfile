@@ -43,7 +43,7 @@ pipeline {
                   def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}" )
                   openshift.delete( models )
                   def created = openshift.create( models )
-                  def bc = openshift.selector( 'bc', [build: 'ols-router'] )
+                      def bc = openshift.selector( 'bc', [build: '${pn}'] )
                   def statusv = openshift.raw( 'status', '-v' )
                   echo "Cluster status: ${statusv.out}"
                   def buildSelector = bc.startBuild()
