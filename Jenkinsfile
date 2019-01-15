@@ -13,13 +13,16 @@ pipeline {
             }
         }
 
+/* comment out sonar block untill jdk11 support by sonar        
         stage('build && SonarQube analysis') {
         environment {
         scannerHome = tool 'appqa'
         }    
             steps {
                 withSonarQubeEnv('SonarQube') {
-                sh "${scannerHome}/bin/sonar-scanner"
+                    withMaven(maven:'m3') {
+                        sh 'mvn clean package sonar:sonar'
+                    }
                 }
             }
         }
@@ -30,7 +33,8 @@ pipeline {
                 }
             }
         }
-
+end of sonar block */
+        
         stage ('Artifactory configuration') {
             steps {
                 rtServer (
