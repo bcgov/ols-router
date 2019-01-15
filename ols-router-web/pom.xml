@@ -44,7 +44,7 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>ca.bc.gov.app.router</groupId>
+      <groupId>ca.bc.gov.ols</groupId>
       <artifactId>ols-router-core</artifactId>
       <version>${project.version}</version>
       <exclusions>
