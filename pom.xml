@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2008-2019, Province of British Columbia
+     All rights reserved.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>ca.bc.gov.ols</groupId>
+	<artifactId>ols-router</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>OLS Router</name>
+
+	<organization>
+		<name>Province of British Columbia</name>
+		<url>http://www.gov.bc.ca/</url>
+	</organization>
+
+	<scm>
+		<connection>scm:git:git://github.com/bcgov/ols-router.git</connection>
+		<developerConnection>scm:git:[fetch=]git://github.com/bcgov/ols-router.git[push=]git@github.com:bcgov/ols-router.git</developerConnection>
+		<url>https://github.com/bcgov/ols-router</url>
+	</scm>
+	
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+    		<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    	</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Chris Hodgson</name>
+			<organization>Refractions Research Inc</organization>
+			<organizationUrl>http://www.refractions.net/</organizationUrl>
+			<email>chodgson@refractions.net</email>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+			<timezone>America/Vancouver</timezone>
+		</developer>
+	</developers>
+
+	<contributors>
+		<contributor>
+			<name>Michael Ross</name>
+			<email>Michael.RA.Ross@gov.bc.ca</email>
+			<organization>Province of British Columbia</organization>
+			<organizationUrl>http://www.gov.bc.ca</organizationUrl>
+			<roles>
+				<role>businessArchitect</role>
+			</roles>
+			<timezone>PST</timezone>
+		</contributor>
+		<contributor>
+			<name>Brian Kelsey</name>
+			<email>Brian.Kelsey@gov.bc.ca</email>
+			<organization>Province of British Columbia</organization>
+			<organizationUrl>http://www.gov.bc.ca</organizationUrl>
+			<roles>
+				<role>businessTester</role>
+			</roles>
+			<timezone>PST</timezone>
+		</contributor>
+	</contributors>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<cassandraContactPoint>hummingbird.animals</cassandraContactPoint>
+		<environment>devel</environment>
+		<com.graphhopper.version>0.5.0</com.graphhopper.version>
+	</properties>
+
+	<modules>
+		<module>ols-router-core</module>
+		<module>ols-router-web</module>
+		<module>ols-router-process</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<release>11</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<configuration>
+					<includePom>true</includePom>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>javadoc-html</id>
+						<phase>install</phase>
+						<configuration>
+							<quiet>true</quiet>
+							<show>public</show>
+						</configuration>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<header>src/license/license-header.txt</header>
+					<properties>
+						<name>OpenLocationServer</name>
+						<owner>Province of British Columbia</owner>
+						<years>2008-2015</years>
+					</properties>
+					<excludes>
+						<exclude>**/*.txt</exclude>
+						<exclude>**/*.TXT</exclude>
+						<exclude>data/**</exclude>
+						<exclude>**/js/lib/**</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+					</excludes>
+					<keywords>
+						<keyword>copyright</keyword>
+						<keyword>license</keyword>
+					</keywords>
+				</configuration>
+				<!-- executions>
+					<execution>
+						<inherited>false</inherited>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions -->
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.8</version>
+				<!-- executions>
+					<execution>
+						<id>aggregate-add-third-party</id>
+						<inherited>true</inherited>
+						<configuration>
+							<force>true</force>
+							<outputDirectory>src/license/</outputDirectory>
+							<useMissingFile>true</useMissingFile>
+							<licenseMerges>
+								<licenseMerge>apache_2_0|apache_v2</licenseMerge>
+								<licenseMerge>apache_2_0|The Apache Software License, Version 2.0</licenseMerge>
+								<licenseMerge>apache_2_0|Apache License, Version 2.0</licenseMerge>
+								<licenseMerge>apache_2_0|Apache License 2.0</licenseMerge>
+								<licenseMerge>apache_2_0|Apache License</licenseMerge>
+								<licenseMerge>apache_2_0|Apache 2.0 License</licenseMerge>
+								<licenseMerge>apache_2_0|Apache 2</licenseMerge>
+								<licenseMerge>apache_2_0|ASF 2.0</licenseMerge>
+								<licenseMerge>bsd_2|The BSD License</licenseMerge>
+								<licenseMerge>bsd_2|BSD License</licenseMerge>
+								<licenseMerge>cddl_1_0|Common Development and Distribution License (CDDL) v1.0</licenseMerge>
+								<licenseMerge>cddl_1_0|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0</licenseMerge>
+								<licenseMerge>epl_1|Eclipse Public License - v 1.0</licenseMerge>
+								<licenseMerge>lgpl_2_1|LGPL 2.1</licenseMerge>
+								<licenseMerge>lgpl_2_1|GNU Lesser General Public License</licenseMerge>
+								<licenseMerge>lgpl_2_1|Lesser General Public License (LGPL)</licenseMerge>
+								<licenseMerge>mit|MIT License</licenseMerge>
+								<licenseMerge>mpl_1_1|MPL 1.1</licenseMerge>
+							</licenseMerges>
+						</configuration>
+						<goals>
+							<goal>aggregate-add-third-party</goal>
+						</goals>
+					</execution>
+				</executions -->
+			</plugin>
+			<!-- plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.4</version>
+				<executions>
+					<execution>
+						<id>attach-descriptor</id>
+						<goals>
+							<goal>attach-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-markdown</artifactId>
+						<version>1.6</version>
+					</dependency>
+					<dependency>
+						<groupId>lt.velykis.maven.skins</groupId>
+						<artifactId>reflow-velocity-tools</artifactId>
+						<version>1.1.1</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.velocity</groupId>
+						<artifactId>velocity</artifactId>
+						<version>1.7</version>
+					</dependency>
+					<dependency>
+						<groupId>net.trajano.wagon</groupId>
+						<artifactId>wagon-git</artifactId>
+						<version>2.0.2</version>
+					</dependency>
+				</dependencies>
+			</plugin -->
+			<!-- plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<inherited>false</inherited>
+						<configuration>
+							<outputDirectory>${basedir}/target/scripts</outputDirectory>
+							<resources>
+								<resource>
+									<directory>scripts/sql/</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+							<filters>
+								<filter>scripts/sql/sql.properties</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin -->
+		</plugins>
+	</build>
+	
+	<profiles>
+		<profile>
+			<id>only-eclipse</id>
+			<activation>
+				<property>
+					<name>m2e.version</name>
+				</property>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+						<plugin>
+							<groupId>org.eclipse.m2e</groupId>
+							<artifactId>lifecycle-mapping</artifactId>
+							<version>1.0.0</version>
+							<configuration>
+								<lifecycleMappingMetadata>
+									<pluginExecutions>
+										<pluginExecution>
+											<pluginExecutionFilter>
+												<groupId>
+													org.codehaus.mojo
+												</groupId>
+												<artifactId>
+													license-maven-plugin
+												</artifactId>
+												<versionRange>
+													[1.8,)
+												</versionRange>
+												<goals>
+													<goal>
+														aggregate-add-third-party
+													</goal>
+												</goals>
+											</pluginExecutionFilter>
+											<action>
+												<ignore/>
+											</action>
+										</pluginExecution>
+									</pluginExecutions>
+								</lifecycleMappingMetadata>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+		<profile>
+			<id>deliv</id>
+			<properties>
+				<cassandraContactPoint>nusakan.dmz</cassandraContactPoint>
+				<environment>deliv</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<cassandraContactPoint>nusakan.dmz</cassandraContactPoint>
+				<environment>test</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<cassandraContactPoint>canopus.dmz</cassandraContactPoint>
+				<environment>prod</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>k8s</id>
+			<properties>
+				<cassandraContactPoint>cassandra</cassandraContactPoint>
+				<environment>k8s</environment>
+			</properties>
+		</profile>
+	</profiles>
+	
+</project>
