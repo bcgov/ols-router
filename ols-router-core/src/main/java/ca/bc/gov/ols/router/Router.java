@@ -41,7 +41,7 @@ public class Router {
 
 	public Router(Properties props, GeometryFactory geometryFactory,
 			GeometryReprojector reprojector) {
-		logger.debug(getClass().getName() + " constructor called");
+		logger.debug("{} constructor called", getClass().getName());
 		this.geometryFactory = geometryFactory;
 		this.reprojector = reprojector;
 

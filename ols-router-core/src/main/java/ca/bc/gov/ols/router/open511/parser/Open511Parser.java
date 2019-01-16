@@ -251,8 +251,10 @@ public class Open511Parser {
 					break;
 				case "restrictions":
 					road.setRestrictions(parseList(jr, this::parseRestriction));
+					break;
 				case "+delay":
 					road.setDelay(jr.nextInt());
+					break;
 				default:
 					jr.skipValue();
 				}

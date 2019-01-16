@@ -57,8 +57,8 @@ public class GraphHopperCoordinateSequence implements CoordinateSequence {
 		switch(ordinateIndex) {
 		case 0: return points.getLon(index);
 		case 1: return points.getLat(index);
+		default: return 0;
 		}
-		return 0;
 	}
 
 	@Override
@@ -73,6 +73,7 @@ public class GraphHopperCoordinateSequence implements CoordinateSequence {
 				break;
 		case 1: points.set(index, value, points.getLon(index), 0);
 				break;
+		default:
 		}
 	}
 

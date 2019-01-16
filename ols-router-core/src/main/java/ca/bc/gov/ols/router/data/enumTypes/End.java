@@ -19,9 +19,10 @@ public enum End {
 		case 'T':
 		case 't':
 			return TO;
+		default:
+			throw new IllegalArgumentException("Invalid End) value: '" + c
+					+ "' (must be one of 'F', 'f', 'T', 't')");
 		}
-		throw new IllegalArgumentException("Invalid End) value: '" + c
-				+ "' (must be one of 'F', 'f', 'T', 't')");
 	}
 	
 	public End opposite() {

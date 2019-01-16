@@ -8,6 +8,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.EnumSet;
+import java.util.Set;
 
 import ca.bc.gov.ols.router.data.enumTypes.DayCode;
 import ca.bc.gov.ols.router.time.TemporalSet;
@@ -17,11 +18,22 @@ import ca.bc.gov.ols.router.time.TemporalSet;
  * days of the week and time ranges of those days 
  */ 
 public class WeeklyTimeRange implements TemporalSet {
+	public static final LocalTime TIME_AM_START = LocalTime.parse("07:00");
+	public static final LocalTime TIME_AM_END = LocalTime.parse("09:00");
+	public static final LocalTime TIME_PM_START = LocalTime.parse("16:00");
+	public static final LocalTime TIME_PM_END = LocalTime.parse("18:00");
+	
+	public static final LocalTime[] TIME_RANGE_ALWAYS = new LocalTime[] {LocalTime.MIN, LocalTime.MAX};
+	public static final LocalTime[] TIME_RANGE_AM = new LocalTime[] {TIME_AM_START, TIME_AM_END};
+	public static final LocalTime[] TIME_RANGE_PM = new LocalTime[] {TIME_PM_START, TIME_PM_END};
+	public static final LocalTime[] TIME_RANGE_AMPM = new LocalTime[] {TIME_AM_START, TIME_AM_END, TIME_PM_START, TIME_PM_END};
+	public static final LocalTime[] TIME_RANGE_DAY = new LocalTime[] {TIME_AM_START, TIME_PM_END};
+
 	public static final WeeklyTimeRange ALWAYS = new WeeklyTimeRange(EnumSet.allOf(DayOfWeek.class), new LocalTime[] {LocalTime.MIN, LocalTime.MAX});
-	private final EnumSet<DayOfWeek> daySet;
+	private final Set<DayOfWeek> daySet;
 	private final LocalTime[] timeRanges;
 
-	public WeeklyTimeRange(EnumSet<DayOfWeek> daySet, LocalTime[] timeRanges) {
+	public WeeklyTimeRange(Set<DayOfWeek> daySet, LocalTime[] timeRanges) {
 		if(daySet == null || timeRanges == null) {
 			throw new IllegalArgumentException("Invalid arguments to create WeeklyTimeRange; niether dayCode nor timeRanges can be null");
 		}
@@ -96,7 +108,7 @@ public class WeeklyTimeRange implements TemporalSet {
 		return dateTime;
 	}
 
-	public EnumSet<DayOfWeek> getDaySet() {
+	public Set<DayOfWeek> getDaySet() {
 		return daySet;
 	}
 
@@ -120,7 +132,7 @@ public class WeeklyTimeRange implements TemporalSet {
 	}
 
 	public static WeeklyTimeRange create(String dayCodeStr, String timeRangeStr) {
-		EnumSet<DayOfWeek> daySet = DayCode.parse(dayCodeStr);
+		Set<DayOfWeek> daySet = DayCode.parse(dayCodeStr);
 		if(timeRangeStr == null || timeRangeStr.isEmpty()) {
 			return null;
 		}

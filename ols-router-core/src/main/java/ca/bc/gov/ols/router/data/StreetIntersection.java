@@ -26,11 +26,7 @@ public class StreetIntersection {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof StreetIntersection
-				&& this.id == ((StreetIntersection)obj).id) {
-			return true;
-		}
-		return false;
+		return obj instanceof StreetIntersection && this.id == ((StreetIntersection)obj).id;
 	}
 	
 	@Override

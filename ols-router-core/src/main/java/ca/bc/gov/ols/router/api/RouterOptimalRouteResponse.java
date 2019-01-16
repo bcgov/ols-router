@@ -6,7 +6,7 @@ package ca.bc.gov.ols.router.api;
 
 import com.vividsolutions.jts.geom.LineString;
 
-public class RouterOptimalRouteResponse extends RouterRouteResponse implements RouterOptimizedResponse{
+public class RouterOptimalRouteResponse extends RouterRouteResponse implements RouterOptimizedResponse {
 
 	private long routingExecutionTime;
 	private long optimizationExecutionTime;

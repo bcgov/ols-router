@@ -86,7 +86,7 @@ public class ApiResponse {
 	}
 
 	public void reproject(GeometryReprojector gr) {
-		
+		// reproject is a no-op unless you have geometry data to reproject.
 	}
 	
 	protected List<Point> reprojectPoints(List<Point> points, GeometryReprojector gr) {

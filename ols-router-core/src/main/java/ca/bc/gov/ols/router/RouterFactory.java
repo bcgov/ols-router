@@ -15,15 +15,12 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 
 public class RouterFactory {
-	final static Logger logger = LoggerFactory.getLogger(RouterFactory.class.getCanonicalName());
+	static final Logger logger = LoggerFactory.getLogger(RouterFactory.class.getCanonicalName());
 	
 	private Properties properties = new Properties();
 	private GeometryFactory geometryFactory;
 	private GeometryReprojector geometryReprojector;
 	
-	public RouterFactory() {
-	}
-		
 	public void setGeometryFactory(GeometryFactory gf) {
 		geometryFactory = gf;
 	}
@@ -33,7 +30,7 @@ public class RouterFactory {
 	}
 
 	public Router getRouter() {
-		logger.info(getClass().getName() + ": Creating new router instance");
+		logger.info("{}: Creating new router instance", getClass().getName());
 		return new Router(properties, geometryFactory, geometryReprojector);
 	}
 	
