@@ -8,23 +8,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
+import static ca.bc.gov.ols.router.data.WeeklyTimeRange.*;
 
 public enum TurnTimeCode {
-	MF_24(WeeklyTimeRange.create("MF", "ALWAYS")),
-	MF_AM(WeeklyTimeRange.create("MF", "07:00-09:00")),
-	MF_AMPM(WeeklyTimeRange.create("MF", "07:00-09:00|16:00-18:00")),
-	MF_DAY(WeeklyTimeRange.create("MF", "07:00-18:00")),
-	MF_PM(WeeklyTimeRange.create("MF", "16:00-18:00")),
-	MS_24(WeeklyTimeRange.create("MS", "ALWAYS")),
-	MS_AM(WeeklyTimeRange.create("MS", "07:00-09:00")),
-	MS_AMPM(WeeklyTimeRange.create("MS", "07:00-09:00|16:00-18:00")),
-	MS_DAY(WeeklyTimeRange.create("MS", "07:00-18:00")),
-	MS_PM(WeeklyTimeRange.create("MS", "16:00-18:00")),
-	SS_24(WeeklyTimeRange.create("SS", "ALWAYS")),
-	SS_AM(WeeklyTimeRange.create("SS", "07:00-09:00")),
-	SS_AMPM(WeeklyTimeRange.create("SS", "07:00-09:00|16:00-18:00")),
-	SS_DAY(WeeklyTimeRange.create("SS", "07:00-18:00")),
-	SS_PM(WeeklyTimeRange.create("SS", "16:00-18:00"));
+	MF_24(new WeeklyTimeRange(DayCode.MF.getDaySet(), TIME_RANGE_ALWAYS)),
+	MF_AM(new WeeklyTimeRange(DayCode.MF.getDaySet(), TIME_RANGE_AM)),
+	MF_AMPM(new WeeklyTimeRange(DayCode.MF.getDaySet(), TIME_RANGE_AMPM)),
+	MF_DAY(new WeeklyTimeRange(DayCode.MF.getDaySet(), TIME_RANGE_DAY)),
+	MF_PM(new WeeklyTimeRange(DayCode.MF.getDaySet(), TIME_RANGE_PM)),
+	MS_24(new WeeklyTimeRange(DayCode.MS.getDaySet(), TIME_RANGE_ALWAYS)),
+	MS_AM(new WeeklyTimeRange(DayCode.MS.getDaySet(), TIME_RANGE_AM)),
+	MS_AMPM(new WeeklyTimeRange(DayCode.MS.getDaySet(), TIME_RANGE_AMPM)),
+	MS_DAY(new WeeklyTimeRange(DayCode.MS.getDaySet(), TIME_RANGE_DAY)),
+	MS_PM(new WeeklyTimeRange(DayCode.MS.getDaySet(), TIME_RANGE_PM)),
+	SS_24(new WeeklyTimeRange(DayCode.SS.getDaySet(), TIME_RANGE_ALWAYS)),
+	SS_AM(new WeeklyTimeRange(DayCode.SS.getDaySet(), TIME_RANGE_AM)),
+	SS_AMPM(new WeeklyTimeRange(DayCode.SS.getDaySet(), TIME_RANGE_AMPM)),
+	SS_DAY(new WeeklyTimeRange(DayCode.SS.getDaySet(), TIME_RANGE_DAY)),
+	SS_PM(new WeeklyTimeRange(DayCode.SS.getDaySet(), TIME_RANGE_PM));
 
 	private final static Logger logger = LoggerFactory.getLogger(TurnTimeCode.class.getCanonicalName());
 

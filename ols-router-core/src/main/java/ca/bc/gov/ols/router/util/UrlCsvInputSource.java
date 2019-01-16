@@ -38,7 +38,7 @@ public class UrlCsvInputSource implements CsvInputSource {
 	}
 
 	public void close() throws IOException {
-
+		// TODO: not sure how to implement this; may not be required
 	}
 	
 }

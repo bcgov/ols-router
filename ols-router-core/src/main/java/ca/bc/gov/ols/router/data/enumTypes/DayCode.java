@@ -6,6 +6,7 @@ package ca.bc.gov.ols.router.data.enumTypes;
 
 import java.time.DayOfWeek;
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public enum DayCode {
 		this.daySet = daySet;
 	}
 	
-	public static EnumSet<DayOfWeek> parse(String dayCode) {
+	public static Set<DayOfWeek> parse(String dayCode) {
 		if(dayCode != null && !dayCode.isEmpty()) {
 			try {
 				return DayCode.valueOf(dayCode.toUpperCase()).daySet;
@@ -38,9 +39,9 @@ public enum DayCode {
 		return daySet;
 	}
 
-	public static DayCode of(EnumSet<DayOfWeek> daySet) {
+	public static DayCode of(Set<DayOfWeek> set) {
 		for(DayCode dayCode : values()) {
-			if(dayCode.daySet.equals(daySet)) {
+			if(dayCode.daySet.equals(set)) {
 				return dayCode;
 			} 
 		}

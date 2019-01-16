@@ -19,9 +19,10 @@ public enum AddressScheme {
 			return CONTINUOUS;
 		case 'S':
 			return SINGLE;
+		default:
+			throw new IllegalArgumentException("Invalid address scheme (aka. parity) value: '" + c
+					+ "' (must be one of 'E', 'O', 'C', 'S')");
 		}
-		throw new IllegalArgumentException("Invalid address scheme (aka. parity) value: '" + c
-				+ "' (must be one of 'E', 'O', 'C', 'S')");
 	}
 	
 	public static String parityToString(AddressScheme scheme) {

@@ -42,11 +42,7 @@ public class CassandraRouterConfig extends RouterConfig {
 			String name = row.getString("config_param_name");
 			String value = row.getString("config_param_value");
 			try {
-				if("copyrightLicenseURI".equals(name)) {
-					copyrightLicenseURI = value;
-				} else if("copyrightNotice".equals(name)) {
-					copyrightNotice = value;
-				} else if(name.startsWith("dataSource.baseFileUrl")) {
+				if(name.startsWith("dataSource.baseFileUrl")) {
 					if((name.equals("dataSource.baseFileUrl") && dataSourceBaseFileUrl == null)
 							|| name.equals("dataSource.baseFileUrl." + environment.toString().toLowerCase())) {
 						dataSourceBaseFileUrl = value;
@@ -57,24 +53,41 @@ public class CassandraRouterConfig extends RouterConfig {
 							dataSourceBaseFileUrl = dataSourceBaseFileUrl + "/";
 						}
 					} // we ignore values for other environments
-				} else if("disclaimer".equals(name)) {
-					disclaimer = value;
-				} else if("glossaryBaseUrl".equals(name)) {
-					glossaryBaseUrl = value;
-				} else if("kmlStylesUrl".equals(name)) {
-					kmlStylesUrl = value;
-				} else if("moreInfoUrl".equals(name)) {
-					moreInfoUrl = value;
-				} else if("privacyStatement".equals(name)) {
-					privacyStatement = value;
-				} else if("maxPairs".equals(name)) {
-					maxPairs = Integer.parseInt(value);
-				} else if("maxRoutePoints".equals(name)) {
-					maxRoutePoints = Integer.parseInt(value);
-				} else if("enableTurnRestrictions".equals(name)) {
-					enableTurnRestrictions = Boolean.parseBoolean(value);
 				} else {
-					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
+					switch(name) {
+					case "copyrightLicenseURI":
+							copyrightLicenseURI = value;
+							break;
+					case "copyrightNotice":
+						copyrightNotice = value; 
+						break;
+					case "disclaimer":
+						disclaimer = value; 
+						break;
+					case "glossaryBaseUrl":
+						glossaryBaseUrl = value; 
+						break;
+					case "kmlStylesUrl":
+						kmlStylesUrl = value; 
+						break;
+					case "moreInfoUrl":
+						moreInfoUrl = value; 
+						break;
+					case "privacyStatement":
+						privacyStatement = value; 
+						break;
+					case "maxPairs":
+						maxPairs = Integer.parseInt(value); 
+						break;
+					case "maxRoutePoints":
+						maxRoutePoints = Integer.parseInt(value); 
+						break;
+					case "enableTurnRestrictions":
+						enableTurnRestrictions = Boolean.parseBoolean(value); 
+						break;
+					default:
+						logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
+					}
 				}
 			} catch(IllegalArgumentException iae) {
 				logger.warn("Unparseable configuration parameter '{}' with value '{}'", name, value);
