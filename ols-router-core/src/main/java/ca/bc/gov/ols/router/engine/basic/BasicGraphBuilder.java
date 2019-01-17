@@ -158,6 +158,11 @@ public class BasicGraphBuilder implements GraphBuilder {
 				}
 			}
 		}
+		if(edgeIds == null) {
+			// shouldn't happen unless there was bad input
+			logger.warn("Invalid Id sequence in turn costs: " + oldIds + " (turn cost/restriction ignored)");
+			return;			
+		}
 		// determine which segmentId to use for the last segment
 		int lastNodeId = newIds[newIds.length-2]; 
 		if(graph.getFromNodeId(edgeIds[0]) == lastNodeId) {
@@ -216,7 +221,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 						List<TemporalSet> schedList = new ArrayList<TemporalSet>(scheds.size());
 						for(RecurringSchedule sched : scheds) {
 							schedList.add(new TemporalSetIntersection(
-									new WeeklyTimeRange(sched.getDays(), new LocalTime[] {sched.getDailyStartTime(), sched.getDailyEndTime()}),
+									new WeeklyTimeRange(sched.getDays(), Arrays.asList(sched.getDailyStartTime(), sched.getDailyEndTime())),
 									new DateInterval(sched.getStartDate(), sched.getEndDate())
 							));
 						}

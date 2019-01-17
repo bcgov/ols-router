@@ -205,7 +205,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 					response.addResult(sb.toString());
 				} else {
 					response.addResult(DistanceUnit.METRE.convertTo((float)ghResponse.getDistance(), response.getDistanceUnit()), 
-							ghResponse.getTime()/1000);
+							ghResponse.getTime()/1000.0d);
 				}
 			});
 		}

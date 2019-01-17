@@ -7,7 +7,10 @@ package ca.bc.gov.ols.router.data;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import ca.bc.gov.ols.router.data.enumTypes.DayCode;
@@ -23,17 +26,17 @@ public class WeeklyTimeRange implements TemporalSet {
 	public static final LocalTime TIME_PM_START = LocalTime.parse("16:00");
 	public static final LocalTime TIME_PM_END = LocalTime.parse("18:00");
 	
-	public static final LocalTime[] TIME_RANGE_ALWAYS = new LocalTime[] {LocalTime.MIN, LocalTime.MAX};
-	public static final LocalTime[] TIME_RANGE_AM = new LocalTime[] {TIME_AM_START, TIME_AM_END};
-	public static final LocalTime[] TIME_RANGE_PM = new LocalTime[] {TIME_PM_START, TIME_PM_END};
-	public static final LocalTime[] TIME_RANGE_AMPM = new LocalTime[] {TIME_AM_START, TIME_AM_END, TIME_PM_START, TIME_PM_END};
-	public static final LocalTime[] TIME_RANGE_DAY = new LocalTime[] {TIME_AM_START, TIME_PM_END};
+	public static final List<LocalTime> TIME_RANGE_ALWAYS = Collections.unmodifiableList(Arrays.asList(LocalTime.MIN, LocalTime.MAX));
+	public static final List<LocalTime> TIME_RANGE_AM = Collections.unmodifiableList(Arrays.asList(TIME_AM_START, TIME_AM_END));
+	public static final List<LocalTime> TIME_RANGE_PM = Collections.unmodifiableList(Arrays.asList(TIME_PM_START, TIME_PM_END));
+	public static final List<LocalTime> TIME_RANGE_AMPM = Collections.unmodifiableList(Arrays.asList(TIME_AM_START, TIME_AM_END, TIME_PM_START, TIME_PM_END));
+	public static final List<LocalTime> TIME_RANGE_DAY = Collections.unmodifiableList(Arrays.asList(TIME_AM_START, TIME_PM_END));
 
-	public static final WeeklyTimeRange ALWAYS = new WeeklyTimeRange(EnumSet.allOf(DayOfWeek.class), new LocalTime[] {LocalTime.MIN, LocalTime.MAX});
+	public static final WeeklyTimeRange ALWAYS = new WeeklyTimeRange(EnumSet.allOf(DayOfWeek.class), TIME_RANGE_ALWAYS);
 	private final Set<DayOfWeek> daySet;
-	private final LocalTime[] timeRanges;
+	private final List<LocalTime> timeRanges;
 
-	public WeeklyTimeRange(Set<DayOfWeek> daySet, LocalTime[] timeRanges) {
+	public WeeklyTimeRange(Set<DayOfWeek> daySet, List<LocalTime> timeRanges) {
 		if(daySet == null || timeRanges == null) {
 			throw new IllegalArgumentException("Invalid arguments to create WeeklyTimeRange; niether dayCode nor timeRanges can be null");
 		}
@@ -47,15 +50,15 @@ public class WeeklyTimeRange implements TemporalSet {
 		}
 		if(daySet.contains(dateTime.getDayOfWeek())) {
 			LocalTime time = LocalTime.from(dateTime);
-			for(int i = 0; i < timeRanges.length; i += 2) {
-				if(timeRanges[i].isBefore(timeRanges[i+1])) {
+			for(int i = 0; i < timeRanges.size(); i += 2) {
+				if(timeRanges.get(i).isBefore(timeRanges.get(i+1))) {
 					// start time is before end time, normal order
-					if(time.isAfter(timeRanges[i]) && time.isBefore(timeRanges[i+1])) {
+					if(time.isAfter(timeRanges.get(i)) && time.isBefore(timeRanges.get(i+1))) {
 						return true;
 					}
 				} else {
 					// start time is after end time, outside order
-					if(time.isAfter(timeRanges[i]) || time.isBefore(timeRanges[i+1])) {
+					if(time.isAfter(timeRanges.get(i)) || time.isBefore(timeRanges.get(i+1))) {
 						return true;
 					}
 				}
@@ -65,12 +68,7 @@ public class WeeklyTimeRange implements TemporalSet {
 	}
 
 	public boolean isAlways() {
-		if(daySet.equals(DayCode.SS.getDaySet()) 
-				&& timeRanges[0].equals(LocalTime.MIN)
-				&& timeRanges[1].equals(LocalTime.MAX)) {
-			return true;
-		}
-		return false;
+		return daySet.equals(DayCode.SS.getDaySet()) && timeRanges.equals(TIME_RANGE_ALWAYS);
 	}
 
 	@Override
@@ -82,21 +80,21 @@ public class WeeklyTimeRange implements TemporalSet {
 			changed = false;
 			if(daySet.contains(dateTime.getDayOfWeek())) {
 				LocalTime time = LocalTime.from(dateTime);
-				for(int i = 0; i < timeRanges.length; i += 2) {
-					if(timeRanges[i].isBefore(timeRanges[i+1])) {
+				for(int i = 0; i < timeRanges.size(); i += 2) {
+					if(timeRanges.get(i).isBefore(timeRanges.get(i+1))) {
 						// start time is before end time, normal order
-						if(time.isAfter(timeRanges[i]) && time.isBefore(timeRanges[i+1])) {
-							dateTime = dateTime.with(timeRanges[i+1]);
+						if(time.isAfter(timeRanges.get(i)) && time.isBefore(timeRanges.get(i+1))) {
+							dateTime = dateTime.with(timeRanges.get(i+1));
 							changed = true;
 							continue restart;
 						}
 					} else {
 						// start time is after end time, outside order
-						if(time.isBefore(timeRanges[i+1])) {
-							dateTime = dateTime.with(timeRanges[i+1]);
+						if(time.isBefore(timeRanges.get(i+1))) {
+							dateTime = dateTime.with(timeRanges.get(i+1));
 							changed = true;
 							continue restart;
-						} else if(time.isAfter(timeRanges[i])) {
+						} else if(time.isAfter(timeRanges.get(i))) {
 							dateTime = dateTime.plusDays(1).with(LocalTime.MIN);
 							changed = true;
 							continue restart;
@@ -112,20 +110,20 @@ public class WeeklyTimeRange implements TemporalSet {
 		return daySet;
 	}
 
-	public LocalTime[] getTimeRanges() {
+	public List<LocalTime> getTimeRanges() {
 		return timeRanges;
 	}
 
 	public String getTimeRangeString() {
 		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < timeRanges.length; i += 2) {
+		for(int i = 0; i < timeRanges.size(); i += 2) {
 			if(i != 0) {
 				sb.append("|");
 			}
-			if(timeRanges[i].equals(LocalTime.MIN) && timeRanges[i+1].equals(LocalTime.MAX)) {
+			if(timeRanges.get(i).equals(LocalTime.MIN) && timeRanges.get(i+1).equals(LocalTime.MAX)) {
 				sb.append("ALWAYS");
 			} else {
-				sb.append(timeRanges[i] + "-" + timeRanges[i+1]);
+				sb.append(timeRanges.get(i) + "-" + timeRanges.get(i+1));
 			}
 		}
 		return sb.toString();
@@ -138,10 +136,7 @@ public class WeeklyTimeRange implements TemporalSet {
 		}
 		LocalTime[] timeRanges = null;
 		if("ALWAYS".equals(timeRangeStr)) {
-			timeRanges = new LocalTime[2];
-			timeRanges[0] = LocalTime.MIN;
-			timeRanges[1] = LocalTime.MAX;
-			return new WeeklyTimeRange(daySet, timeRanges);
+			return new WeeklyTimeRange(daySet, TIME_RANGE_ALWAYS);
 		}
 		String[] rangeStrs = timeRangeStr.split("\\|");
 		timeRanges = new LocalTime[rangeStrs.length * 2];
@@ -154,7 +149,7 @@ public class WeeklyTimeRange implements TemporalSet {
 			timeRanges[i*2] = LocalTime.parse(timeStrs[0]);
 			timeRanges[i*2+1] = LocalTime.parse(timeStrs[1]);
 		}
-		return new WeeklyTimeRange(daySet, timeRanges);
+		return new WeeklyTimeRange(daySet, Arrays.asList(timeRanges));
 	}
 
 }

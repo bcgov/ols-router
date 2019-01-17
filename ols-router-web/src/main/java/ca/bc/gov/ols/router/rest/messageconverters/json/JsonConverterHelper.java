@@ -173,12 +173,12 @@ public class JsonConverterHelper extends ConverterHelper {
 		for(int i = 0; i < polygons.size(); i++) {
 			jw.beginObject();
 			jw.name("type").value("Feature");
-			jw.name("ID").value(i+1);
+			jw.name("ID").value((long)i+1);
 			jw.name("geometry");
 			geometry(jw, polygons.get(i));
 			jw.name("properties");
 			jw.beginObject();
-			jw.name("title").value(response.getZoneSize() * (i+1));
+			jw.name("title").value((long)response.getZoneSize() * (i+1));
 			jw.endObject(); // properties
 			jw.endObject(); // feature
 		}

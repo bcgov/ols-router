@@ -101,20 +101,27 @@ public enum DistanceUnit {
 		nf.setMaximumFractionDigits(0);
 		nf.setMinimumFractionDigits(0);
 		
+		StringBuilder sb = new StringBuilder();
 		// round metres/feet to nearest 100/50/5 to make nice numbers
 		if(METRE.equals(unit) || FOOT.equals(unit)) {
+			int intDist;
 			if(dist > 1000) {
-				dist = 100 * Math.round(dist/100);
+				intDist = 100 * (int)Math.round(dist/100);
 			} else if(dist > 100) {
-				dist = 50 * Math.round(dist/50);
+				intDist = 50 * (int)Math.round(dist/50);
 			} else if(dist > 10) { 
-				dist = 5 * Math.round(dist/5);
+				intDist = 5 * (int)Math.round(dist/5);
+			} else {
+				intDist = (int)Math.round(dist);
 			}
+			sb.append(nf.format(intDist));
 		} else if(dist < 10) {
 			// allow one digit of fractional km/miles
-			nf.setMaximumFractionDigits(1);				
+			nf.setMaximumFractionDigits(1);
+			sb.append(nf.format(dist));
 		}
-		return nf.format(dist) + " " + unit.abbr();		
+		sb.append(" " + unit.abbr());
+		return sb.toString();		
 	}
 	
 	private static void buildNameMap() {
