@@ -57,3 +57,22 @@ spec:
         persistentVolumeClaim:
           claimName: jenkins-j11
   - type: ConfigChange
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: gluster-block
+    volume.beta.kubernetes.io/storage-provisioner: gluster.org/glusterblock
+  name: jenkins-j11
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+status:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 20Gi
