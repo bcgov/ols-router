@@ -109,7 +109,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			em.mergeEdges(edgeLists);
 			return new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getDirections(), em.getNotifications());
 		} catch(Throwable t) {
-			t.printStackTrace();
+			logger.warn("Exception thrown: ", t);
 			return new RouterDirectionsResponse(params);
 		}
 	}
@@ -137,6 +137,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			return response;
 		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
 			return new RouterDistanceBetweenPairsResponse(params);
 		}
 	}
@@ -162,6 +163,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			em.mergeEdges(edgeLists);
 			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), visitOrder);
 		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
 			response = new RouterOptimalRouteResponse(params);
 		}			
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
@@ -192,6 +194,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
 					em.getRoute(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
 			response = new RouterOptimalDirectionsResponse(params);
 		}			
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
