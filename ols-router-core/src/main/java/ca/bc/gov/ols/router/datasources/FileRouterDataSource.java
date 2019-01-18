@@ -28,11 +28,11 @@ import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnCost;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enumTypes.DividerType;
-import ca.bc.gov.ols.router.data.enumTypes.RoadClass;
-import ca.bc.gov.ols.router.data.enumTypes.SurfaceType;
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.DividerType;
+import ca.bc.gov.ols.router.data.enums.RoadClass;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
 import ca.bc.gov.ols.router.util.UrlCsvInputSource;
 
 public class FileRouterDataSource implements RouterDataSource {
@@ -50,7 +50,7 @@ public class FileRouterDataSource implements RouterDataSource {
 	//private TIntObjectHashMap<List<StreetSegment>> ferrySegsByIntId;
 
 	public FileRouterDataSource(RouterConfig config, GeometryFactory geometryFactory) throws IOException {
-		logger.info(getClass().getName() + "() constructor called");
+		logger.trace("{}() constructor called", getClass().getName());
 		this.config = config;
 		this.geometryFactory = geometryFactory;
 		
@@ -214,7 +214,7 @@ public class FileRouterDataSource implements RouterDataSource {
 		return null;
 	}
 
-	private TIntObjectHashMap<String> loadStreetNames() throws IOException {
+	private TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = getStreetNames();
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
@@ -249,7 +249,7 @@ public class FileRouterDataSource implements RouterDataSource {
 		return nameIdMap;
 	}
 
-	private TIntIntHashMap loadStreetNameOnSegs() throws IOException {
+	private TIntIntHashMap loadStreetNameOnSegs() {
 		// build a map from the StreetSegmentId to primary StreetNameId
 		RowReader reader = getStreetNameOnSegments();
 		TIntIntHashMap nameIdBySegmentIdMap = new TIntIntHashMap(300000);
@@ -367,7 +367,7 @@ public class FileRouterDataSource implements RouterDataSource {
 		
 	private InputStream getInputStream(String name) throws IOException {
 		String fileUrlString = config.getDataSourceBaseFileUrl() + name;
-		logger.info("Reading from file: " + fileUrlString);
+		logger.info("Reading from file: {}", fileUrlString);
 		if(fileUrlString.startsWith("file:")) {
 			return new FileInputStream(new File(fileUrlString.substring(5)));
 		}

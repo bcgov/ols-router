@@ -15,7 +15,7 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import ca.bc.gov.ols.router.data.enumTypes.Environment;
+import ca.bc.gov.ols.router.data.enums.Environment;
 
 public class CassandraRouterConfig extends RouterConfig {
 	private static final Logger logger = LoggerFactory.getLogger(CassandraRouterConfig.class.getCanonicalName());
@@ -42,50 +42,50 @@ public class CassandraRouterConfig extends RouterConfig {
 			String name = row.getString("config_param_name");
 			String value = row.getString("config_param_value");
 			try {
-				if(name.startsWith("dataSource.baseFileUrl")) {
-					if((name.equals("dataSource.baseFileUrl") && dataSourceBaseFileUrl == null)
-							|| name.equals("dataSource.baseFileUrl." + environment.toString().toLowerCase())) {
-						dataSourceBaseFileUrl = value;
-						if(dataSourceBaseFileUrl.endsWith("street_load")) {
-							dataSourceBaseFileUrl = dataSourceBaseFileUrl.substring(0, dataSourceBaseFileUrl.lastIndexOf("street_load"));
-						}
-						if(!dataSourceBaseFileUrl.endsWith("/")) {
-							dataSourceBaseFileUrl = dataSourceBaseFileUrl + "/";
-						}
-					} // we ignore values for other environments
-				} else {
-					switch(name) {
-					case "copyrightLicenseURI":
-							copyrightLicenseURI = value;
-							break;
-					case "copyrightNotice":
-						copyrightNotice = value; 
+				switch(name) {
+				case "copyrightLicenseURI":
+						copyrightLicenseURI = value;
 						break;
-					case "disclaimer":
-						disclaimer = value; 
-						break;
-					case "glossaryBaseUrl":
-						glossaryBaseUrl = value; 
-						break;
-					case "kmlStylesUrl":
-						kmlStylesUrl = value; 
-						break;
-					case "moreInfoUrl":
-						moreInfoUrl = value; 
-						break;
-					case "privacyStatement":
-						privacyStatement = value; 
-						break;
-					case "maxPairs":
-						maxPairs = Integer.parseInt(value); 
-						break;
-					case "maxRoutePoints":
-						maxRoutePoints = Integer.parseInt(value); 
-						break;
-					case "enableTurnRestrictions":
-						enableTurnRestrictions = Boolean.parseBoolean(value); 
-						break;
-					default:
+				case "copyrightNotice":
+					copyrightNotice = value; 
+					break;
+				case "disclaimer":
+					disclaimer = value; 
+					break;
+				case "glossaryBaseUrl":
+					glossaryBaseUrl = value; 
+					break;
+				case "kmlStylesUrl":
+					kmlStylesUrl = value; 
+					break;
+				case "moreInfoUrl":
+					moreInfoUrl = value; 
+					break;
+				case "privacyStatement":
+					privacyStatement = value; 
+					break;
+				case "maxPairs":
+					maxPairs = Integer.parseInt(value); 
+					break;
+				case "maxRoutePoints":
+					maxRoutePoints = Integer.parseInt(value); 
+					break;
+				case "enableTurnRestrictions":
+					enableTurnRestrictions = Boolean.parseBoolean(value); 
+					break;
+				default:
+					if(name.startsWith("dataSource.baseFileUrl")) {
+						if((name.equals("dataSource.baseFileUrl") && dataSourceBaseFileUrl == null)
+								|| name.equals("dataSource.baseFileUrl." + environment.toString().toLowerCase())) {
+							if(value.endsWith("street_load")) {
+								value = value.substring(0, value.lastIndexOf("street_load"));
+							}
+							if(!value.endsWith("/")) {
+								value = value + "/";
+							}
+							dataSourceBaseFileUrl = value;
+						} // we ignore values for other environments
+					} else {
 						logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
 					}
 				}

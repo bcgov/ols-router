@@ -13,7 +13,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-import ca.bc.gov.ols.router.data.enumTypes.DayCode;
+import ca.bc.gov.ols.router.data.enums.DayCode;
 import ca.bc.gov.ols.router.time.TemporalSet;
 
 /** 

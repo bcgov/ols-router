@@ -14,7 +14,8 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 public abstract class AbstractBasicRowReader implements RowReader {
-	
+	public static final int NULL_INT_VALUE = Integer.MIN_VALUE;
+
 	protected GeometryFactory gf;
 	private WKTReader wktReader;
 	
@@ -30,11 +31,16 @@ public abstract class AbstractBasicRowReader implements RowReader {
 	public int getInt(String column) {
 		Object result = getObject(column);
 		if(result == null) {
-			return 0;
+			return NULL_INT_VALUE;
 		}
 		return Integer.valueOf(result.toString());
 	}
 	
+	@Override
+	public int getIntNullValue() {
+		return AbstractBasicRowReader.NULL_INT_VALUE;
+	}
+
 	@Override
 	public Integer getInteger(String column) {
 		Object result = getObject(column);

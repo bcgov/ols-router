@@ -24,7 +24,7 @@ import com.vividsolutions.jts.geom.Point;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnCost;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
 import ca.bc.gov.ols.router.datasources.RowReader;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
 import ca.bc.gov.ols.router.open511.EventResponse;

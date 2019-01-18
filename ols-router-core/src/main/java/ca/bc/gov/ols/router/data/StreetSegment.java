@@ -4,20 +4,15 @@
  */
 package ca.bc.gov.ols.router.data;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.vividsolutions.jts.geom.LineString;
 
-import ca.bc.gov.ols.router.data.enumTypes.DividerType;
-import ca.bc.gov.ols.router.data.enumTypes.RoadClass;
-import ca.bc.gov.ols.router.data.enumTypes.SurfaceType;
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.DividerType;
+import ca.bc.gov.ols.router.data.enums.RoadClass;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
 
 public class StreetSegment {
-	private static final Logger logger = LoggerFactory.getLogger(StreetSegment.class.getCanonicalName());
-	
 	protected final int segmentId;
 	protected final LineString centerLine;
 	protected int startIntersectionId;

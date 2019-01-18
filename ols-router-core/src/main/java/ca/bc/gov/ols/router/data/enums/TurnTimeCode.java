@@ -2,7 +2,7 @@
  * Copyright 2008-2019, Province of British Columbia
  *  All rights reserved.
  */
-package ca.bc.gov.ols.router.data.enumTypes;
+package ca.bc.gov.ols.router.data.enums;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public enum TurnTimeCode {
 			try {
 				return TurnTimeCode.valueOf((turnTimeCode.substring(0, 2) + "_" + turnTimeCode.substring(3)).toUpperCase());
 			} catch (IllegalArgumentException iae) {
-				logger.warn("Illegal turnTimeCode \"%\", ignored.", turnTimeCode);
+				logger.warn("Illegal turnTimeCode '{}' ignored.", turnTimeCode);
 			}
 		}
 		return null;

@@ -6,7 +6,7 @@ package ca.bc.gov.ols.router.rest.converters;
 
 import org.springframework.core.convert.converter.Converter;
 
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 
 public class DistanceUnitConverter implements Converter<String, DistanceUnit> {
 

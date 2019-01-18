@@ -20,8 +20,8 @@ public class ScheduleInterval implements TemporalSet{
 	public static ScheduleInterval parse(String str) {
 		String[] parts = str.split("\\/");
 		
-		LocalDateTime start, end = null;
-		start = LocalDateTime.parse(parts[0]);
+		LocalDateTime start = LocalDateTime.parse(parts[0]);
+		LocalDateTime end = null;
 		if(parts.length > 1) {
 			end = LocalDateTime.parse(parts[1]);
 		} 

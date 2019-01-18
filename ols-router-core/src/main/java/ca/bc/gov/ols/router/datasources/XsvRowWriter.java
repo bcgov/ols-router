@@ -27,7 +27,7 @@ public class XsvRowWriter implements RowWriter  {
 	
 	public XsvRowWriter(File file, char separator, List<String> schema, boolean quotes) {
 		try {
-			logger.info("CsvRowWriter opened for file: " + file.getCanonicalPath());
+			logger.info("CsvRowWriter opened for file: {}", file.getCanonicalPath());
 			if(quotes) {
 				csvWriter = new CSVWriter(new BufferedWriter(new FileWriter(file)), separator);
 			} else {
@@ -60,7 +60,7 @@ public class XsvRowWriter implements RowWriter  {
 	@Override
 	public void close() {
 		try {
-			logger.info("CsvRowWriter closed after writing: " + writeCount + " records");
+			logger.info("CsvRowWriter closed after writing: {} records", writeCount);
 			csvWriter.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);

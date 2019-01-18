@@ -29,8 +29,7 @@ public class JsonpResponseConverter extends JsonResponseConverter {
 
 	@Override
 	protected void writeInternal(ApiResponse response,
-			HttpOutputMessage outputMessage) throws IOException,
-			HttpMessageNotWritableException {
+			HttpOutputMessage outputMessage) throws IOException {
 		Writer out = new OutputStreamWriter(outputMessage.getBody(), "UTF-8");
 		JsonpConverterHelper helper = new JsonpConverterHelper(router, out);
 		helper.convertResponse(response);

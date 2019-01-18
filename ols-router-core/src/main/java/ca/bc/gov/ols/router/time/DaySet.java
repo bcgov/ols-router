@@ -7,12 +7,13 @@ package ca.bc.gov.ols.router.time;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.EnumSet;
+import java.util.Set;
 
 public class DaySet implements TemporalSet {
-	private final EnumSet<DayOfWeek> daySet;
+	private final Set<DayOfWeek> daySet;
 
-	public DaySet(EnumSet<DayOfWeek> daySet) {
-		this.daySet = EnumSet.copyOf(daySet);
+	public DaySet(Set<DayOfWeek> daySet) {
+		this.daySet = Set.copyOf(daySet);
 	}
 
 	@Override

@@ -6,6 +6,7 @@ package ca.bc.gov.ols.router.api;
 
 import java.time.Instant;
 import java.util.EnumSet;
+import java.util.Set;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -13,7 +14,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 import ca.bc.gov.ols.router.RouterConfig;
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
 
 public class NavInfoParameters {
 
@@ -21,7 +22,7 @@ public class NavInfoParameters {
 	private double[] bbox;
 	private Envelope envelope;
 	private Instant departure = Instant.now();
-	private EnumSet<NavInfoType> types = EnumSet.allOf(NavInfoType.class);
+	private Set<NavInfoType> types = EnumSet.allOf(NavInfoType.class);
 	
 	public int getOutputSRS() {
 		return outputSRS;
@@ -49,11 +50,11 @@ public class NavInfoParameters {
 		}
 	}
 
-	public EnumSet<NavInfoType> getTypes() {
+	public Set<NavInfoType> getTypes() {
 		return types;
 	}
 
-	public void setTypes(EnumSet<NavInfoType> types) {
+	public void setTypes(Set<NavInfoType> types) {
 		this.types = types;
 	}
 

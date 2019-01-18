@@ -2,7 +2,7 @@
  * Copyright 2008-2019, Province of British Columbia
  *  All rights reserved.
  */
-package ca.bc.gov.ols.router.data.enumTypes;
+package ca.bc.gov.ols.router.data.enums;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +36,7 @@ public enum AccessRestriction {
 				return dt;
 			}
 		}
-		// throw new IllegalArgumentException("Invalid AccessRestriction value: '" + accessRestriction + "'.");
-		logger.warn("Invalid AccessRestriction value: '" + accessRestriction + "'.");;
+		logger.warn("Invalid AccessRestriction value: '{}'.", accessRestriction);
 		return NONE;
 	}
 	

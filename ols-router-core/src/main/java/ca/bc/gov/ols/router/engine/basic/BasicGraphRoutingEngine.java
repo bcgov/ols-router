@@ -51,8 +51,8 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasources.RouterDataLoader;
 import ca.bc.gov.ols.router.datasources.RouterDataSource;
@@ -70,7 +70,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	
 	public BasicGraphRoutingEngine(RouterConfig config, RouterDataSource dataSource,
 			GeometryFactory geometryFactory, GeometryReprojector reprojector) throws IOException {
-		logger.debug(getClass().getName() + " constructor called");
+		logger.trace("{}() constructor called", getClass().getName());
 		this.config = config;
 		this.gf = geometryFactory;
 		

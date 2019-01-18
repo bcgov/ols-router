@@ -6,7 +6,7 @@ package ca.bc.gov.ols.router.data.vis;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
 
 public class VisFeature {
 	private Geometry geom;

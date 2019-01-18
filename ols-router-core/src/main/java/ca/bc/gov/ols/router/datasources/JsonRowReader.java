@@ -127,12 +127,16 @@ public class JsonRowReader implements RowReader {
 						jsonReader.beginObject();
 						String type = null;
 						while(jsonReader.hasNext()) {
-							double x,y;
+							double x;
+							double y;
 							switch(jsonReader.nextName()) {
 							case "type":
 								type = jsonReader.nextString();
 								break;
 							case "coordinates":
+								if(type == null) {
+									throw new RuntimeException("GeoJSON geometry type must come before coordinates.");
+								}
 								switch(type) {
 								case "Point":
 									jsonReader.beginArray();
@@ -214,11 +218,16 @@ public class JsonRowReader implements RowReader {
 	@Override
 	public int getInt(String column) {
 		if(curRow == null || curRow.get(column) == null) {
-			return NULL_INT_VALUE;
+			return AbstractBasicRowReader.NULL_INT_VALUE;
 		}
 		return ((BigDecimal)(curRow.get(column))).intValue();
 	}
-	
+
+	@Override
+	public int getIntNullValue() {
+		return AbstractBasicRowReader.NULL_INT_VALUE;
+	}
+
 	@Override
 	public Integer getInteger(String column) {
 		if(curRow == null || curRow.get(column) == null) {
@@ -278,7 +287,7 @@ public class JsonRowReader implements RowReader {
 	@Override
 	public void close() {
 		try {
-			logger.info("JsonRowReader closed after reading: " + readCount + " records");
+			logger.info("JsonRowReader closed after reading: {} records", readCount);
 			jsonReader.endArray();
 			jsonReader.endObject();
 			jsonReader.close();

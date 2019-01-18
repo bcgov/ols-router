@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.LineString;
 
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.Notification;

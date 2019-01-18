@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Point;
 
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 
 public class RouterDistanceResponse extends ApiResponse {
 
@@ -46,6 +46,7 @@ public class RouterDistanceResponse extends ApiResponse {
 		return distance >= 0;
 	}
 	
+	@Override
 	public void reproject(GeometryReprojector gr) {
 		super.reproject(gr);
 		points = reprojectPoints(points, gr);

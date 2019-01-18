@@ -142,7 +142,8 @@ public class EdgeMerger {
 					}
 				}
 				int waitTime = edges.waitTime(edgeIdx);
-				double edgeDist, edgeTime;
+				double edgeDist;
+				double edgeTime;
 				if(edgeIdx == edges.size()-1) {
 					// first edge, use the time/dist as is
 					edgeDist = edges.dist(edgeIdx);

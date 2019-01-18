@@ -2,7 +2,7 @@
  * Copyright 2008-2019, Province of British Columbia
  *  All rights reserved.
  */
-package ca.bc.gov.ols.router.data.enumTypes;
+package ca.bc.gov.ols.router.data.enums;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,7 @@ public enum DividerType {
 				return dt;
 			}
 		}
-		// throw new IllegalArgumentException("Invalid DividerType value: '" + dividerType + "'.");
-		logger.warn("Invalid DividerType value: '" + dividerType + "'.");
+		logger.warn("Invalid DividerType value: '{}'.", dividerType);
 		return NONE;
 	}
 	

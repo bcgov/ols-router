@@ -53,13 +53,13 @@ public class HtmlErrorMessageConverter extends AbstractHttpMessageConverter<Erro
 	
 	@Override
 	protected ErrorMessage readInternal(Class<? extends ErrorMessage> clazz,
-			HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+			HttpInputMessage inputMessage) throws IOException {
 		return null;
 	}
 	
 	@Override
 	protected void writeInternal(ErrorMessage message, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException {
+			throws IOException {
 		outputMessage.getHeaders().setContentType(MediaType.TEXT_HTML);
 		Writer out = new OutputStreamWriter(outputMessage.getBody(), "UTF-8");
 		out.write("<!DOCTYPE html>\r\n<html>\r\n<head></head>\r\n<body>\r\n");
