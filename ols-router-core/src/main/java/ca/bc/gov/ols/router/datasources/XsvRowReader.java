@@ -102,7 +102,7 @@ public abstract class XsvRowReader extends AbstractBasicRowReader implements Row
 	@Override
 	public void close() {
 		try {
-			logger.info("XsvRowReader closed after reading: " + readCount + " records");
+			logger.info("XsvRowReader closed after reading: {} records", readCount);
 			reader.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);

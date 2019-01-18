@@ -9,7 +9,7 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Envelope;
 
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
 
 public class VisLayers {
 

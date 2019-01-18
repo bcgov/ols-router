@@ -10,8 +10,8 @@ import java.util.List;
 
 import com.vividsolutions.jts.geom.Point;
 
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
-import ca.bc.gov.ols.router.data.enumTypes.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 
 public class ApiResponse {
 

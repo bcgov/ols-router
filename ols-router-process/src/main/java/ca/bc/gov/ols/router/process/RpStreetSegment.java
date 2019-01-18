@@ -7,13 +7,13 @@ package ca.bc.gov.ols.router.process;
 import java.util.EnumMap;
 
 import ca.bc.gov.ols.router.data.StreetSegment;
-import ca.bc.gov.ols.router.data.enumTypes.DividerType;
-import ca.bc.gov.ols.router.data.enumTypes.End;
-import ca.bc.gov.ols.router.data.enumTypes.RoadClass;
-import ca.bc.gov.ols.router.data.enumTypes.SurfaceType;
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
-import ca.bc.gov.ols.router.data.enumTypes.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.DividerType;
+import ca.bc.gov.ols.router.data.enums.End;
+import ca.bc.gov.ols.router.data.enums.RoadClass;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
 
 import com.vividsolutions.jts.algorithm.Angle;
 import com.vividsolutions.jts.geom.Coordinate;

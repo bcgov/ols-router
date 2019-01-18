@@ -49,15 +49,13 @@ public class JsonNavInfoResponseConverter extends AbstractHttpMessageConverter<N
 	@Override
 	protected NavInfoResponse readInternal(
 			Class<? extends NavInfoResponse> clazz,
-			HttpInputMessage inputMessage) throws IOException,
-			HttpMessageNotReadableException {
+			HttpInputMessage inputMessage) throws IOException {
 		return null;
 	}
 
 	@Override
 	protected void writeInternal(NavInfoResponse response,
-			HttpOutputMessage outputMessage) throws IOException,
-			HttpMessageNotWritableException {
+			HttpOutputMessage outputMessage) throws IOException {
 		Writer out = new OutputStreamWriter(outputMessage.getBody(), "UTF-8");
 		GeometryReprojector gr = router.getGeometryReprojector();
 		

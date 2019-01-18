@@ -55,8 +55,8 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
-import ca.bc.gov.ols.router.data.enumTypes.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.datasources.RouterDataLoader;
 import ca.bc.gov.ols.router.datasources.RouterDataSource;
 import ca.bc.gov.ols.router.directions.Direction;
@@ -81,7 +81,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		
 	public GraphHopperRoutingEngine(RouterConfig config, RouterDataSource dataSource,
 			GeometryFactory geometryFactory, GeometryReprojector reprojector) throws IOException {
-		logger.debug(getClass().getName() + " constructor called");
+		logger.trace("{}() constructor called",getClass().getName());
 		// were are just going to make our own factory because it has to produce geometries with SRID=GH_SRS 
 		//this.geometryFactory = geometryFactory;
 		this.geometryFactory = new GeometryFactory(geometryFactory.getPrecisionModel(), GH_SRS);

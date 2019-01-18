@@ -278,6 +278,7 @@ public class Open511Parser {
 					break;
 				case "value":
 					restriction.setValue(jr.nextDouble());
+					break;
 				default:
 					jr.skipValue();
 				}
@@ -376,12 +377,16 @@ public class Open511Parser {
 		jr.beginObject();
 		String type = null;
 		while(jr.hasNext()) {
-			double x,y;
+			double x;
+			double y;
 			switch(jr.nextName()) {
 			case "type":
 				type = jr.nextString();
 				break;
 			case "coordinates":
+				if(type == null) {
+					throw new RuntimeException("GeoJSON geometry type must come before coordinates.");
+				}
 				switch(type) {
 				case "Point":
 					jr.beginArray();

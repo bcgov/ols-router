@@ -14,9 +14,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 import ca.bc.gov.ols.router.RouterConfig;
-import ca.bc.gov.ols.router.data.enumTypes.DistanceUnit;
-import ca.bc.gov.ols.router.data.enumTypes.RouteOption;
-import ca.bc.gov.ols.router.data.enumTypes.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
+import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 
 public class RoutingParameters {
 	

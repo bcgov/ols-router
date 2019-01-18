@@ -29,7 +29,7 @@ public class Isochrone extends AbstractRoutingAlgorithm {
 
     // TODO use same class as used in GTFS module?
     class IsoLabel extends EdgeEntry {
-        public IsoLabel parent;
+        protected IsoLabel parentLabel;
 
         public IsoLabel(int edgeId, int adjNode, double weight) {
         	super(edgeId, adjNode, weight);
@@ -122,8 +122,8 @@ public class Isochrone extends AbstractRoutingAlgorithm {
             buckets.get(bucketIndex).add(new Double[]{lon, lat});
 
             // guess center of road to increase precision a bit for longer roads
-            if (label.parent != null) {
-                nodeId = label.parent.adjNode;
+            if (label.parentLabel != null) {
+                nodeId = label.parentLabel.adjNode;
                 double lat2 = na.getLatitude(nodeId);
                 double lon2 = na.getLongitude(nodeId);
                 buckets.get(bucketIndex).add(new Double[]{(lon + lon2) / 2, (lat + lat2) / 2});
@@ -191,14 +191,14 @@ public class Isochrone extends AbstractRoutingAlgorithm {
                 IsoLabel nEdge = fromMap.get(tmpNode);
                 if (nEdge == null) {
                     nEdge = new IsoLabel(iter.getEdge(), tmpNode, tmpWeight);
-                    nEdge.parent = currEdge;
+                    nEdge.parentLabel = currEdge;
                     fromMap.put(tmpNode, nEdge);
                     fromHeap.add(nEdge);
                 } else if (nEdge.weight > tmpWeight) {
                     fromHeap.remove(nEdge);
                     nEdge.edge = iter.getEdge();
                     nEdge.weight = tmpWeight;
-                    nEdge.parent = currEdge;
+                    nEdge.parentLabel = currEdge;
                     fromHeap.add(nEdge);
                 }
             }

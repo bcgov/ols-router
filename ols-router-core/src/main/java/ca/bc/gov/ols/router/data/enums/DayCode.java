@@ -2,7 +2,7 @@
  * Copyright 2008-2019, Province of British Columbia
  *  All rights reserved.
  */
-package ca.bc.gov.ols.router.data.enumTypes;
+package ca.bc.gov.ols.router.data.enums;
 
 import java.time.DayOfWeek;
 import java.util.EnumSet;
@@ -29,7 +29,7 @@ public enum DayCode {
 			try {
 				return DayCode.valueOf(dayCode.toUpperCase()).daySet;
 			} catch (IllegalArgumentException iae) {
-				logger.warn("Illegal DayCode \"%\", ignored.", dayCode);
+				logger.warn("Illegal DayCode \"{}\", ignored.", dayCode);
 			}
 		}
 		return null;

@@ -45,13 +45,13 @@ public class KmlErrorMessageConverter extends AbstractHttpMessageConverter<Error
 	
 	@Override
 	protected ErrorMessage readInternal(Class<? extends ErrorMessage> clazz,
-			HttpInputMessage inputMessage) throws IOException, HttpMessageNotReadableException {
+			HttpInputMessage inputMessage) throws IOException {
 		return null;
 	}
 	
 	@Override
 	protected void writeInternal(ErrorMessage message, HttpOutputMessage outputMessage)
-			throws IOException, HttpMessageNotWritableException {
+			throws IOException {
 		Writer out = new OutputStreamWriter(outputMessage.getBody(), "UTF-8");
 		RouterConfig config = router.getConfig();
 		out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"

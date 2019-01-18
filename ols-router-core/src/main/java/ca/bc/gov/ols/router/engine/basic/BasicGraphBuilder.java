@@ -53,8 +53,8 @@ import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnCost;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
 import ca.bc.gov.ols.router.data.vis.VisTurnRestriction;
@@ -136,14 +136,14 @@ public class BasicGraphBuilder implements GraphBuilder {
 				// we save them for now and then compare them against the nodeId to find the right one  
 				edgeIds = edgeIdBySegId.get(oldIds[i]);
 				if(edgeIds == null) {
-					logger.warn("Invalid segmentId in turn costs: " + oldIds[i] + "(turn cost/restriction ignored)");
+					logger.warn("Invalid segmentId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
 					return;
 				}
 			} else {
 				// odd indexes are node Ids
 				Integer nodeId = nodeIdByIntId.get(oldIds[i]);
 				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
-					logger.warn("Invalid intersectionId in turn costs: " + oldIds[i] + "(turn cost/restriction ignored)");
+					logger.warn("Invalid intersectionId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
 					return;
 				}
 				newIds[i] = nodeId;
@@ -153,14 +153,14 @@ public class BasicGraphBuilder implements GraphBuilder {
 				} else if(edgeIds.length > 1 && graph.getToNodeId(edgeIds[1]) == nodeId) {
 					newIds[i-1] = edgeIds[1];
 				} else {
-					logger.warn("Invalid segment/intersectionId sequence in turn costs: " + oldIds[i-1] + "|" + oldIds[i] + " (turn cost/restriction ignored)");
+					logger.warn("Invalid segment/intersectionId sequence in turn costs: {}|{} (turn cost/restriction ignored)", oldIds[i-1], oldIds[i]);
 					return;
 				}
 			}
 		}
 		if(edgeIds == null) {
 			// shouldn't happen unless there was bad input
-			logger.warn("Invalid Id sequence in turn costs: " + oldIds + " (turn cost/restriction ignored)");
+			logger.warn("Invalid Id sequence in turn costs: {} (turn cost/restriction ignored)", Arrays.toString(oldIds));
 			return;			
 		}
 		// determine which segmentId to use for the last segment
@@ -170,13 +170,13 @@ public class BasicGraphBuilder implements GraphBuilder {
 		} else if(edgeIds.length > 1 && graph.getFromNodeId(edgeIds[1]) == lastNodeId) {
 			newIds[newIds.length-1] = edgeIds[1];
 		} else {
-			logger.warn("Invalid intersectionId/segment sequence in turn costs: " + oldIds[oldIds.length-2] + "|" + oldIds[oldIds.length-1] + " (turn cost/restriction ignored)");
+			logger.warn("Invalid intersectionId/segment sequence in turn costs: {}|{} (turn cost/restriction ignored)", oldIds[oldIds.length-2], oldIds[oldIds.length-1]);
 			return;
 		}
 		
 		boolean result = turnCostLookup.addCost(newIds, cost.getCost(), cost.getRestriction());
 		if(!result) {
-			logger.warn("Failed to add turn restriction for original Ids: " + Arrays.toString(oldIds));
+			logger.warn("Failed to add turn restriction for original Ids: {}", Arrays.toString(oldIds));
 			return;
 		}
 		
@@ -227,7 +227,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 						}
 						schedule = new TemporalSetUnion(schedList);
 					} else {
-						logger.warn("Invalid event schedule has neither recurring nor intervals: " + evt.getUrl());
+						logger.warn("Invalid event schedule has neither recurring nor intervals: {}", evt.getUrl());
 						continue;
 					}
 					// determine the event type
@@ -263,7 +263,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 			
 			int[] edgeIds = edgeIdBySegId.get(tlid);
 			if(edgeIds == null) {
-				logger.warn("Traffic Info provided for a non existent segment, id: " + tlid);
+				logger.warn("Traffic Info provided for a non existent segment, id: {}", tlid);
 			} else {
 				for(int edgeId : edgeIds) {
 					if(graph.getReversed(edgeId)) {
@@ -317,7 +317,8 @@ public class BasicGraphBuilder implements GraphBuilder {
 		Map<Point,String> terminalNamesByPoint = new HashMap<Point,String>();
 		for(int edgeId : ferryEdges) {
 			LineString ls = graph.getLineString(edgeId);
-			Point startPoint, endPoint;
+			Point startPoint;
+			Point endPoint;
 			if(graph.getReversed(edgeId)) {
 				startPoint = ls.getEndPoint();
 				endPoint = ls.getStartPoint();
@@ -332,14 +333,14 @@ public class BasicGraphBuilder implements GraphBuilder {
 				edgeIdByStopIds.put(firstStop.getId().getId() + "_" + lastStop.getId().getId(), edgeId);
 				terminalNamesByPoint.put(startPoint, firstStop.getName());
 			} else {
-				logger.warn("No stop associated with ferry segment named: " + name);
+				logger.warn("No stop associated with ferry segment named: {}", name);
 			}
 			FerryInfo info = ferryInfoByName.get(name);
 			if(info != null) {
 				scheduleLookup.addFerryInfo(edgeId, info);
 				graph.setSpeedLimit(edgeId, (short)(ls.getLength()*3.6/info.getTravelTime()));
 			} else {
-				logger.warn("No ferry information assocated with ferry segment named: " + name);
+				logger.warn("No ferry information assocated with ferry segment named: {}", name);
 			}
 			LineString ferryLine = graph.getLineString(edgeId);
 			if(graph.getReversed(edgeId)) {
@@ -407,7 +408,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 				// get the stops and associate the trip-leg with the ferry edge(s)
 				Integer edgeId = edgeIdByStopIds.get(begin.getStop().getId().getId() + "_" + end.getStop().getId().getId());
 				if(edgeId == null) {
-					logger.info("No edge found for trip: " + trip.getRoute().getShortName());
+					logger.info("No edge found for trip: {}", trip.getRoute().getShortName());
 					continue;
 				} 
 				scheduleLookup.addSchedule(edgeId, calendarByServiceId.get(Integer.parseInt(trip.getServiceId().getId())), 

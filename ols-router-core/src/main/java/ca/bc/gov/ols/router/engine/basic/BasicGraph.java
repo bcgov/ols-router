@@ -19,7 +19,7 @@ import com.vividsolutions.jts.index.strtree.ItemBoundable;
 import com.vividsolutions.jts.index.strtree.ItemDistance;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
 import ca.bc.gov.ols.router.util.IntObjectArrayMap;
 
@@ -106,7 +106,8 @@ public class BasicGraph {
 		int closestEdgeId = (Integer)spatialIndex.nearestNeighbour(point.getEnvelopeInternal(), NO_EDGE, new ItemDistance() {
 			@Override
 			public double distance(ItemBoundable item1, ItemBoundable item2) {
-				Geometry geom1, geom2;
+				Geometry geom1;
+				Geometry geom2;
 				int edge1 = (Integer)item1.getItem();
 				if(edge1 == NO_EDGE) {
 					geom1 = point;

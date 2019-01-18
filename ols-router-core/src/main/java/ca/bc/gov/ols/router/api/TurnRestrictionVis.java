@@ -9,7 +9,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enumTypes.TurnDirection;
+import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 
 public class TurnRestrictionVis {

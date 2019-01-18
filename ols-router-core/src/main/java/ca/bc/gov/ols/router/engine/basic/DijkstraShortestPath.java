@@ -23,8 +23,8 @@ import com.vividsolutions.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enumTypes.RouteOption;
-import ca.bc.gov.ols.router.data.enumTypes.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
+import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.util.LineStringSplitter;
 
 public class DijkstraShortestPath {
@@ -191,7 +191,7 @@ public class DijkstraShortestPath {
 						if(waitAndTravelTime[1] > 0) {
 							waitTime = waitAndTravelTime[0]; 
 							overrideTravelSeconds = waitAndTravelTime[1];
-							logger.info("Ferry schedule travel time: " + overrideTravelSeconds);
+							logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
 						}
 					}
 				}
@@ -267,7 +267,7 @@ public class DijkstraShortestPath {
 				}
 			}
 		}
-		logger.debug(checkedEdgeCount + " edges checked to find the the shortest path");
+		logger.debug("{} edges checked to find the the shortest path", checkedEdgeCount);
 		
 		// make a list of all the toEdgeIndexes
 		Integer[] toEdgeIdxs = new Integer[toEdges.length];

@@ -17,8 +17,6 @@ import com.vividsolutions.jts.geom.Point;
  */
 public interface RowReader {
 	
-	static final int NULL_INT_VALUE = Integer.MIN_VALUE;
-	
 	/**
 	 * Increments the row pointer to the next row of data.
 	 * 
@@ -41,6 +39,13 @@ public interface RowReader {
 	 * @return the value of the specified column
 	 */
 	public int getInt(String column);
+	
+	/**
+	 * Returns the value that would be returned by getInt() if the underlying value is null.
+	 * 
+	 * @return the value that would be returned by getInt() if the underlying value is null
+	 */
+	public int getIntNullValue();
 	
 	/**
 	 * Returns the value of the specified column as an Integer.

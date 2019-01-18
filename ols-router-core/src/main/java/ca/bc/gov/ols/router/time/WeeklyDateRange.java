@@ -5,14 +5,14 @@
 package ca.bc.gov.ols.router.time;
 
 import java.time.DayOfWeek;
-import java.util.EnumSet;
+import java.util.Set;
 
 public class WeeklyDateRange {
 
-	private final EnumSet<DayOfWeek> daySet;
+	private final Set<DayOfWeek> daySet;
 	private final DateInterval dateRange;
 
-	public WeeklyDateRange(EnumSet<DayOfWeek> daySet, DateInterval dateRange) {
+	public WeeklyDateRange(Set<DayOfWeek> daySet, DateInterval dateRange) {
 		if(daySet == null || dateRange == null) {
 			throw new IllegalArgumentException("Invalid arguments to create WeeklyDateRange; niether dayCode nor dateRange can be null");
 		}
@@ -20,7 +20,7 @@ public class WeeklyDateRange {
 		this.dateRange = dateRange;
 	}
 
-	public EnumSet<DayOfWeek> getDaySet() {
+	public Set<DayOfWeek> getDaySet() {
 		return daySet;
 	}
 

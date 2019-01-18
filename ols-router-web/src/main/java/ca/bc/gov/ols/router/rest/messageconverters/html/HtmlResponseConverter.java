@@ -37,15 +37,13 @@ public class HtmlResponseConverter extends AbstractHttpMessageConverter<ApiRespo
 	@Override
 	protected RouterDirectionsResponse readInternal(
 			Class<? extends ApiResponse> clazz,
-			HttpInputMessage inputMessage) throws IOException,
-			HttpMessageNotReadableException {
+			HttpInputMessage inputMessage) throws IOException {
 		return null;
 	}
 
 	@Override
 	protected void writeInternal(ApiResponse response,
-			HttpOutputMessage outputMessage) throws IOException,
-			HttpMessageNotWritableException {
+			HttpOutputMessage outputMessage) throws IOException {
 		Writer out = new OutputStreamWriter(outputMessage.getBody(), "UTF-8");
 		HtmlConverterHelper helper = new HtmlConverterHelper(router, out);
 		helper.convertResponse(response);

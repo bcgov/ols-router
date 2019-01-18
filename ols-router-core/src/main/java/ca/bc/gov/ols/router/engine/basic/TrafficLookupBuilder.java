@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class TrafficLookupBuilder {
 	// the number of hours (in each direction in time) that a sample can influence
@@ -21,11 +22,11 @@ public class TrafficLookupBuilder {
 	private static final double SPREAD = 2D;
 
 	private BasicGraph graph;
-	TIntObjectHashMap<EnumMap<DayOfWeek,List<TrafficEntry>>> trafficData;
+	TIntObjectHashMap<Map<DayOfWeek,List<TrafficEntry>>> trafficData;
 	
 	public TrafficLookupBuilder(BasicGraph graph) {
 		this.graph = graph;
-		trafficData = new TIntObjectHashMap<EnumMap<DayOfWeek,List<TrafficEntry>>>();
+		trafficData = new TIntObjectHashMap<Map<DayOfWeek,List<TrafficEntry>>>();
 	}
 	
 	public void addTraffic(int edgeId, String days, LocalTime time, int speed) {
@@ -36,7 +37,7 @@ public class TrafficLookupBuilder {
 	}
 		
 	private void addEntry(int edgeId, DayOfWeek day, LocalTime time, short speed) {
-		EnumMap<DayOfWeek,List<TrafficEntry>> edgeEntries = trafficData.get(edgeId);
+		Map<DayOfWeek,List<TrafficEntry>> edgeEntries = trafficData.get(edgeId);
 		if(edgeEntries == null) {
 			edgeEntries = new EnumMap<DayOfWeek,List<TrafficEntry>>(DayOfWeek.class);
 			trafficData.put(edgeId, edgeEntries);
@@ -51,9 +52,9 @@ public class TrafficLookupBuilder {
 	
 	public TrafficLookup build() {
 		TIntObjectHashMap<short[]> traffic = new TIntObjectHashMap<short[]>();
-		trafficData.forEachEntry(new TIntObjectProcedure<EnumMap<DayOfWeek,List<TrafficEntry>>>() {
+		trafficData.forEachEntry(new TIntObjectProcedure<Map<DayOfWeek,List<TrafficEntry>>>() {
 			@Override
-			public boolean execute(int edgeId, EnumMap<DayOfWeek, List<TrafficEntry>> trafficMap) {
+			public boolean execute(int edgeId, Map<DayOfWeek, List<TrafficEntry>> trafficMap) {
 				trafficData.remove(edgeId);
 				short baseSpeed = graph.getSpeedLimit(edgeId);
 				short[] t = new short[7*24];

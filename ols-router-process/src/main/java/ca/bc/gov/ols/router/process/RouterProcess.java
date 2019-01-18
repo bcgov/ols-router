@@ -27,13 +27,13 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.ols.router.RouterFactory;
 import ca.bc.gov.ols.router.data.TurnCost;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enumTypes.DayCode;
-import ca.bc.gov.ols.router.data.enumTypes.DividerType;
-import ca.bc.gov.ols.router.data.enumTypes.RoadClass;
-import ca.bc.gov.ols.router.data.enumTypes.SurfaceType;
-import ca.bc.gov.ols.router.data.enumTypes.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enumTypes.TravelDirection;
-import ca.bc.gov.ols.router.data.enumTypes.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.DayCode;
+import ca.bc.gov.ols.router.data.enums.DividerType;
+import ca.bc.gov.ols.router.data.enums.RoadClass;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
 import ca.bc.gov.ols.router.datasources.CsvRowReader;
 import ca.bc.gov.ols.router.datasources.JsonRowReader;
 import ca.bc.gov.ols.router.datasources.JsonRowWriter;
@@ -78,7 +78,7 @@ public class RouterProcess {
 		String dir = args[0];
 		File f = new File(dir);
 		if(!f.isDirectory()) {
-			logger.error("Invalid data dir: '" + dir +"'");
+			logger.error("Invalid data dir: '{}'", dir);
 			System.exit(-1);
 		}
 		dataDir = dir;
@@ -175,7 +175,12 @@ public class RouterProcess {
 			String highwayRoute3 = rr.getString("highway_route_3");
 			if(highwayRoute3 != null) highwayRoute3 = highwayRoute3.intern();
 
-			TurnTimeCode fromLeftTR = null, fromCentreTR = null, fromRightTR = null, toLeftTR = null, toCentreTR = null, toRightTR = null;
+			TurnTimeCode fromLeftTR = null;
+			TurnTimeCode fromCentreTR = null;
+			TurnTimeCode fromRightTR = null;
+			TurnTimeCode toLeftTR = null;
+			TurnTimeCode toCentreTR = null;
+			TurnTimeCode toRightTR = null;
 			if(startTrafficImpactor != TrafficImpactor.OVERPASS && startTrafficImpactor != TrafficImpactor.UNDERPASS) {
 				fromLeftTR = TurnTimeCode.convert(rr.getString("from_left_turn_restriction"));
 				fromCentreTR = TurnTimeCode.convert(rr.getString("from_centre_turn_restriction"));
@@ -599,14 +604,14 @@ public class RouterProcess {
         					&& !fr.segs.contains(end.getSegment()) 
         					&& end.getSegment().getName().equals(ferryEnd.getSegment().getName())) {
         				// get the route
-        				FerryRoute newFr = buildFerryRoute(end, fr.clone());
+        				FerryRoute newFr = buildFerryRoute(end, new FerryRoute(fr));
         				if(newFr != null && (bestRoute == null || newFr.length < bestRoute.length)) {
         					bestRoute = newFr;
         				}
         			}
         		}
         		if(bestRoute == null) {
-        			logger.error("Error merging ferry segments for ferry named '" +  ferryEnd.getSegment().getName() + "' related segment Id: " + ferryEnd.getSegment().getSegmentId());
+        			logger.error("Error merging ferry segments for ferry named '{}' related segment Id: {}",  ferryEnd.getSegment().getName(), ferryEnd.getSegment().getSegmentId());
         			return null;
         		}
         		bestRoute.addSeg(ferryEnd.getSegment());
@@ -617,19 +622,19 @@ public class RouterProcess {
 		
 		logWriter.close();
 		//trWriter.close();
-		logger.info("Number of ferry segments compiled: " + ferryCount);
-		logger.info("Number of restrictions dropped: " + droppedTRs);
-		logger.info("Number of non-routeable segments dropped: " + droppedSegs);
+		logger.info("Number of ferry segments compiled: {}", ferryCount);
+		logger.info("Number of restrictions dropped: {}", droppedTRs);
+		logger.info("Number of non-routeable segments dropped: {}", droppedSegs);
 		
 		logger.info("Turn restriction generation --------------------------------");
-		logger.info("Number of isolated turning lanes detected: " + isolatedTurningLaneCount);
-		logger.info("Number of turning lanes restrictions added: " + turningLaneRestrictionCount);
-		logger.info("Number of turning lanes not restricted: " + turningLaneNonRestrictionCount);
-		logger.info("Number of multi-way turning lane restrictions added: " + multiwayTurningLaneRestrictionCount);
-		logger.info("Number of multi-way turning lanes not restricted: " + multiwayTurningLaneNonRestrictionCount);
-		logger.info("Number of divided end turn restrictions added: " + dividedEndRestrictionCount);
-		logger.info("Number of u-turn restrictions added: " + uTurnRestrictionCount);
-		logger.info("Number of u-turns not restricted based on angle: " + uTurnNonRestrictionCount);
+		logger.info("Number of isolated turning lanes detected: {}", isolatedTurningLaneCount);
+		logger.info("Number of turning lanes restrictions added: {}", turningLaneRestrictionCount);
+		logger.info("Number of turning lanes not restricted: {}", turningLaneNonRestrictionCount);
+		logger.info("Number of multi-way turning lane restrictions added: {}", multiwayTurningLaneRestrictionCount);
+		logger.info("Number of multi-way turning lanes not restricted: {}", multiwayTurningLaneNonRestrictionCount);
+		logger.info("Number of divided end turn restrictions added: {}", dividedEndRestrictionCount);
+		logger.info("Number of u-turn restrictions added: {}", uTurnRestrictionCount);
+		logger.info("Number of u-turns not restricted based on angle: {}", uTurnNonRestrictionCount);
 		
 		logger.info("Writing output segments...");
 		writeSegments(segments);
@@ -680,11 +685,11 @@ public class RouterProcess {
 		}
 		
 		htWriter.close();
-		logger.info("Historic Traffic Entries written: " + htCount);
+		logger.info("Historic Traffic Entries written: {}", htCount);
 
 	}
 
-	private TIntObjectHashMap<String> loadStreetNames() throws IOException {
+	private TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
@@ -719,7 +724,7 @@ public class RouterProcess {
 		return nameIdMap;
 	}
 
-	private TIntIntHashMap loadStreetNameOnSegs() throws IOException {
+	private TIntIntHashMap loadStreetNameOnSegs() {
 		// build a map from the StreetSegmentId to primary StreetNameId
 		RowReader reader = new JsonRowReader(dataDir + "street_load_street_name_on_seg_xref.json", geometryFactory);
 		TIntIntHashMap nameIdBySegmentIdMap = new TIntIntHashMap(300000);
@@ -849,7 +854,7 @@ public class RouterProcess {
 			segCount++;
 		}
 		streetWriter.close();
-		logger.info("Segments written: " + segCount);
+		logger.info("Segments written: {}", segCount);
 	}
 	
 	private void writeTurnCosts(TIntObjectHashMap<List<TurnCost>> turnCosts) {
@@ -876,7 +881,7 @@ public class RouterProcess {
 			}
 		});
 		trWriter.close();
-		logger.info("Turn Costs written: " + trCount);
+		logger.info("Turn Costs written: {}", trCount);
 	}
 
 	private TurnCost buildTurnCost(RpStreetEnd inSegEnd, RpStreetIntersection intersection, 
@@ -969,7 +974,11 @@ class FerryRoute {
 		this.length = length;
 		this.segs = segs;
 	}	
-	
+
+	public FerryRoute(FerryRoute base) {
+		this(base.length, new ArrayList<RpStreetSegment>(base.segs));
+	}
+
 	public FerryRoute(RpStreetSegment seg) {
 		length = seg.getCenterLine().getLength();
 		segs = new ArrayList<RpStreetSegment>();
@@ -981,9 +990,6 @@ class FerryRoute {
 		segs.add(seg);
 	}
 	
-	public FerryRoute clone() {
-		return new FerryRoute(length, new ArrayList<RpStreetSegment>(segs));
-	}
 	
 	public LineString buildLine() {
 		if(segs.size() == 1) {

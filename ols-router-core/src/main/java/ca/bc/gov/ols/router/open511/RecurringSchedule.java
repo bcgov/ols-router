@@ -7,14 +7,14 @@ package ca.bc.gov.ols.router.open511;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.EnumSet;
+import java.util.Set;
 
 public class RecurringSchedule {
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private LocalTime dailyStartTime;
 	private LocalTime dailyEndTime;
-	private EnumSet<DayOfWeek> days;
+	private Set<DayOfWeek> days;
 	
 	public LocalDate getStartDate() {
 		return startDate;
@@ -48,11 +48,11 @@ public class RecurringSchedule {
 		this.dailyEndTime = dailyEndTime;
 	}
 	
-	public EnumSet<DayOfWeek> getDays() {
+	public Set<DayOfWeek> getDays() {
 		return days;
 	}
 	
-	public void setDays(EnumSet<DayOfWeek> days) {
+	public void setDays(Set<DayOfWeek> days) {
 		this.days = days;
 	}
 	

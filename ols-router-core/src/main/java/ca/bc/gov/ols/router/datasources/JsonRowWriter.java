@@ -36,7 +36,7 @@ public class JsonRowWriter implements RowWriter {
 
 	public JsonRowWriter(File file, String name) {
 		try {
-			logger.info("JsonRowWriter opened for file: " + file.getCanonicalPath());
+			logger.info("JsonRowWriter opened for file: {}", file.getCanonicalPath());
 			bw = new BufferedWriter(new FileWriter(file));
 			jw = new JsonWriter(bw);
 			jw.beginObject();
@@ -165,7 +165,7 @@ public class JsonRowWriter implements RowWriter {
 	@Override
 	public void close() {
 		try {
-			logger.info("JsonRowWriter closed after writing: " + writeCount + " records");
+			logger.info("JsonRowWriter closed after writing: {} records", writeCount);
 			jw.endArray();
 			jw.endObject();
 			jw.close();

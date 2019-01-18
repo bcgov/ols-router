@@ -2,7 +2,7 @@
  * Copyright 2008-2019, Province of British Columbia
  *  All rights reserved.
  */
-package ca.bc.gov.ols.router.data.enumTypes;
+package ca.bc.gov.ols.router.data.enums;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,7 @@ public enum SurfaceType {
 				}
 			}
 		}
-		//throw new IllegalArgumentException("Invalid SurfaceType value: '" + surfaceType + "'.");
-		logger.warn("Invalid SurfaceType value: '" + surfaceType + "'.");;
+		logger.warn("Invalid SurfaceType value: '{}'.", surfaceType);
 		return UNKNOWN;
 	}
 	

@@ -9,7 +9,7 @@ import java.util.List;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
-import ca.bc.gov.ols.router.data.enumTypes.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.NavInfoType;
 
 public class VisTurnRestriction extends VisFeature {
 
