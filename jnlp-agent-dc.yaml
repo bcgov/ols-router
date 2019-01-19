@@ -41,6 +41,28 @@ spec:
         image: jenkins/jnlp-slave:latest-jdk11
         imagePullPolicy: IfNotPresent
         name: jnlp-slave
+        livenessProbe:
+          exec:
+            command:
+              - curl
+              - '-sSfI'
+              - 'http://jenkins:8080/whoAmI/'
+          failureThreshold: 3
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 95
+        readinessProbe:
+          exec:
+            command:
+              - curl
+              - '-sSfI'
+              - 'http://jenkins:8080/whoAmI/'
+          failureThreshold: 3
+          initialDelaySeconds: 7
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 90        
         resources:
           limits:
             cpu: "2"
