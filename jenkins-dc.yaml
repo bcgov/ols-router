@@ -33,6 +33,24 @@ spec:
           limits:
             cpu: "2"
             memory: 4Gi
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /whoAmI
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 65
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1            
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 50000
+          timeoutSeconds: 1            
         volumeMounts:
         - mountPath: /var/jenkins_home
           name: jenkins-master
