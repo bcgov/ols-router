@@ -143,6 +143,9 @@ public class BasicGraphBuilder implements GraphBuilder {
 				// odd indexes are node Ids
 				Integer nodeId = nodeIdByIntId.get(oldIds[i]);
 				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
+					nodeId = nodeIdByIntId.get(-oldIds[i]); // try the negative intId, for an overpass case
+				}
+				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
 					logger.warn("Invalid intersectionId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
 					return;
 				}
