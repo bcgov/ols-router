@@ -76,6 +76,7 @@ public class DijkstraShortestPath {
 		LocalDateTime startTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset)), RouterConfig.DEFAULT_TIME_ZONE);
 		
 		// check all of the to edges for the special case of being the same edge as the start edge
+		nextEndEdge:
 		for(int toEdgeIdx = 0; toEdgeIdx < toEdges.length; toEdgeIdx++) {
 			// shortcut the case where start and end edge are the same, and can be traversed between
 			// if the start and end edge are the same
@@ -106,11 +107,11 @@ public class DijkstraShortestPath {
 						}
 						
 			
-						startEdge = new SplitEdge(new int[] {startEdgeId}, startEdge.getPoint(), splitString);
+						SplitEdge newStartEdge = new SplitEdge(new int[] {startEdgeId}, startEdge.getPoint(), splitString);
 						double time = length * 3.6 / speedFunction.apply(endEdgeId, startTime);
 						EdgeList edges = new EdgeList(1);
 						edges.add(startEdgeId, time, length, 0);
-						edges.setStartEdge(startEdge);
+						edges.setStartEdge(newStartEdge);
 						edges.setEndEdge(endEdge);
 						paths[toEdgeIdx] = edges;
 						double cost = costFunction.apply(endEdgeId, time, length);
@@ -119,6 +120,7 @@ public class DijkstraShortestPath {
 						if(cost > worstPathCost) {
 							worstPathCost = cost;
 						}
+						continue nextEndEdge;						
 					}
 				}
 			} 

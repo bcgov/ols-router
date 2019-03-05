@@ -80,6 +80,7 @@
 		<module>ols-router-core</module>
 		<module>ols-router-web</module>
 		<module>ols-router-process</module>
+		<module>ols-router-admin</module>
 	</modules>
 
 	<build>

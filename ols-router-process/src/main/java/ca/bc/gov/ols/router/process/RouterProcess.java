@@ -33,6 +33,7 @@ import ca.bc.gov.ols.router.data.enums.RoadClass;
 import ca.bc.gov.ols.router.data.enums.SurfaceType;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
 import ca.bc.gov.ols.router.datasources.CsvRowReader;
 import ca.bc.gov.ols.router.datasources.JsonRowReader;
@@ -49,6 +50,9 @@ public class RouterProcess {
 	private final static Logger logger = LoggerFactory.getLogger(RouterProcess.class.getCanonicalName());
 	private static final byte LEFT_COST = 4; 
 	private static final byte RIGHT_COST = 2; 
+	
+	// BASE_ONLY = true to create turn_costs_base.csv for turn managment UI, ignoring custom file 
+	private static final boolean BASE_ONLY = true;
 	
 	static int droppedTRs = 0;
 	static int droppedSegs = 0;
@@ -439,7 +443,7 @@ public class RouterProcess {
 					        		if(relativeAngle < 90 || relativeAngle > 270) {
 					        			turningLaneRestrictionCount++;
 					        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-					        					(byte)0, WeeklyTimeRange.ALWAYS, "GENERATED: Logically implied ramp-to-ramp restriction", null);
+					        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.Y, "GENERATED: Logically implied ramp-to-ramp restriction", null);
 				        				addTurnCost(turnCosts, tr);
 					        			//outputTRRow(tr);
 					        		} else {
@@ -456,11 +460,11 @@ public class RouterProcess {
 					        		// skip incoming segments 
 					        		if(out.getTravelDir().equals(TravelDirection.REVERSE)) continue;
 					        		int relativeAngle = (out.getAngle() + 360 - in.getAngle()) % 360;
-					        		// tighter than 90 degrees left or right
+					        		// tighter than 45 degrees left or right (from straight)
 					        		if(relativeAngle < 135 || relativeAngle > 225) {
 					        			multiwayTurningLaneRestrictionCount++;
 					        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-					        					(byte)0, WeeklyTimeRange.ALWAYS, "GENERATED: Logically implied ramp-to-ramp restriction (multi-way)", null);
+					        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.X, "GENERATED: Logically implied ramp-to-ramp restriction (multi-way)", null);
 				        				addTurnCost(turnCosts, tr);
 					        			//outputTRRow(tr);
 					        		} else {
@@ -505,7 +509,7 @@ public class RouterProcess {
 			        			if(validThird) {
 				        			dividedEndRestrictionCount++;
 				        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-				        					(byte)0, WeeklyTimeRange.ALWAYS, "GENERATED: Logically implied divided-end u-turn restriction", null);
+				        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.V, "GENERATED: Logically implied divided-end u/v-turn restriction", null);
 			        				addTurnCost(turnCosts, tr);
 				        			//outputTRRow(tr);
 			        			}
@@ -564,7 +568,7 @@ public class RouterProcess {
 			        					+ between.getSegment().getSegmentId() + "|" 
 			        					+ out.getIntersectionId() + "|" 
 			        					+ out.getSegment().getSegmentId(),
-			        					(byte)0, WeeklyTimeRange.ALWAYS, "GENERATED: Logically implied u-turn restriction", null);
+			        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.U, "GENERATED: Logically implied u-turn restriction", null);
 		        				addTurnCost(turnCosts, tr);
 			        			//outputTRRow(tr);
 		        			} else {
@@ -618,7 +622,9 @@ public class RouterProcess {
         		return bestRoute;
 			}
 		});
-		readTurnCosts(turnCosts, dataDir + "turn_restrictions_custom.csv");
+		if(!BASE_ONLY) { 
+			readTurnCosts(turnCosts, dataDir + "turn_restrictions_custom.csv");
+		}
 		
 		logWriter.close();
 		//trWriter.close();
@@ -639,7 +645,11 @@ public class RouterProcess {
 		logger.info("Writing output segments...");
 		writeSegments(segments);
 
-		writeTurnCosts(turnCosts);
+		String fileName = "turn_costs.csv";
+		if(BASE_ONLY) {
+			fileName = "turn_costs_base.csv";
+		}
+		writeTurnCosts(turnCosts, fileName);
 		//dataSource.close();
 	}
 	
@@ -759,6 +769,7 @@ public class RouterProcess {
 					oldTurnCost.setCost(newTurnCost.getCost());
 				}
 				oldTurnCost.setRestriction(newTurnCost.getRestriction());
+				oldTurnCost.setType(newTurnCost.getType());
 				if(newTurnCost.getSourceDescription() != null && !"".equals(newTurnCost.getSourceDescription())) {
 					if(oldTurnCost.getSourceDescription() == null || "".equals(oldTurnCost.getSourceDescription())) {
 						oldTurnCost.setSourceDescription(newTurnCost.getSourceDescription());
@@ -817,8 +828,9 @@ public class RouterProcess {
 			String dayCodeStr = turnCostReader.getString("DAY_CODE");
 			String timeRangeStr = turnCostReader.getString("TIME_RANGES");
 			WeeklyTimeRange restriction = WeeklyTimeRange.create(dayCodeStr, timeRangeStr);
+			TurnRestrictionType type = TurnRestrictionType.convert(turnCostReader.getString("TYPE"));
 			String description = turnCostReader.getString("DESCRIPTION");
-			addTurnCost(turnCosts, new TurnCost(idSeq, (byte)(int)cost, restriction, "", description));
+			addTurnCost(turnCosts, new TurnCost(idSeq, (byte)(int)cost, restriction, type, "", description));
 		}
 	}
 	private void writeSegments(List<RpStreetSegment> segments) {
@@ -857,9 +869,9 @@ public class RouterProcess {
 		logger.info("Segments written: {}", segCount);
 	}
 	
-	private void writeTurnCosts(TIntObjectHashMap<List<TurnCost>> turnCosts) {
-		File trFile = new File(dataDir + "turn_costs.csv");
-		List<String> trSchema = Arrays.asList("ID","EDGE_NODE_SET","DAY_CODE","TIME_RANGES","TRAVERSAL_COST","SOURCE_DESCRIPTION","CUSTOM_DESCRIPTION");
+	private void writeTurnCosts(TIntObjectHashMap<List<TurnCost>> turnCosts, String fileName) {
+		File trFile = new File(dataDir + fileName);
+		List<String> trSchema = Arrays.asList("ID","EDGE_NODE_SET","DAY_CODE","TIME_RANGES","TRAVERSAL_COST","TYPE","SOURCE_DESCRIPTION","CUSTOM_DESCRIPTION");
 		XsvRowWriter trWriter = new XsvRowWriter(trFile, ',', trSchema, false);
 		
 		turnCosts.forEachValue(new TObjectProcedure<List<TurnCost>>() {
@@ -873,6 +885,7 @@ public class RouterProcess {
 					row.put("DAY_CODE", tc.getRestriction() == null ? "" : DayCode.of(tc.getRestriction().getDaySet()));
 					row.put("TIME_RANGES", tc.getRestriction() == null ? "" : tc.getRestriction().getTimeRangeString());
 					row.put("TRAVERSAL_COST", tc.getCost());
+					row.put("TYPE", tc.getType());
 					row.put("SOURCE_DESCRIPTION", tc.getSourceDescription());
 					row.put("CUSTOM_DESCRIPTION", tc.getCustomDescription());
 					trWriter.writeRow(row);
@@ -911,7 +924,7 @@ public class RouterProcess {
 			return null;			
 		}
 		return new TurnCost(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
-				cost, restriction, restriction == null ? "" : "ITN", null);
+				cost, restriction, null, restriction == null ? "" : "ITN", null);
 	}	
 
 	private static EnumMap<RoadClass,Double> buildTrafficMultiplierMap() {

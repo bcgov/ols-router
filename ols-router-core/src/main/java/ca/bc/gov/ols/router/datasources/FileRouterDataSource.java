@@ -33,6 +33,7 @@ import ca.bc.gov.ols.router.data.enums.RoadClass;
 import ca.bc.gov.ols.router.data.enums.SurfaceType;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.util.UrlCsvInputSource;
 
 public class FileRouterDataSource implements RouterDataSource {
@@ -209,7 +210,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			String dayCodeStr = turnCostReader.getString("DAY_CODE");
 			String timeRangeStr = turnCostReader.getString("TIME_RANGES");
 			WeeklyTimeRange restriction = WeeklyTimeRange.create(dayCodeStr, timeRangeStr);
-			return new TurnCost(idSeq, cost, restriction, null, null);
+			TurnRestrictionType type = TurnRestrictionType.convert(turnCostReader.getString("TYPE"));
+			return new TurnCost(idSeq, cost, restriction, type, null, null);
 		}
 		return null;
 	}
