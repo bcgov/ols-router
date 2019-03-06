@@ -11,7 +11,7 @@
 <c:choose>
   <c:when test="${!configuration.errors.isEmpty()}">
   <h2>Import Failed</h2>
-  <p><b>Errors</b></p>
+  <p><strong>Errors</strong></p>
   <ul>
   <c:forEach var="error" items="${configuration.errors}">
     <li>${error}</li>
@@ -23,7 +23,7 @@
   </c:otherwise>
 </c:choose>
 <c:if test="${!configuration.messages.isEmpty()}">
-	<p><b>Messages</b></p>
+	<p><strong>Messages</strong></p>
 	<ul>
 	<c:forEach var="msg" items="${configuration.messages}">
   		<li>${msg}</li>

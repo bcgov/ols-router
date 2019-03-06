@@ -50,7 +50,7 @@ public class FileRouterDataSource implements RouterDataSource {
 	//private int nextFerrySeg = -1;
 	//private TIntObjectHashMap<List<StreetSegment>> ferrySegsByIntId;
 
-	public FileRouterDataSource(RouterConfig config, GeometryFactory geometryFactory) throws IOException {
+	public FileRouterDataSource(RouterConfig config, GeometryFactory geometryFactory) {
 		logger.trace("{}() constructor called", getClass().getName());
 		this.config = config;
 		this.geometryFactory = geometryFactory;

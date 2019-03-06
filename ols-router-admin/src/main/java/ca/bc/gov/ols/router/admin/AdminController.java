@@ -10,8 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,13 +26,13 @@ import ca.bc.gov.ols.router.admin.data.Configuration;
 
 @RestController
 public class AdminController {
-	final static Logger logger = LoggerFactory.getLogger(
+	static final Logger logger = LoggerFactory.getLogger(
 			AdminController.class.getCanonicalName());
 	
 	@Autowired
 	private AdminApplication adminApp;
 	
-	@RequestMapping(value = "/export", produces = "application/json")
+	@GetMapping(value = "/export", produces = "application/json")
 	public void doExport(HttpServletResponse response) throws IOException {
 		Session session = adminApp.getSession();
 		String keyspace = adminApp.getKeyspace();
@@ -73,14 +73,14 @@ public class AdminController {
 		jw.close();
 	}
 	
-	@RequestMapping(value = "/validate", method = RequestMethod.POST)
+	@PostMapping(value = "/validate")
 	public ModelAndView doValidate(@RequestParam("file") MultipartFile file) {
 		Configuration conf = new Configuration(file);
 		conf.compare(adminApp);
 		return new ModelAndView("view/validate", "configuration", conf);
 	}
 
-	@RequestMapping(value = "/import", method = RequestMethod.POST)
+	@PostMapping(value = "/import"	)
 	public ModelAndView doImport(@RequestParam("file") MultipartFile file) {
 		Configuration conf = new Configuration(file);
 		if(conf.getErrors().isEmpty()) {

@@ -35,7 +35,9 @@ import ca.bc.gov.ols.router.admin.data.ConfigurationParameter;
 
 @Component
 public class AdminApplication {
-	final static Logger logger = LoggerFactory.getLogger(
+	private static final String CONFIG_PARAM_TABLE = "BGEO_CONFIGURATION_PARAMETERS";
+
+	static final Logger logger = LoggerFactory.getLogger(
 			AdminApplication.class.getCanonicalName());
 
 	private static AdminApplication singleton;
@@ -85,7 +87,7 @@ public class AdminApplication {
 	private void validateKeyspace() {
 		KeyspaceMetadata ks = session.getCluster().getMetadata().getKeyspace(keyspace);
 		if(ks == null) {
-			logger.warn("Cassandra keyspace '" + keyspace + "' does not exist; creating.");
+			logger.warn("Cassandra keyspace '{}' does not exist; creating.", keyspace);
 			// for local unreplicated cassandra
 			//session.execute("CREATE KEYSPACE " + keyspace + " WITH REPLICATION={ 'class' : 'SimpleStrategy', 'replication_factor' : 1 };");
 			session.execute("CREATE KEYSPACE " + keyspace + " WITH REPLICATION={ 'class' : 'SimpleStrategy', 'replication_factor' : 3 };");
@@ -96,8 +98,8 @@ public class AdminApplication {
 	}
 	
 	private void createConfigParametersTable() {
-		logger.warn("Creating table " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS");
-		session.execute("CREATE TABLE " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS("
+		logger.warn("Creating table {}.{}", keyspace, CONFIG_PARAM_TABLE);
+		session.execute("CREATE TABLE " + keyspace + "." + CONFIG_PARAM_TABLE + "("
 				+ "APP_ID TEXT, "
 				+ "CONFIG_PARAM_NAME TEXT, "
 				+ "CONFIG_PARAM_VALUE TEXT,"
@@ -106,7 +108,7 @@ public class AdminApplication {
 	}
 
 	private void populateConfigParametersTable() {
-		logger.warn("Populating table " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS");
+		logger.warn("Populating table {}.{}", keyspace, CONFIG_PARAM_TABLE);
 		InputStream in = AdminApplication.class.getClassLoader().getResourceAsStream("configuration_parameters.csv");
 		try (CSVReader reader = new CSVReader(new InputStreamReader(new BufferedInputStream(in), Charset.forName("UTF-8")))) {
 			String[] header = reader.readNext(); 
@@ -127,28 +129,28 @@ public class AdminApplication {
 				case "config_param_value":
 					valueIdx = i;
 					break;
+				default:
 				}
 			}
 			String [] row;
 			PreparedStatement pStatement = session.prepare("INSERT INTO " 
-					+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS "
+					+ keyspace + "." + CONFIG_PARAM_TABLE +" "
 					+ "(APP_ID, CONFIG_PARAM_NAME, CONFIG_PARAM_VALUE) " 
 					+ "VALUES (?, ?, ?) IF NOT EXISTS;");
 			while((row = reader.readNext()) != null) {
 				session.execute(pStatement.bind(row[appIdIdx], row[nameIdx], row[valueIdx]));
 			}
-			reader.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
 	}
 
 	private void validateConfigParametersTable() {
-		logger.info("Validating table " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS");
+		logger.info("Validating table {}.{}", keyspace, CONFIG_PARAM_TABLE);
 		KeyspaceMetadata ks = session.getCluster().getMetadata().getKeyspace(keyspace);
-		TableMetadata table = ks.getTable("BGEO_CONFIGURATION_PARAMETERS");
+		TableMetadata table = ks.getTable(CONFIG_PARAM_TABLE);
 		if(table == null) {
-			logger.warn("Table " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS does not exist");
+			logger.warn("Table {}.{} does not exist", keyspace, CONFIG_PARAM_TABLE);
 			createConfigParametersTable();
 		} else {
 			// adds any necessary parameters
@@ -185,12 +187,9 @@ public class AdminApplication {
 			            (ThreadPoolExecutor)Executors.newFixedThreadPool(5));
 				
 				// save BGEO_CONFIGURATION_PARAMETERS
-			    // We won't truncate because if we are importing an older config it might not have values for new params
 			    // Cassandra inserts act as updates if the key part already exists 
-				//logger.info("Truncating table " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS");
-				//session.execute("TRUNCATE " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS;");
 				PreparedStatement pStatement = session.prepare("INSERT INTO " 
-						+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS "
+						+ keyspace + "." + CONFIG_PARAM_TABLE +" "
 						+ "(APP_ID, CONFIG_PARAM_NAME, CONFIG_PARAM_VALUE) " 
 						+ "VALUES (?, ?, ?);");
 				for(ConfigurationParameter configParam : conf.getConfigParams()) {
