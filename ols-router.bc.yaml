@@ -40,7 +40,9 @@ objects:
         - name: REPO
           value: ${SITE_REPO}
         - name: GOAL
-          value: ${MVN_GOAL}          
+          value: ${MVN_GOAL}
+        - name: PNAME
+          value: ${PROJ_NAME}
         from:
           kind: ImageStreamTag
           name: maven:3-jdk-11
