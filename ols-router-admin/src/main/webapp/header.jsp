@@ -4,6 +4,7 @@
     All rights reserved.
 
 --%>
+<!DOCTYPE html>
 <html>
   <head>
     <title>Location Services Admin</title>
