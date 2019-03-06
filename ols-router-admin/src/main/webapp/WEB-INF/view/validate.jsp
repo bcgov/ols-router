@@ -8,12 +8,12 @@
 <%@ include file="../../header.jsp" %>
 <div class="bodyContent">
 <h1>Validate Configuration</h1>
-<p><b>File Name:</b> ${configuration.fileName}</p>
-<p><b>Export Date (from file contents):</b> ${configuration.exportDate}</p> 
+<p><strong>File Name:</strong> ${configuration.fileName}</p>
+<p><strong>Export Date (from file contents):</strong> ${configuration.exportDate}</p> 
 <c:choose>
   <c:when test="${!configuration.errors.isEmpty()}">
     <h2 class="red">Validation Failed</h2>
-    <p><b>Errors</b></p>
+    <p><strong>Errors</strong></p>
     <ul>
     <c:forEach var="error" items="${configuration.errors}">
       <li>${error}</li>
@@ -25,7 +25,7 @@
   </c:otherwise>
 </c:choose>
 <c:if test="${!configuration.messages.isEmpty()}">
-	<p><b>Messages</b></p>
+	<p><strong>Messages</strong></p>
 	<ul>
 	<c:forEach var="msg" items="${configuration.messages}">
   		<li>${msg}</li>
@@ -41,7 +41,7 @@
 <h3>Configuration Parameters Differences</h3>
 <c:choose>
   <c:when test="${configuration.configParamDiffs == null || configuration.configParamDiffs.isEmpty()}">
-    <p><b>No Differences</b></p>
+    <p><strong>No Differences</strong></p>
   </c:when>
   <c:otherwise>
     <table class="diffTable">

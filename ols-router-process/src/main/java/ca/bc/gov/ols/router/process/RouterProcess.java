@@ -100,7 +100,7 @@ public class RouterProcess {
 		geometryFactory = RouterFactory.geometryFactoryFromProps(props);
 	}
 
-	public void process() throws IOException {
+	public void process() {
 		openLogWriter();
 		
 //		File trFile = new File(dataDir + "turn_restrictions_uturn_new.csv");

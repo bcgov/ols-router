@@ -10,26 +10,20 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class DaySet implements TemporalSet {
-	private final Set<DayOfWeek> daySet;
+	private final Set<DayOfWeek> days;
 
-	public DaySet(Set<DayOfWeek> daySet) {
-		this.daySet = Set.copyOf(daySet);
+	public DaySet(Set<DayOfWeek> days) {
+		this.days = Set.copyOf(days);
 	}
 
 	@Override
 	public boolean contains(LocalDateTime dateTime) {
-		if(daySet.contains(dateTime.getDayOfWeek())) {
-			return true;
-		}
-		return false;
+		return days.contains(dateTime.getDayOfWeek());
 	}
 
 	@Override
 	public boolean isAlways() {
-		if(EnumSet.allOf(DayOfWeek.class).equals(daySet)) {
-			return true;
-		}
-		return false;
+		return EnumSet.allOf(DayOfWeek.class).equals(days);
 	}
 
 	@Override
