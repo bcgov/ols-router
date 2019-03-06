@@ -1,6 +1,5 @@
 package ca.bc.gov.ols.router.data.enums;
 
-import org.apache.catalina.tribes.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
