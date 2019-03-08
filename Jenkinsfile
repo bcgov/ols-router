@@ -1,11 +1,11 @@
-pipeline {
+ pipeline {
     agent any
     parameters {
     string(defaultValue: 'https://github.com/bcgov/ols-router.git', description: 'Source Code Repo URL', name: 'gitRepo')
     string(defaultValue: 'dev', description: 'Git Branch or Tag Name', name: 'gitBranch')
-    string(defaultValue: 'ols-router', description: 'Project Name', name: 'pn', trim: false)    
+    choice(name: 'pn', choices: ['ols-router-admin', 'ols-router-web'], description: 'Product Name to build, used by docker package') 
     string(defaultValue: '4.0.0', description: 'Version Tag will be used by Arctifactory', name: 'mvnTag', trim: false)
-    string(defaultValue: 'clean package -Pk8s', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
+    string(defaultValue: 'clean package -Pk8s -pl ${pn} -am', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
     }
     stages {
         stage ('code checkout') {
@@ -21,7 +21,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     withMaven(maven:'m3') {
-                        sh 'mvn ${mvnGoal} sonar:sonar'
+                        sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
                     }
                 }
             }
@@ -43,7 +43,7 @@ pipeline {
                     def models = openshift.process( "-f", "https://raw.githubusercontent.com/bcgov/ols-router/tools/ols-router.bc.yaml", "-p", "PROJ_NAME=${pn}", "SITE_REPO=${gitRepo}", "REPO_BRANCH=${gitBranch}", "MVN_GOAL=${mvnGoal}" )
                     openshift.delete( models )
                     def created = openshift.create( models )
-                    def bc = openshift.selector( 'bc', [build: 'ols-router'] )
+                    def bc = openshift.selector( 'bc', [build: '${pn}'] )
                     def statusv = openshift.raw( 'status', '-v' )
                     echo "Cluster status: ${statusv.out}"
                     def buildSelector = bc.startBuild()
