@@ -32,19 +32,19 @@
     <dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.21</version>
+	  <version>1.7.25</version>
     </dependency>
     <dependency>                                    
 	  <groupId>org.slf4j</groupId>                
 	  <artifactId>jcl-over-slf4j</artifactId>     
-	  <version>1.7.21</version>  
+	  <version>1.7.25</version>  
 	</dependency>
     <dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-log4j12</artifactId>
-	  <version>1.7.21</version>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.11.1</version>
     </dependency>
-    <dependency>
+     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
       <version>1.4</version>
