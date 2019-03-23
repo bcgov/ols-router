@@ -35,7 +35,7 @@ public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
 	
 	private final BasicGraph graph;
-	private final GeometryFactory gf;
+	private final EdgeList[] edgeLists;
 	private final RoutingParameters params;
 	private boolean calcRoute = false;
 	private boolean calcDirections = false;
@@ -45,13 +45,13 @@ public class EdgeMerger {
 	private List<Direction> directions;
 	private List<Notification> notifications;
 	
-	public EdgeMerger(BasicGraph graph, GeometryFactory gf, RoutingParameters params) {
+	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
+		this.edgeLists = edgeLists;
 		this.graph = graph;
-		this.gf = gf;
 		this.params = params;
 	}
 
-	public void mergeEdges(EdgeList[] edgeLists) {
+	private void mergeEdges(GeometryFactory gf) {
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 		AbstractTravelDirection curDir = null;
 		if(calcDirections) {
@@ -222,12 +222,19 @@ public class EdgeMerger {
 		return notifications;
 	}
 
-	public void calcRoute() {
-		calcRoute  = true;
+	public void calcDistance() {
+		mergeEdges(null);
+	}
+	
+	public void calcRoute(GeometryFactory gf) {
+		calcRoute = true;
+		mergeEdges(gf);
 	}
 
-	public void calcDirections() {
+	public void calcDirections(GeometryFactory gf) {
+		calcRoute = true;
 		calcDirections  = true;
+		mergeEdges(gf);
 	}
 
 	

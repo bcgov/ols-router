@@ -23,6 +23,8 @@ public class RouterConfig {
 	public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Canada/Pacific");
 	private static final Logger logger = LoggerFactory.getLogger(RouterConfig.class.getCanonicalName());
 	
+	private static RouterConfig INSTANCE;
+	
 	protected int baseSrsCode = -1;
 	protected String dataSourceBaseFileUrl;
 	protected String copyrightLicenseURI = "";
@@ -35,12 +37,14 @@ public class RouterConfig {
 	protected int maxPairs = -1;
 	protected int maxRoutePoints = -1;
 	protected int maxOptimalRoutePoints = -1;
-	protected boolean enableTurnRestrictions = false;
+	protected String defaultDisableOptions = "";
 	
 	public RouterConfig() {
+		INSTANCE = this;
 	}
 	
 	public RouterConfig(Properties props, GeometryFactory gf) {
+		INSTANCE = this;
 		String baseSrsCodeStr = props.getProperty("baseSrsCode");
 		try {
 			baseSrsCode = Integer.parseInt(baseSrsCodeStr);
@@ -48,6 +52,13 @@ public class RouterConfig {
 			logger.error("Invalid or no baseSrsCode defined in properties file: \""
 					+ baseSrsCodeStr + "\"");
 		}
+	}
+
+	public static RouterConfig getInstance() {
+		if(INSTANCE == null) {
+			logger.error("Unexpected request for uninitialized RouterConfig");
+		}
+		return INSTANCE;
 	}
 	
 	public int getBaseSrsCode() {
@@ -102,8 +113,8 @@ public class RouterConfig {
 		return privacyStatement;
 	}
 
-	public boolean isTurnRestrictionsEnabled() {
-		return enableTurnRestrictions;
+	public String getDefaultDisableOptions() {
+		return defaultDisableOptions;
 	}
 
 }
