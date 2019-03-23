@@ -328,7 +328,7 @@ public class FileRouterDataSource implements RouterDataSource {
 	@Override
 	public GtfsDaoImpl getGtfs() throws IOException {
 		GtfsReader reader = new GtfsReader();
-	    reader.setInputSource(new UrlCsvInputSource(config.getDataSourceBaseFileUrl() + "gtfs\\"));
+	    reader.setInputSource(new UrlCsvInputSource(config.getDataSourceBaseFileUrl() + "gtfs/"));
 	    GtfsDaoImpl gtfs = new GtfsDaoImpl();
 	    reader.setEntityStore(gtfs);
 	    reader.run();
@@ -337,7 +337,7 @@ public class FileRouterDataSource implements RouterDataSource {
 
 	@Override
 	public RowReader getGTFSMappingReader() throws IOException {
-		InputStream is = getInputStream("gtfs\\ITN_to_BCF.txt");
+		InputStream is = getInputStream("gtfs/ITN_to_BCF.txt");
 		return new CsvRowReader(new BufferedInputStream(is), geometryFactory);
 	}
 
