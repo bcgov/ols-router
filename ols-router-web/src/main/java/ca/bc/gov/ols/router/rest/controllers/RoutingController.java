@@ -35,7 +35,6 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.rest.GeotoolsGeometryReprojector;
 import ca.bc.gov.ols.router.rest.exceptions.InvalidParameterException;
 import ca.bc.gov.ols.router.util.StopWatch;
@@ -62,27 +61,63 @@ public class RoutingController {
 		}
 		return ResponseEntity.ok(null);
 	}
-	
-	@RequestMapping(value = {"/distance","/truck/distance"}, method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterDistanceResponse distance(RoutingParameters params, BindingResult bindingResult) {
+
+	@RequestMapping(value = {"/distance","/truck/distance"}, method = {RequestMethod.GET})
+	public RouterDistanceResponse distanceGet(RoutingParameters params, BindingResult bindingResult) {
+		return distance(params, bindingResult);
+	}
+
+	@RequestMapping(value = {"/distance","/truck/distance"}, method = {RequestMethod.POST})
+	public RouterDistanceResponse distancePost(RoutingParameters params, BindingResult bindingResult) {
+		return distance(params, bindingResult);
+	}
+
+	private RouterDistanceResponse distance(RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.distance(params);
 	}
-	
-	@RequestMapping(value = {"/route","/truck/route"}, method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterRouteResponse route(RoutingParameters params, BindingResult bindingResult) {
+
+	@RequestMapping(value = {"/route","/truck/route"}, method = {RequestMethod.GET})
+	public RouterRouteResponse routeGet(RoutingParameters params, BindingResult bindingResult) {
+		return route(params, bindingResult);
+	}
+
+	@RequestMapping(value = {"/route","/truck/route"}, method = {RequestMethod.POST})
+	public RouterRouteResponse routePost(RoutingParameters params, BindingResult bindingResult) {
+		return route(params, bindingResult);
+	}
+
+	private RouterRouteResponse route(RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.route(params);
 	}
 
-	@RequestMapping(value = {"/directions","/truck/directions"}, method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterDirectionsResponse directions(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = {"/directions","/truck/directions"}, method = {RequestMethod.GET})
+	public RouterDirectionsResponse directionsGet(RoutingParameters params, BindingResult bindingResult) {
+		return directions(params, bindingResult);
+	}
+
+	@RequestMapping(value = {"/directions","/truck/directions"}, method = {RequestMethod.POST})
+	public RouterDirectionsResponse directionsPost(RoutingParameters params, BindingResult bindingResult) {
+		return directions(params, bindingResult);
+	}
+	
+	private RouterDirectionsResponse directions(RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.directions(params);
 	}
 
-	@RequestMapping(value = {"/optimalRoute","/truck/optimalRoute"}, method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterOptimalRouteResponse optimalRoute(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = {"/optimalRoute","/truck/optimalRoute"}, method = {RequestMethod.GET})
+	public RouterOptimalRouteResponse optimalRouteGet(RoutingParameters params, BindingResult bindingResult) {
+		return optimalRoute(params, bindingResult);
+	}
+
+	@RequestMapping(value = {"/optimalRoute","/truck/optimalRoute"}, method = {RequestMethod.POST})
+	public RouterOptimalRouteResponse optimalRoutePost(RoutingParameters params, BindingResult bindingResult) {
+		return optimalRoute(params, bindingResult);
+	}
+
+	private RouterOptimalRouteResponse optimalRoute(RoutingParameters params, BindingResult bindingResult) {
 		validateOptimalRouteRequest(params, bindingResult);
 		
 		StopWatch sw = new StopWatch();
@@ -94,8 +129,17 @@ public class RoutingController {
 		return response;
 	}
 
-	@RequestMapping(value = {"/optimalDirections","/truck/optimalDirections"}, method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = {"/optimalDirections","/truck/optimalDirections"}, method = {RequestMethod.GET})
+	public RouterOptimalDirectionsResponse optimalDirectionsGet(RoutingParameters params, BindingResult bindingResult) {
+		return optimalDirections(params, bindingResult);
+	}
+	
+	@RequestMapping(value = {"/optimalDirections","/truck/optimalDirections"}, method = {RequestMethod.POST})
+	public RouterOptimalDirectionsResponse optimalDirectionsPost(RoutingParameters params, BindingResult bindingResult) {
+		return optimalDirections(params, bindingResult);
+	}
+
+	private RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params, BindingResult bindingResult) {
 		validateOptimalRouteRequest(params, bindingResult);
 		StopWatch sw = new StopWatch();
 		sw.start();
@@ -106,8 +150,17 @@ public class RoutingController {
 		return response;
 	}
 
-	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.GET})
+	public RouterDistanceBetweenPairsResponse distanceBetweenPairsGet(RoutingParameters params, BindingResult bindingResult) {
+		return distanceBetweenPairsPost(params, bindingResult);
+	}
+
+	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.POST})
+	public RouterDistanceBetweenPairsResponse distanceBetweenPairsPost(RoutingParameters params, BindingResult bindingResult) {
+		return distanceBetweenPairsPost(params, bindingResult);
+	}
+
+	private RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -179,8 +232,17 @@ public class RoutingController {
 		}
 	}
 
-	@RequestMapping(value = "/isochrones", method = {RequestMethod.GET,RequestMethod.POST})
-	public IsochroneResponse isochrones(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = "/isochrones", method = {RequestMethod.GET})
+	public IsochroneResponse isochronesGet(RoutingParameters params, BindingResult bindingResult) {
+		return isochrones(params, bindingResult);
+	}
+
+	@RequestMapping(value = "/isochrones", method = {RequestMethod.POST})
+	public IsochroneResponse isochronesPost(RoutingParameters params, BindingResult bindingResult) {
+		return isochrones(params, bindingResult);
+	}
+
+	private IsochroneResponse isochrones(RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -211,7 +273,7 @@ public class RoutingController {
 		return response;
 	}
 
-	@RequestMapping(value = "/loop", method = {RequestMethod.GET,RequestMethod.POST})
+	@RequestMapping(value = "/loop", method = {RequestMethod.GET})
 	public IsochroneResponse loop(RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
@@ -235,7 +297,7 @@ public class RoutingController {
 		return response;
 	}
 	
-	@RequestMapping(value = "/navInfo", method = {RequestMethod.GET,RequestMethod.POST})
+	@RequestMapping(value = "/navInfo", method = {RequestMethod.GET})
 	public NavInfoResponse navInfo(NavInfoParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
