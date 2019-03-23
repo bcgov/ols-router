@@ -49,6 +49,11 @@ public class RoutingParameters {
 	private boolean inbound = false;
 	private EnumSet<RouteOption> disabledOptions = EnumSet.noneOf(RouteOption.class);
 	
+	
+	public RoutingParameters() {
+		setDisable(RouterConfig.getInstance().getDefaultDisableOptions());
+	}
+	
 	public int getOutputSRS() {
 		return outputSRS;
 	}
@@ -247,6 +252,14 @@ public class RoutingParameters {
 
 	public void setDisable(String disabledOptionList) {
 		disabledOptions = RouteOption.fromList(disabledOptionList);
+	}
+
+	public void disableOption(RouteOption ro) {
+		disabledOptions.add(ro);
+	}
+
+	public void enableOption(RouteOption ro) {
+		disabledOptions.remove(ro);
 	}
 
 	public boolean isEnabled(RouteOption ro) {

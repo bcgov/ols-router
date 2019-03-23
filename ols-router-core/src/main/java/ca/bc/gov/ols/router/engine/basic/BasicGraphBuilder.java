@@ -74,7 +74,7 @@ import ca.bc.gov.ols.router.time.WeeklyDateRange;
 import ca.bc.gov.ols.router.util.IntObjectArrayMap;
 
 public class BasicGraphBuilder implements GraphBuilder {
-	private final static Logger logger = LoggerFactory.getLogger(BasicGraphBuilder.class.getCanonicalName());
+	private static final Logger logger = LoggerFactory.getLogger(BasicGraphBuilder.class.getCanonicalName());
 	
 	private BasicGraph graph;
 	private RouterConfig config;
@@ -163,7 +163,9 @@ public class BasicGraphBuilder implements GraphBuilder {
 		}
 		if(edgeIds == null) {
 			// shouldn't happen unless there was bad input
-			logger.warn("Invalid Id sequence in turn costs: {} (turn cost/restriction ignored)", Arrays.toString(oldIds));
+			if(logger.isWarnEnabled()) {
+				logger.warn("Invalid Id sequence in turn costs: {} (turn cost/restriction ignored)", Arrays.toString(oldIds));
+			}
 			return;			
 		}
 		// determine which segmentId to use for the last segment
@@ -179,7 +181,9 @@ public class BasicGraphBuilder implements GraphBuilder {
 		
 		boolean result = turnCostLookup.addCost(newIds, cost.getCost(), cost.getRestriction());
 		if(!result) {
-			logger.warn("Failed to add turn restriction for original Ids: {}", Arrays.toString(oldIds));
+			if(logger.isWarnEnabled()) {
+				logger.warn("Failed to add turn restriction for original Ids: {}", Arrays.toString(oldIds));
+			}
 			return;
 		}
 		
@@ -207,7 +211,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 					|| (!EventType.CONSTRUCTION.equals(evt.getEventType())
 							&& !EventType.INCIDENT.equals(evt.getEventType()))
 					|| evt.getGeography() == null
-					|| evt.getGeography().getGeometryType() != "Point") {
+					|| !evt.getGeography().getGeometryType().equals("Point")) {
 				continue;
 			}
 			if(evt.getRoads().get(0).getDelay() != null
@@ -424,10 +428,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	private boolean checkFerryStopDistance(GeometryFactory gf, Point startPoint, Stop firstStop) {
 		Point stopPoint = gf.createPoint(new Coordinate(firstStop.getLon(), firstStop.getLat()));
 		double distance = startPoint.distance(reprojector.reproject(stopPoint, config.getBaseSrsCode()));
-		if(distance > 100) {
-			return false;
-		}
-		return true;
+		return distance <= 100;
 	}
 	
 	private int addNode(int intId, Point point) {

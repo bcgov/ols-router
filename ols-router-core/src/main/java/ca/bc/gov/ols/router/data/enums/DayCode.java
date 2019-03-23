@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 public enum DayCode {
 	MF(EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY)),
 	MS(EnumSet.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)),
+	FS(EnumSet.of(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY)),
+	FU(EnumSet.of(DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY)),
 	SS(EnumSet.allOf(DayOfWeek.class));
 	
 	private final static Logger logger = LoggerFactory.getLogger(DayCode.class.getCanonicalName());

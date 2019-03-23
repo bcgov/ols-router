@@ -9,14 +9,22 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.api.DefaultsResponse;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.NavInfoParameters;
 import ca.bc.gov.ols.router.api.NavInfoResponse;
@@ -27,14 +35,10 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.rest.GeotoolsGeometryReprojector;
 import ca.bc.gov.ols.router.rest.exceptions.InvalidParameterException;
 import ca.bc.gov.ols.router.util.StopWatch;
-
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 @RestController
 @CrossOrigin
@@ -44,40 +48,64 @@ public class RoutingController {
 	@Autowired
 	private Router router;
 	
-	@RequestMapping(value = "/distance", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterDistanceResponse distance(RoutingParameters params, BindingResult bindingResult) {
+	@RequestMapping(value = "/ping", method = {RequestMethod.GET})
+	public ResponseEntity<String> ping() {
+		RoutingParameters params = new RoutingParameters();
+		params.setPoints(new double[] {-123.36487770080568, 48.42547002823357, -123.37015628814699, 48.41812208203614});
 		RouterConfig config = router.getConfig();
-		if(bindingResult.hasErrors()) {
-			throw new InvalidParameterException(bindingResult);
-		}
 		params.resolve(config,
 				new GeometryFactory(new PrecisionModel(), params.getOutputSRS()),
 				new GeotoolsGeometryReprojector());
-		if(params.getPoints() == null) {
-			throw new IllegalArgumentException(
-					"Parameter \"points\" is required and must be in the format \"x,y,x,y...\".");
+		RouterDistanceResponse response = router.distance(params);
+		if(response.getDistanceStr().equals("")) {
+			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(null);
 		}
+		return ResponseEntity.ok(null);
+	}
+	
+	@RequestMapping(value = {"/distance","/truck/distance"}, method = {RequestMethod.GET,RequestMethod.POST})
+	public RouterDistanceResponse distance(RoutingParameters params, BindingResult bindingResult) {
+		validateRouteRequest(params, bindingResult);
+		return router.distance(params);
+	}
+	
+	@RequestMapping(value = {"/route","/truck/route"}, method = {RequestMethod.GET,RequestMethod.POST})
+	public RouterRouteResponse route(RoutingParameters params, BindingResult bindingResult) {
+		validateRouteRequest(params, bindingResult);
+		return router.route(params);
+	}
 
-		List<Point> points = params.getPoints();
-		if(points.size() < 2) {
-			throw new IllegalArgumentException(
-					"Exactly two parameters named \"point\" are required in the format \"x,y\".");
-		}
-		
-		if(config.getMaxRoutePoints() >= 0 && points.size() > config.getMaxRoutePoints()) {
-			throw new IllegalArgumentException(
-					"There may not be more than " + config.getMaxRoutePoints() + " points provided.");
-		}
+	@RequestMapping(value = {"/directions","/truck/directions"}, method = {RequestMethod.GET,RequestMethod.POST})
+	public RouterDirectionsResponse directions(RoutingParameters params, BindingResult bindingResult) {
+		validateRouteRequest(params, bindingResult);
+		return router.directions(params);
+	}
+
+	@RequestMapping(value = {"/optimalRoute","/truck/optimalRoute"}, method = {RequestMethod.GET,RequestMethod.POST})
+	public RouterOptimalRouteResponse optimalRoute(RoutingParameters params, BindingResult bindingResult) {
+		validateOptimalRouteRequest(params, bindingResult);
 		
 		StopWatch sw = new StopWatch();
 		sw.start();
-		RouterDistanceResponse response = router.distance(params);
+		RouterOptimalRouteResponse response = router.optimalRoute(params);
 		sw.stop();
 		
 		response.setExecutionTime(sw.getElapsedTime());
 		return response;
 	}
-	
+
+	@RequestMapping(value = {"/optimalDirections","/truck/optimalDirections"}, method = {RequestMethod.GET,RequestMethod.POST})
+	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params, BindingResult bindingResult) {
+		validateOptimalRouteRequest(params, bindingResult);
+		StopWatch sw = new StopWatch();
+		sw.start();
+		RouterOptimalDirectionsResponse response = router.optimalDirections(params);
+		sw.stop();
+		
+		response.setExecutionTime(sw.getElapsedTime());
+		return response;
+	}
+
 	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.GET,RequestMethod.POST})
 	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
@@ -119,36 +147,20 @@ public class RoutingController {
 		return response;
 	}
 
-	@RequestMapping(value = "/optimalRoute", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterOptimalRouteResponse optimalRoute(RoutingParameters params, BindingResult bindingResult) {
-		RouterConfig config = router.getConfig();
-		if(bindingResult.hasErrors()) {
-			throw new InvalidParameterException(bindingResult);
-		}
-		params.resolve(config,
-				new GeometryFactory(new PrecisionModel(), params.getOutputSRS()),
-				new GeotoolsGeometryReprojector());
-		List<Point> points = params.getPoints();
-		if(points == null || points.size() < 2) {
-			throw new IllegalArgumentException(
-					"Parameter \"points\" is required and must be in the format \"x,y,x,y...\".");
-		}
-		if(config.getMaxOptimalRoutePoints() >= 0 && points.size() > config.getMaxOptimalRoutePoints()) {
-			throw new IllegalArgumentException(
-					"There may not be more than " + config.getMaxOptimalRoutePoints() + " points provided.");
-		}
-		
-		StopWatch sw = new StopWatch();
-		sw.start();
-		RouterOptimalRouteResponse response = router.optimalRoute(params);
-		sw.stop();
-		
-		response.setExecutionTime(sw.getElapsedTime());
-		return response;
+	@RequestMapping(value = "/defaults", method = {RequestMethod.GET})
+	public DefaultsResponse defaults() {
+		return new DefaultsResponse(router.getConfig());
+	}
+	
+	private void validateRouteRequest(RoutingParameters params, BindingResult bindingResult) {
+		validateRouteRequest(params, bindingResult, router.getConfig().getMaxRoutePoints());		
 	}
 
-	@RequestMapping(value = "/route", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterRouteResponse route(RoutingParameters params, BindingResult bindingResult) {
+	private void validateOptimalRouteRequest(RoutingParameters params, BindingResult bindingResult) {
+		validateRouteRequest(params, bindingResult, router.getConfig().getMaxOptimalRoutePoints());		
+	}
+
+	private void validateRouteRequest(RoutingParameters params, BindingResult bindingResult, int maxPoints) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -165,69 +177,6 @@ public class RoutingController {
 			throw new IllegalArgumentException(
 					"There may not be more than " + config.getMaxRoutePoints() + " points provided.");
 		}
-		
-		StopWatch sw = new StopWatch();
-		sw.start();
-		RouterRouteResponse response = router.route(params);
-		sw.stop();
-		
-		response.setExecutionTime(sw.getElapsedTime());
-		return response;
-	}
-
-	@RequestMapping(value = "/optimalDirections", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params, BindingResult bindingResult) {
-		RouterConfig config = router.getConfig();
-		if(bindingResult.hasErrors()) {
-			throw new InvalidParameterException(bindingResult);
-		}
-		params.resolve(config,
-				new GeometryFactory(new PrecisionModel(), params.getOutputSRS()),
-				new GeotoolsGeometryReprojector());
-		List<Point> points = params.getPoints();
-		if(points == null || points.size() < 2) {
-			throw new IllegalArgumentException(
-					"Parameter \"points\" is required and must be in the format \"x,y,x,y...\".");
-		}
-		if(config.getMaxOptimalRoutePoints() >= 0 && points.size() > config.getMaxOptimalRoutePoints()) {
-			throw new IllegalArgumentException(
-					"There may not be more than " + config.getMaxOptimalRoutePoints() + " points provided.");
-		}
-		StopWatch sw = new StopWatch();
-		sw.start();
-		RouterOptimalDirectionsResponse response = router.optimalDirections(params);
-		sw.stop();
-		
-		response.setExecutionTime(sw.getElapsedTime());
-		return response;
-	}
-
-	@RequestMapping(value = "/directions", method = {RequestMethod.GET,RequestMethod.POST})
-	public RouterDirectionsResponse directions(RoutingParameters params, BindingResult bindingResult) {
-		RouterConfig config = router.getConfig();
-		if(bindingResult.hasErrors()) {
-			throw new InvalidParameterException(bindingResult);
-		}
-		params.resolve(config,
-				new GeometryFactory(new PrecisionModel(), params.getOutputSRS()),
-				new GeotoolsGeometryReprojector());
-		List<Point> points = params.getPoints();
-		if(points == null || points.size() < 2) {
-			throw new IllegalArgumentException(
-					"Parameter \"points\" is required and must be in the format \"x,y,x,y...\".");
-		}
-		if(config.getMaxRoutePoints() >= 0 && points.size() > config.getMaxRoutePoints()) {
-			throw new IllegalArgumentException(
-					"There may not be more than " + config.getMaxRoutePoints() + " points provided.");
-		}
-		
-		StopWatch sw = new StopWatch();
-		sw.start();
-		RouterDirectionsResponse response = router.directions(params);
-		sw.stop();
-		
-		response.setExecutionTime(sw.getElapsedTime());
-		return response;
 	}
 
 	@RequestMapping(value = "/isochrones", method = {RequestMethod.GET,RequestMethod.POST})

@@ -52,7 +52,7 @@ public class RouterProcess {
 	private static final byte RIGHT_COST = 2; 
 	
 	// BASE_ONLY = true to create turn_costs_base.csv for turn managment UI, ignoring custom file 
-	private static final boolean BASE_ONLY = true;
+	private static final boolean BASE_ONLY = false;
 	
 	static int droppedTRs = 0;
 	static int droppedSegs = 0;
@@ -66,6 +66,7 @@ public class RouterProcess {
 	static int dividedEndRestrictionCount = 0;
 	static int uTurnRestrictionCount = 0;
 	static int uTurnNonRestrictionCount = 0;
+	static int barricadedTurnCount = 0;
 	static GeometryFactory geometryFactory;
 	//private XsvRowWriter trWriter;
 	
@@ -274,6 +275,7 @@ public class RouterProcess {
 						// this is an outgoing-only stub
 						continue;
 					}
+
 					// determine which outgoing stubs are lefts and rights and which is the centre
 		        	ArrayList<RpStreetEnd> rights = new ArrayList<RpStreetEnd>(ends.size());
 		        	ArrayList<RpStreetEnd> lefts = new ArrayList<RpStreetEnd>(ends.size());
@@ -641,6 +643,7 @@ public class RouterProcess {
 		logger.info("Number of divided end turn restrictions added: {}", dividedEndRestrictionCount);
 		logger.info("Number of u-turn restrictions added: {}", uTurnRestrictionCount);
 		logger.info("Number of u-turns not restricted based on angle: {}", uTurnNonRestrictionCount);
+		logger.info("Number of turns restricted due to barricades: {}", barricadedTurnCount);
 		
 		logger.info("Writing output segments...");
 		writeSegments(segments);
@@ -906,6 +909,13 @@ public class RouterProcess {
 			}
 			return null;
 		}
+		// full-time restriction on barricaded segments
+		if(TrafficImpactor.BARRICADE.equals(inSegEnd.getTrafficImpactor()) 
+				|| TrafficImpactor.BARRICADE.equals(outSegEnd.getTrafficImpactor())) {
+			barricadedTurnCount++;
+			return new TurnCost(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
+					cost, WeeklyTimeRange.ALWAYS, null, "ITN", null);
+		}
 		// no costs on over/underpasses
 		if(inSegEnd.getTrafficImpactor().equals(TrafficImpactor.OVERPASS) || inSegEnd.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)
 				||outSegEnd.getTrafficImpactor().equals(TrafficImpactor.OVERPASS) || outSegEnd.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)) {
@@ -955,7 +965,8 @@ public class RouterProcess {
 		int onGroup = thisEnd.getSegment().getRoadClass().getGroup();
 		int acrossGroup = otherEnd.getSegment().getRoadClass().getGroup();
 		if(onGroup == 0 || acrossGroup == 0) return 0;
-		byte[][] matrix = turnCostMatrix.get(thisEnd.getTrafficImpactor());
+		TrafficImpactor imp = thisEnd.getTrafficImpactor();
+		byte[][] matrix = turnCostMatrix.get(imp);
 		if(matrix == null) return 0;
 		return matrix[onGroup-1][acrossGroup-1];
 	}

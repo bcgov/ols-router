@@ -52,6 +52,7 @@ import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasources.RouterDataLoader;
@@ -81,33 +82,55 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	
 	@Override
 	public RouterDistanceResponse distance(RoutingParameters params) {
-		//TODO
-		return new RouterDistanceResponse(params, 0, 0);
+		try {
+			StopWatch sw = new StopWatch();
+			sw.start();
+			EdgeMerger em = doRoute(params);
+			em.calcDistance();
+			RouterDistanceResponse response = new RouterDistanceResponse(params, em.getDist(), em.getTime());
+			sw.stop();
+			response.setExecutionTime(sw.getElapsedTime());
+			return response;
+		} catch(IllegalArgumentException iae) {
+			return new RouterDistanceResponse(params);
+		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
+			return new RouterDistanceResponse(params);
+		}
 	}
 	
 	@Override
 	public RouterRouteResponse route(RoutingParameters params) {
-		//TODO
-		return new RouterRouteResponse(params, 0, 0, null);
+		try {
+			StopWatch sw = new StopWatch();
+			sw.start();
+			EdgeMerger em = doRoute(params);
+			em.calcRoute(gf);
+			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute());
+			sw.stop();
+			response.setExecutionTime(sw.getElapsedTime());
+			return response;
+		} catch(IllegalArgumentException iae) {
+			return new RouterRouteResponse(params);
+		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
+			return new RouterRouteResponse(params);
+		}
 	}
 
 	@Override
 	public RouterDirectionsResponse directions(RoutingParameters params) {
 		try {
-			List<Point> points = params.getFullPoints();
-			SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide());
-			EdgeList[] edgeLists = new EdgeList[points.size()-1];
-			double timeOffset = 0;
-			for(int i = 1; i < points.size(); i++) {
-				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
-				edgeLists[i-1] = dsp.findShortestPath(edgeSplits[i-1], edgeSplits[i], timeOffset);
-				timeOffset += edgeLists[i-1].time(0);
-			}
-			EdgeMerger em = new EdgeMerger(graph, gf, params);
-			em.calcRoute();
-			em.calcDirections();
-			em.mergeEdges(edgeLists);
-			return new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getDirections(), em.getNotifications());
+			StopWatch sw = new StopWatch();
+			sw.start();
+			EdgeMerger em = doRoute(params);
+			em.calcDirections(gf);
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getDirections(), em.getNotifications());
+			sw.stop();
+			response.setExecutionTime(sw.getElapsedTime());
+			return response;
+		} catch(IllegalArgumentException iae) {
+			return new RouterDirectionsResponse(params);
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
 			return new RouterDirectionsResponse(params);
@@ -115,8 +138,86 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	}
 
 	@Override
+	public RouterOptimalRouteResponse optimalRoute(RoutingParameters params) {
+		StopWatch sw = new StopWatch();
+		sw.start();
+		StopWatch routingTimer = new StopWatch();
+		StopWatch optimizationTimer = new StopWatch();
+		int[] visitOrder = new int[params.getPoints().size()];
+		RouterOptimalRouteResponse response;
+		try {
+			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
+			em.calcRoute(gf);
+			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), visitOrder);
+		} catch(IllegalArgumentException iae) {
+			response = new RouterOptimalRouteResponse(params);
+		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
+			response = new RouterOptimalRouteResponse(params);
+		}
+		sw.stop();
+		response.setExecutionTime(sw.getElapsedTime());
+		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
+		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
+		return response;
+	}
+
+	@Override
+	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params) {
+		StopWatch sw = new StopWatch();
+		sw.start();
+		StopWatch routingTimer = new StopWatch();
+		StopWatch optimizationTimer = new StopWatch();
+		int[] visitOrder = new int[params.getPoints().size()];
+		RouterOptimalDirectionsResponse response;
+		try {
+			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
+			em.calcDirections(gf);
+			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
+					em.getRoute(), em.getDirections(), em.getNotifications(), visitOrder);
+		} catch(IllegalArgumentException iae) {
+			response = new RouterOptimalDirectionsResponse(params);
+		} catch(Throwable t) {
+			logger.warn("Exception thrown: ", t);
+			response = new RouterOptimalDirectionsResponse(params);
+		}			
+		sw.stop();
+		response.setExecutionTime(sw.getElapsedTime());
+		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
+		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
+		return response;
+	}
+
+	private EdgeMerger doRoute(RoutingParameters params) {
+		List<Point> points = params.getFullPoints();
+		SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide());
+		return doCoreRoute(params, edgeSplits);
+	}
+
+	private EdgeMerger doOptimizedRoute(RoutingParameters params, StopWatch routingTimer, StopWatch optimizationTimer,
+			int[] visitOrder) throws Throwable {
+		SplitEdge[] edgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
+		// do a final route on the resulting optimally-ordered points
+		return doCoreRoute(params, edgeSplits);
+	}
+
+	private EdgeMerger doCoreRoute(RoutingParameters params, SplitEdge[] edgeSplits) {
+		EdgeList[] edgeLists = new EdgeList[edgeSplits.length-1];
+		double timeOffset = 0;
+		for(int i = 1; i < edgeSplits.length; i++) {
+			DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
+			edgeLists[i-1] = dsp.findShortestPath(edgeSplits[i-1], edgeSplits[i], timeOffset);
+			timeOffset += edgeLists[i-1].time(0);
+		}
+		return new EdgeMerger(edgeLists, graph, params);
+	}
+
+
+	@Override
 	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params) {
 		try {
+			StopWatch sw = new StopWatch();
+			sw.start();
 			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
@@ -129,77 +230,21 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 					if(edgeList == null) {
 						response.addResult("");
 					} else {
-						EdgeMerger em = new EdgeMerger(graph, gf, params);
-						em.mergeEdges(new EdgeList[] {edgeList});
+						EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeList}, graph, params);
+						em.calcDistance();
 						response.addResult(em.getDist(), em.getTime());
 					}
 				}
 			}
+			sw.stop();
+			response.setExecutionTime(sw.getElapsedTime());
 			return response;
+		} catch(IllegalArgumentException iae) {
+			return new RouterDistanceBetweenPairsResponse(params);
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
 			return new RouterDistanceBetweenPairsResponse(params);
 		}
-	}
-
-	@Override
-	public RouterOptimalRouteResponse optimalRoute(RoutingParameters params) {
-		StopWatch routingTimer = new StopWatch();
-		StopWatch optimizationTimer = new StopWatch();
-		int[] visitOrder = new int[params.getPoints().size()];
-		RouterOptimalRouteResponse response;
-		try {
-			SplitEdge[] optimizedEdgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
-			// do a final route on the resulting optimally-ordered points
-			EdgeList[] edgeLists = new EdgeList[optimizedEdgeSplits.length-1];
-			double timeOffset = 0;
-			for(int i = 1; i < optimizedEdgeSplits.length; i++) {
-				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
-				edgeLists[i-1] = dsp.findShortestPath(optimizedEdgeSplits[i-1], optimizedEdgeSplits[i], timeOffset);
-				timeOffset += edgeLists[i-1].time(0);
-			}
-			EdgeMerger em = new EdgeMerger(graph, gf, params);
-			em.calcRoute();
-			em.mergeEdges(edgeLists);
-			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), visitOrder);
-		} catch(Throwable t) {
-			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalRouteResponse(params);
-		}			
-		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
-		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
-		return response;
-	}
-
-	@Override
-	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params) {
-		StopWatch routingTimer = new StopWatch();
-		StopWatch optimizationTimer = new StopWatch();
-		int[] visitOrder = new int[params.getPoints().size()];
-		RouterOptimalDirectionsResponse response;
-		try {
-			SplitEdge[] optimizedEdgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
-			// do a final route on the resulting optimally-ordered points
-			EdgeList[] edgeLists = new EdgeList[optimizedEdgeSplits.length-1];
-			double timeOffset = 0;
-			for(int i = 1; i < optimizedEdgeSplits.length; i++) {
-				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
-				edgeLists[i-1] = dsp.findShortestPath(optimizedEdgeSplits[i-1], optimizedEdgeSplits[i], timeOffset);
-				timeOffset += edgeLists[i-1].time(0);
-			}
-			EdgeMerger em = new EdgeMerger(graph, gf, params);
-			em.calcRoute();
-			em.calcDirections();
-			em.mergeEdges(edgeLists);
-			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
-					em.getRoute(), em.getDirections(), em.getNotifications(), visitOrder);
-		} catch(Throwable t) {
-			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalDirectionsResponse(params);
-		}			
-		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
-		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
-		return response;
 	}
 
 	@Override
@@ -214,7 +259,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return null;
 	}
 
-	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) throws Throwable {
+	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
+		params.disableOption(RouteOption.TIMEDEPENDENCY);
 		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide());
 
 		// shortcut the 2-point case
@@ -236,8 +282,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 					// don't add costs from/to the same place (should be 0 anyway)
 					continue;
 				}
-				EdgeMerger em = new EdgeMerger(graph, gf, params);
-				em.mergeEdges(new EdgeList[] {edgeLists[toIndex]});
+				EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeLists[toIndex]}, graph, params);
+				em.calcDistance();
 				costMatrixBuilder.addTransportDistance(""+fromIndex, ""+toIndex, em.getDist());
 				costMatrixBuilder.addTransportTime(""+fromIndex, ""+toIndex, em.getTime());
 			}
@@ -289,7 +335,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		for(Point p : points) {
 			int edgeId = graph.findClosestEdge(p);
 			if(edgeId == BasicGraph.NO_EDGE) {
-				throw new RuntimeException("ERROR: point not near any edge");
+				//throw new RuntimeException("ERROR: point not near any edge");
+				throw new IllegalArgumentException("Point (" + p.getX() + "," + p.getY() + ") is too far from any edge.");
 			}
 			LineString[] splitString = LineStringSplitter.split(graph.getLineString(edgeId), p);
 			int[] edgeIds;

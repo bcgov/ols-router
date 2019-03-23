@@ -70,8 +70,8 @@ public class CassandraRouterConfig extends RouterConfig {
 				case "maxRoutePoints":
 					maxRoutePoints = Integer.parseInt(value); 
 					break;
-				case "enableTurnRestrictions":
-					enableTurnRestrictions = Boolean.parseBoolean(value); 
+				case "defaultDisableOptions":
+					defaultDisableOptions = value; 
 					break;
 				default:
 					if(name.startsWith("dataSource.baseFileUrl")) {

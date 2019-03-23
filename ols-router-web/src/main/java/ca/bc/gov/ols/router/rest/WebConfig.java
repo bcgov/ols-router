@@ -23,6 +23,7 @@ import ca.bc.gov.ols.router.rest.converters.InstantConverter;
 import ca.bc.gov.ols.router.rest.converters.RoutingCriteriaConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.html.HtmlErrorMessageConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.html.HtmlResponseConverter;
+import ca.bc.gov.ols.router.rest.messageconverters.json.JsonDefaultsResponseConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.json.JsonNavInfoResponseConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.json.JsonResponseConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.json.JsonpResponseConverter;
@@ -43,6 +44,7 @@ public class WebConfig implements WebMvcConfigurer {
 		converters.add(jsonpResponseConverter());
 		converters.add(kmlResponseConverter());
 		converters.add(jsonNavInfoResponseConverter());
+		converters.add(jsonDefaultsResponseConverter());
 	}	
 	
 	@Bean
@@ -78,6 +80,11 @@ public class WebConfig implements WebMvcConfigurer {
 	@Bean
 	public JsonNavInfoResponseConverter jsonNavInfoResponseConverter() {
 		return new JsonNavInfoResponseConverter();
+	}
+
+	@Bean
+	public JsonDefaultsResponseConverter jsonDefaultsResponseConverter() {
+		return new JsonDefaultsResponseConverter();
 	}
 
 	@Override
