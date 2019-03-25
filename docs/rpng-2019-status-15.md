@@ -1,8 +1,8 @@
 # RouterNG, Status Report #15
 
-# Date: 2019-03-13
-
-# Prepared by: Graeme Leeming (Refractions Research Inc.)
+Date: 2019-03-13<br>
+Sprint: 6<br>
+Prepared by: Graeme Leeming, *Refractions Research Inc.*
 
 ## Overview
 We are closing in on the end of Sprint 6 and starting to wrap up some of the final details related to phase 1 of the RouterNG project.
