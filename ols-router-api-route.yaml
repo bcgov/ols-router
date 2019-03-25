@@ -1,16 +1,15 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: ols-router-admin
+  name: ols-router-api
   annotations:
     haproxy.router.openshift.io/ip_whitelist: 142.34.5.0/26 142.34.140.0/26
 spec:
-  host: ols-router-admin-dev.apps.gov.bc.ca
-  path: /int/
+  host: router-dev.api.gov.bc.ca
   tls:
     termination: edge
   port:
-    targetPort: ols-router-admin
+    targetPort: ols-router-web
   to:
     kind: Service
-    name: ols-router-admin
+    name: ols-router-web

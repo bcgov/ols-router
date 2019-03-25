@@ -33,7 +33,7 @@ spec:
         name: ols-router-web-k8s
     spec:
       initContainers:
-      - image: docker-registry.default.svc:5000/3aa7ll-tools/ols-router
+      - image: docker-registry.default.svc:5000/3aa7ll-tools/ols-router-web
         imagePullPolicy: Always
         command:
         - cp
@@ -60,17 +60,18 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            path: /index.html
+            path: /ping
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: 200
+
+          initialDelaySeconds: 270
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
         resources:
           limits:
             cpu: 1
-            memory: 3Gi
+            memory: 4Gi
         volumeMounts:
         - mountPath: /usr/local/tomcat/logs
           name: tc-work

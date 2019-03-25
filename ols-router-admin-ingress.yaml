@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: ols-router-admin
+  name: ols-router-admin
+spec:
+  rules:
+    - host: ols-router-admin-dev.apps.gov.bc.ca
+      http:
+        paths:
+          - backend:
+              serviceName: ols-router-admin
+              servicePort: 8080
+            path: /int/
