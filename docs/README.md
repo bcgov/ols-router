@@ -56,6 +56,6 @@ On startup, a Route Planner node will read the latest static road network into a
 ## Draft Phase 2 System Architecture
 In phase 2, the system architecture will be enhanced to support real-time changes to BC's road network.
 
-On startup, the Road Watcher will read in the latest static road network into a cached, live road network. The Road Watcher will then read the latest events from real-time APIs on a periodic schedule (e.g., every five minutes) and convert them to a form that is easily digestable by the Route Planner. The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
+On startup, the Road Watcher will read in the latest static road network into a cached, live road network. The Road Watcher will then read the latest events from real-time APIs on a periodic schedule (e.g., every five minutes) and converts them to a form that is easily digestable by the Route Planner. The Road Watcher then puts the digestible real-time events into a datastore that is accessible to the Route Planner and the Route Planner pulls the updates from the datastore every few minute. The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
 
 ![](https://github.com/bcgov/ols-router/blob/master/docs/BC%20RPNG-Phase-2-Architecture.png)
