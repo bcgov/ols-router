@@ -1,5 +1,5 @@
 # BC Route Planner NG
-BC Route Planner NG is a three year project of the Province of British Columbia to develop a state-of-the art route planner. The BC Route Planner NG is a very vital component of the free and open DataBC Location Services Platform.
+BC Route Planner NG is a three year project of the Province of British Columbia to develop a state-of-the art route planner. The BC Route Planner NG is a vital component of the free and open DataBC Location Services Platform.
 
 In year 1 (2018-19), we will investigate the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, scheduled road events and construction, and ferry schedules. The first release will include components for which there is insufficient or no real data so that a stable API will be available for developers sooner than later. Such components will be turned off by default. Creating and managing data sources is out of scope of this project. Getting data custodians to put usable data APIs in place is not expected this year. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck. 
 
@@ -10,7 +10,10 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
 Project status as of:<br>
-[2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-12.md)<br>
+[2019-03-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-15.md)<br>
+[2019-02-19](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-14.md)<br>
+[2019-01-28](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-13.md)<br>
+[2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-12.md)<br>
 [2018-12-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-11.md)<br>
 [2018-11-30](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-10.md)<br>
 [2018-11-16](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-9.md)<br>
@@ -56,6 +59,8 @@ On startup, a Route Planner node will read the latest static road network into a
 ## Draft Phase 2 System Architecture
 In phase 2, the system architecture will be enhanced to support real-time changes to BC's road network.
 
-On startup, the Road Watcher will read in the latest static road network into a cached, live road network. The Road Watcher will then update the live road network from real-time APIs on a periodic schedule (e.g., every five minutes). The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls (e.g., every week). A candidate real-time database management system to manage the live road network is [RethinkDb](https://www.rethinkdb.com/)
+On startup, the Road Watcher will read in the latest static road network then read in the latest events from real-time APIs on a periodic schedule (e.g., every five minutes) and assign them to the appropriate segments in the network. It will then convert the integrated events into a form that is easily digestable by the Route Planner and write them out to shared datastore that is accessible to all Route Planner nodes.  Individual Route Planner nodes will pull events from the shared datastore every few minutes. 
 
-![](https://github.com/bcgov/ols-router/blob/master/docs/BC%20RPNG-Phase-2-Architecture.png)
+The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
+
+![](https://github.com/bcgov/ols-router/blob/master/docs/BC-RPNG-Phase-2-Architecture.png)

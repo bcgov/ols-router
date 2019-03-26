@@ -1,7 +1,9 @@
 # RouterNG, Status Report #12
+
 Date: 2019-01-04<br>
 Sprint: 5<br>
-Prepared by: Graeme Leeming, *Refractions Research Inc.*
+Prepared by: Graeme Leeming (Refractions Research Inc.)
+
 ## Overview
 There are less than two weeks remaining in Sprint 5. Chris has had time for limited interaction with Leo on deployment strategies. As a result, he has updated the code/modules to work with Java 11. He is also getting file headers and directory structures sorted out.
 Late last year we had a discussion about the use of OpenStreetCam to support data validation. A corresponding URL link has been added to the turn restriction review tool, however its usefulness is quite limited by both data quality and quantity.
