@@ -152,12 +152,12 @@ public class RoutingController {
 
 	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.GET})
 	public RouterDistanceBetweenPairsResponse distanceBetweenPairsGet(RoutingParameters params, BindingResult bindingResult) {
-		return distanceBetweenPairsPost(params, bindingResult);
+		return distanceBetweenPairs(params, bindingResult);
 	}
 
 	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.POST})
 	public RouterDistanceBetweenPairsResponse distanceBetweenPairsPost(RoutingParameters params, BindingResult bindingResult) {
-		return distanceBetweenPairsPost(params, bindingResult);
+		return distanceBetweenPairs(params, bindingResult);
 	}
 
 	private RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params, BindingResult bindingResult) {
