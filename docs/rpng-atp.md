@@ -1,7 +1,7 @@
 # Route Planner NG Acceptance Test Plan
 
 ## Background
-Route Planner Next Generation is a 3 year project to develop an open source route planner capable of time-dependent routing and commercial vehicle routing.
+Route Planner Next Generation is a three year project to develop an open source route planner capable of time-dependent routing and commercial vehicle routing.
 
 - Version 2.0, due for release in May, 2019 will support time-dependent routing. 
 - Version 2.1 will support truck routing for use in height clearance applications.
