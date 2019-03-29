@@ -10,8 +10,8 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
 Project status as of:<br>
-[2019-03-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-15.md)<br>
-[2019-02-19](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-14.md)<br>
+[2019-03-13](rpng-2019-status-15.md)<br>
+[2019-02-19](rpng-2019-status-14.md)<br>
 [2019-01-28](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-13.md)<br>
 [2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-12.md)<br>
 [2018-12-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-11.md)<br>
