@@ -18,7 +18,7 @@ The BC Route Planner NG is a web service (aka API) running behind Kong, our API 
 
 On startup, a Route Planner node will read the latest static road network into a cached road network. Route Planner nodes will be restarted monthly when updated ITN data is received and prepared for use. Historic traffic congestion, road events, and ferry schedules are all cooked data designed solely for proof-of-concept.
 
-![](https://github.com/bcgov/ols-router/blob/master/docs/BC-RPNG-Phase-1-Architecture.png)
+![](BC-RPNG-Phase-1-Architecture.png)
 
 ## Draft Phase 2 System Architecture
 In phase 2, the system architecture will be enhanced to support real-time changes to BC's road network.
