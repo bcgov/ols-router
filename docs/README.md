@@ -12,23 +12,23 @@ In year 3 (2020-2021), we will focus on incorporating user-requested enhancement
 Project status as of:<br>
 [2019-03-13](rpng-2019-status-15.md)<br>
 [2019-02-19](rpng-2019-status-14.md)<br>
-[2019-01-28](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-13.md)<br>
-[2019-01-04](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2019-status-12.md)<br>
-[2018-12-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-11.md)<br>
-[2018-11-30](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-10.md)<br>
-[2018-11-16](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-9.md)<br>
-[2018-10-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-8.md)<br>
-[2018-10-10](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-7.md)<br>
-[2018-09-20](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-6.md)<br>
-[2018-09-06](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-5.md)<br>
-[2018-08-14](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-4.md)<br>
-[2018-07-26](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-3.md)<br>
-[2018-07-13](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-2.md)<br>
-[2018-06-15](https://github.com/bcgov/ols-router/blob/master/docs/rpng-2018-status-1.md)<br>
+[2019-01-28](rpng-2019-status-13.md)<br>
+[2019-01-04](rpng-2019-status-12.md)<br>
+[2018-12-14](rpng-2018-status-11.md)<br>
+[2018-11-30](rpng-2018-status-10.md)<br>
+[2018-11-16](rpng-2018-status-9.md)<br>
+[2018-10-26](rpng-2018-status-8.md)<br>
+[2018-10-10](rpng-2018-status-7.md)<br>
+[2018-09-20](rpng-2018-status-6.md)<br>
+[2018-09-06](rpng-2018-status-5.md)<br>
+[2018-08-14](rpng-2018-status-4.md)<br>
+[2018-07-26](rpng-2018-status-3.md)<br>
+[2018-07-13](rpng-2018-status-2.md)<br>
+[2018-06-15](rpng-2018-status-1.md)<br>
 
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
 
-[Draft Integrated Transportation Network Data Model Gaps](https://github.com/bcgov/ols-router/blob/master/docs/ITN-Data-Mode-Gaps.md)
+[Draft Integrated Transportation Network Data Model Gaps](ITN-Data-Mode-Gaps.md)
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
 
@@ -63,4 +63,4 @@ On startup, the Road Watcher will read in the latest static road network then re
 
 The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
 
-![](https://github.com/bcgov/ols-router/blob/master/docs/BC-RPNG-Phase-2-Architecture.png)
+![](BC-RPNG-Phase-2-Architecture.png)
