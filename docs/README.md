@@ -28,6 +28,8 @@ Project status as of:<br>
 
 [Draft year 1 Route Planner release notes](https://github.com/bcgov/ols-router/issues/75)
 
+[Route Planner NG Acceptance Test Plan](rpng-atp.md)
+
 [Draft Integrated Transportation Network Data Model Gaps](ITN-Data-Mode-Gaps.md)
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
@@ -65,4 +67,3 @@ The Road Watcher will be restarted on a schedule that keeps up with new road con
 
 ![](BC-RPNG-Phase-2-Architecture.png)
 
-[Here](rpng-atp.md) is the Route Planner NG Acceptance Test Plan
