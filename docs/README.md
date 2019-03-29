@@ -64,3 +64,5 @@ On startup, the Road Watcher will read in the latest static road network then re
 The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
 
 ![](BC-RPNG-Phase-2-Architecture.png)
+
+[Here](rpng-atp.md) is the Route Planner NG Acceptance Test Plan
