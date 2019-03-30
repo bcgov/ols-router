@@ -7,7 +7,7 @@ In year 2 (2019-2020), we will add support for truck routing, real-time road eve
 
 In year 3 (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
-[Draft year 1 Route Planner release notes](rpng-2.0-release-notes.md)
+[Route Planner 2.0 release notes](rpng-2.0-release-notes.md)
 
 [Route Planner NG Acceptance Test Plan](rpng-atp.md)
 
