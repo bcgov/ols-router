@@ -35,6 +35,8 @@ Project status as of:<br>
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
 
+[Comparison between ITN and OSM](osm-itn-stats.md)
+
 ## Route Planner NG Year 1 Feature Matrix
 
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
@@ -67,5 +69,3 @@ On startup, the Road Watcher will read in the latest static road network then re
 The Road Watcher will be restarted on a schedule that keeps up with new road construction and changes to road signs and traffic controls.
 
 ![](BC-RPNG-Phase-2-Architecture.png)
-
-[Comparison between ITN and OSM](osm-itn-stats.md)
