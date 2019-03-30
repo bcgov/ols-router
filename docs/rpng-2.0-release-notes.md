@@ -13,12 +13,12 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 2. All new features are grouped into modules which can be turned on or off with each routing request using the disable parameter as follows:
-                  --* sc – ferry schedules
-                  --* tf – historic traffic congestion
-                  --* ev – road events
-                  --* td – time-dependency; turning this off turns off all options above
-                  --* tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
-                  --* tc - turn costs
+                  * sc – ferry schedules
+                  * tf – historic traffic congestion
+                  * ev – road events
+                  * td – time-dependency; turning this off turns off all options above
+                  * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
+                  * tc - turn costs
 
 
 For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
