@@ -74,6 +74,8 @@ Define Route Planner Administration Application tests including:
   
   * Route Planner Admin Application test suite executed manually on developer and delivery platform with no major issues (system test)
 
+### Steps
+
 1. On Test platform, use Routable BC Maker to prepare a routable road network using the latest ITN and turn-restrictions.
 
 2. Run route planner test suite on test platform and compare to delivery platform
