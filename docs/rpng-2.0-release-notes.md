@@ -1,11 +1,16 @@
 # Route Planner 2.0 Release Notes
 
-# Overview
-Route Planner 2.0 is the first release of Route Planner Next Generation. It is backward compatible with Route Planner 1.x . All new features are grouped into modules which can be turned on or off with each routing request.
+## Overview
+Route Planner 2.0 is the first release of Route Planner Next Generation. We took what we learned from using the excellent Graph Hopper open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source Jsprit library for route optimization.
 
-# Features
+## API Changes
 
-## Basic Routing
+1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
+2. All new features are grouped into modules which can be turned on or off with each routing request.
+
+## Features
+
+### Basic Routing
 1. Time-independent turn restrictions
 2. Shortest/fastest route
 3. Turn-by-turn directions including travel time and cardinal direction on each leg.
@@ -18,7 +23,7 @@ Route Planner 2.0 is the first release of Route Planner Next Generation. It is b
 
 There are few time-independent turn-restrictions in the Integrated Transportation Network so their influence on route accuracy will be minimal.
 
-## Time-dependent routing
+### Time-dependent routing
 
 1. Time-dependent turn-restrictions
 3. Turn costs
@@ -27,7 +32,7 @@ There are few time-independent turn-restrictions in the Integrated Transportatio
 6. Traffic congestion; suitable for demo purposes only due to lack of data
 
 
-## Truck routing
+### Truck routing
 1. Turn restrictions based on vehicle dimensions
 2. Road restrictions including height, width, length restrictions; suitable for demo purposes only
 3. Bridge weight restrictions; suitable for demo purposes only
@@ -35,7 +40,7 @@ There are few time-independent turn-restrictions in the Integrated Transportatio
 
 There are few road and bridge restrictions in the Integrated Transportation Network so their influence on route accuracy will be minimal.
 
-## More routing options
+### More routing options
 1. Trip departure date/time
 2. Vehicle dimensions including overall height, overall width, overall length, and gross vehicle weight
 4. Disable advanced routing functions such as time-dependent turn restrictions, turn costs, road events, ferry schedules, and traffic congestion. By default, all advanced routing functions are turned off.
