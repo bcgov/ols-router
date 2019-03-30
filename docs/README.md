@@ -68,3 +68,4 @@ The Road Watcher will be restarted on a schedule that keeps up with new road con
 
 ![](BC-RPNG-Phase-2-Architecture.png)
 
+[Comparison between ITN and OSM](osm-itn-stats.md)
