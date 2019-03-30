@@ -10,6 +10,7 @@
 5. Find optimal order of multiple waypoints (aka Travelling Salesperson Problem)
 6. Find nearest location by road (e.g., find nearest of 160 medical diagnostic facilities to a given point location)
 7. U-turns restrictions
+8. Implicit turn restrictions (e.g., don't turn right at stop light if there is a right-turn yield lane)
 8. Optionally start and end on the correct side of the street
 
 There are few time-independent turn-restrictions in the Integrated Transportation Network so their influence on route accuracy will be minimal.
