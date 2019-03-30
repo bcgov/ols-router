@@ -26,7 +26,7 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 4. Use the *correctSide* boolean flag to specify if origin and destination should begin and end on the correct side of the street. For example, 1175 Douglas St, Victoria, BC is on the east side of Douglas St. To start or end on this side of the street, set correctSide to True.
 
-5. You can specify truck dimensions with the *height* (in metres), *weight* (GVW), and *width* (in metres) parameters.
+5. You can specify truck dimensions with the *height* (OAH in metres), *width* (OAW in metres), and *weight* (GVW in kg)
 
 6. Use the *truckRouteMultiplier* parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, there are many designated truck routes in the Greater Vancouver area.
 
