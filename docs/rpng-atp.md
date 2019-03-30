@@ -24,9 +24,11 @@ GitHub and ZenHub are to be used for issue logging and tracking
 
 ### Defining, storing, and executing test cases and analysing results
 
-The *Route Planner Test Framework* (RPTF) can store and execute a suite of routing test cases and compare results to a reference dataset. 
-The *Brython Router Probe* will be used for additional testing as needed.
-The Location Services in Action application will be used for interactive router validation and bash testing.
+- The *Route Planner Test Framework* (RPTF) can store and execute a suite of routing test cases and compare results to a reference dataset. 
+
+- The *Brython Router Probe* will be used for additional testing as needed.
+
+- The Location Services in Action application will be used for interactive router validation and bash testing.
 
 ## Test Planning Process
 
@@ -58,10 +60,16 @@ Define test cases for various geographic scenarios including:
 
 ## Testing Process
 
+0. Preconditions:
+-- route planner deployed on delivery and test platforms
+-- test tools deployed and configured to access route planner on delivery and test platforms
+
 1. Run test suite on developer platform and verify results (system test)
 
 2. Run test suite on delivery platform and compare to developer platform (system test)
 
 3. Run test suite on test platform and compare to delivery platform (acceptance test)
+
+4. Bash test the route planner using the Location Services in Action application
 
 4. The Ministry will accept or reject system based on acceptance test results.
