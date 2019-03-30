@@ -12,28 +12,25 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 ## API Changes
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
+
 2. All new features are grouped into modules which can be turned on or off with each routing request using the disable parameter as follows:
-                  * sc – ferry schedules
-                  * tf – historic traffic congestion
-                  * ev – road events
-                  * td – time-dependency; turning this off turns off all options above
-                  * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
-                  * tc - turn costs
+   * sc – ferry schedules
+   * tf – historic traffic congestion
+   * ev – road events
+   * td – time-dependency; turning this off turns off all options above
+   * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
+   * tc - turn costs
+
+3. Use the departure parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
+
+4. Use the correctSide boolean flag to specify if origin and destination should begin on the correct side of the street.
+
+5. You can specify truck dimensions with the height (in metres), weight (GVW), and width (in metres) parameters.
+
+6. Use the truckRouteMultiplier parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, there are many designated truck routes in the Greater Vancouver area.
 
 
 For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
-
- 
-departure – departure date and time as in 2019-02-28T11:36:00-08:00
-correctSide – Boolean; if true, route to the correct side of the road
-height – max loaded vehicle height
-width – max loaded vehicle width
-weight – GVW
-truckRouteMultiplier – the degree of attraction to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch
-                                          ITN only has truck routes in Fort St John.
- 
-
-
 
 
 
