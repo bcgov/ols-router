@@ -91,5 +91,3 @@ Scheduled Road Events|Yes|Demo only; no real-time event monitoring, only full ro
 Historic traffic congestion|Yes|Demo only|historic traffic data for each road segment in urban areas|Poor; In the absense of real data, simulated traffic peaks were generated for rush hour only.
 Hard road restrictions|Yes|Demo only; no support for height/weight restrictions by lane or rig type|road minimum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
 Ferry schedules|Yes|Demo only due to lack of data; loads ferry schedules from GTFS files|Suitable for demo only; BC Ferries doesn't provide GTFS so we created GTFS file for winter schedules of two ferry routes
-
-Note: Features can be enabled/disabled on a per route planner request basis.
