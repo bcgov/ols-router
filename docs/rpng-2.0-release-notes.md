@@ -14,7 +14,7 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
-2. All new features are grouped into modules which can be turned on or off with each routing request using the disable parameter as follows:
+2. All new features are grouped into modules that can be turned on or off with each routing request using the new disable parameter as follows:
    * sc – ferry schedules
    * tf – historic traffic congestion
    * ev – road events
