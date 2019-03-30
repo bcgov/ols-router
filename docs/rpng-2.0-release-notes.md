@@ -14,7 +14,7 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
-2. All new features are grouped into modules that can be turned on or off with each routing request using the new disable parameter as follows:
+2. All new features are grouped into modules that can be turned on or off with each routing request using the new *disable* parameter as follows:
    * sc – ferry schedules
    * tf – historic traffic congestion
    * ev – road events
@@ -22,13 +22,13 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
    * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
    * tc - turn costs
 
-3. Use the departure parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
+3. Use the *departure* parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
 
-4. Use the correctSide boolean flag to specify if origin and destination should begin and end on the correct side of the street. For example, 1175 Douglas St, Victoria, BC is on the east side of Douglas St. To start or end on this side of the street, set correctSide to True.
+4. Use the *correctSide* boolean flag to specify if origin and destination should begin and end on the correct side of the street. For example, 1175 Douglas St, Victoria, BC is on the east side of Douglas St. To start or end on this side of the street, set correctSide to True.
 
-5. You can specify truck dimensions with the height (in metres), weight (GVW), and width (in metres) parameters.
+5. You can specify truck dimensions with the *height* (in metres), *weight* (GVW), and *width* (in metres) parameters.
 
-6. Use the truckRouteMultiplier parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, there are many designated truck routes in the Greater Vancouver area.
+6. Use the *truckRouteMultiplier* parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, there are many designated truck routes in the Greater Vancouver area.
 
 
 For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
