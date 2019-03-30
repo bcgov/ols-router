@@ -3,10 +3,39 @@
 ## Overview
 Route Planner 2.0 is the first release of Route Planner Next Generation. We took what we learned from using the excellent Graph Hopper open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source Jsprit library for route optimization.
 
+You must be a provincial government agency or an Integrated Transportation Network partner to use this API.
+Note that we currently restrict the http origin of router requests to the gov.bc.ca domain. If you do want to slap a test app together, let us know your domain and we will add it to our whitelist. You will need an apikey header in your requests. Feel free to use a demo api key available from our rest api console (see link in the guide above).
+ 
+To see the new API in action, feel free to monitor http traffic in your chrome browser while running our demo app, located at our developer site:
+https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
+
 ## API Changes
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
-2. All new features are grouped into modules which can be turned on or off with each routing request.
+2. All new features are grouped into modules which can be turned on or off with each routing request using the disable parameter as follows:
+                  --* sc – ferry schedules
+                  --* tf – historic traffic congestion
+                  --* ev – road events
+                  --* td – time-dependency; turning this off turns off all options above
+                  --* tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
+                  --* tc - turn costs
+
+
+For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
+
+ 
+departure – departure date and time as in 2019-02-28T11:36:00-08:00
+correctSide – Boolean; if true, route to the correct side of the road
+height – max loaded vehicle height
+width – max loaded vehicle width
+weight – GVW
+truckRouteMultiplier – the degree of attraction to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch
+                                          ITN only has truck routes in Fort St John.
+ 
+
+
+
+
 
 ## Features
 
