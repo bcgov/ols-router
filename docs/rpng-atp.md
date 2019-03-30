@@ -60,9 +60,9 @@ Define test cases for various geographic scenarios including:
 
 ## Testing Process
 
-0. Preconditions:
-..* route planner deployed on delivery and test platforms
-..* test tools deployed and configured to access route planner on delivery and test platforms
+Preconditions:
+  * route planner deployed on delivery and test platforms
+  * test tools deployed and configured to access route planner on delivery and test platforms
 
 1. Run test suite on developer platform and verify results (system test)
 
@@ -72,4 +72,4 @@ Define test cases for various geographic scenarios including:
 
 4. Bash test the route planner using the Location Services in Action application
 
-5. Acceptance: The Ministry will accept system if most acceptance test cases pass and failed acceptance test cases identified only minor issues.
+Acceptance: The Ministry will accept system if most acceptance test cases pass and failed acceptance test cases identified only minor issues.
