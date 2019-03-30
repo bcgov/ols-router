@@ -24,7 +24,7 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 3. Use the departure parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
 
-4. Use the correctSide boolean flag to specify if origin and destination should begin on the correct side of the street.
+4. Use the correctSide boolean flag to specify if origin and destination should begin and end on the correct side of the street. For example, 1175 Douglas St, Victoria, BC is on the east side of Douglas. To start or end on this side of the street, set correctSide to True.
 
 5. You can specify truck dimensions with the height (in metres), weight (GVW), and width (in metres) parameters.
 
