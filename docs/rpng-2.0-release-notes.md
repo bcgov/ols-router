@@ -1,4 +1,7 @@
-# Route Planner NG 2.0 Release Notes
+# Route Planner 2.0 Release Notes
+
+# Overview
+Route Planner 2.0 is the first release of Route Planner Next Generation. It is backward compatible with Route Planner 1.x . All new features are grouped into modules which can be turned on or off with each routing request.
 
 # Features
 
