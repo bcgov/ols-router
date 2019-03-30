@@ -50,12 +50,16 @@ Define test cases for each feature of the router including:
  - route optimization
  
 
-Define test cases for various geographic scenarios including:
+Define route planning test cases for various geographic scenarios including:
  - urban areas (high road density)
  - rural areas (low road density)
  - by geographic region (e.g., lower mainland, Vancouver Island, NW BC, SE BC, NE BC, Prince George area)
  - short distances
  - long distances
+
+Define Route Planner Administration Application tests including:
+ - export/import configuration values
+ - reconfigure and reboot route planner
 
 
 ## Testing Process
@@ -66,14 +70,17 @@ Define test cases for various geographic scenarios including:
 
   * Test tools deployed and configured to access route planner on delivery and test platforms
 
-1. Run test suite on developer platform and verify results (system test)
+  * Route planner test suite run on developer and delivery platforms with no major issues (system test)
+  
+  * Route Planner Admin Application test suite executed manually on developer and delivery platform with no major issues (system test)
 
-2. Run test suite on delivery platform and compare to developer platform (system test)
+1. Run route planner test suite on test platform and compare to delivery platform
 
-3. Run test suite on test platform and compare to delivery platform (acceptance test)
+2. Bash test the route planner using the Location Services in Action application
 
-4. Bash test the route planner using the Location Services in Action application
+3. Execute Route Planner Administration test suite manually on Test Platform
+
 
 ### Acceptance
 
-The Ministry will accept the system if most acceptance test cases pass and failed acceptance test cases raised only minor issues.
+The Ministry will accept the system if all acceptance test cases pass.
