@@ -15,10 +15,10 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
 2. All new features are grouped into modules that can be turned on or off with each routing request using the new *disable* parameter as follows:
-   * sc – ferry schedules
-   * tf – historic traffic congestion
-   * ev – road events
-   * td – time-dependency; turning this off turns off all options above
+   * sc – ferry schedules; disabled by default; disabled by default and only suitable for demos
+   * tf – historic traffic congestion; disabled by default and only suitable for demos
+   * ev – road events; disabled by default and only suitable for demos
+   * td – time-dependency; turning this off turns off sc, tf, and ev modules
    * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
    * tc - turn costs
 
