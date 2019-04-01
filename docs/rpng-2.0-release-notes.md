@@ -1,7 +1,7 @@
 # Route Planner 2.0 Release Notes
 
 ## Overview
-Route Planner 2.0 is the first release of Route Planner Next Generation. We took what we learned from using the excellent Graph Hopper open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source [Jsprit library](https://github.com/graphhopper/jsprit) for route optimization.
+Route Planner 2.0 is the first release of Route Planner Next Generation. We took what we learned from using the excellent [Graph Hopper](https://github.com/graphhopper/graphhopper) open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source [Jsprit](https://github.com/graphhopper/jsprit) library for route optimization.
 
 You must be a provincial government agency or an Integrated Transportation Network partner to use this API in your applications. Note that we currently restrict the http origin of router requests to the gov.bc.ca domain so if you do want to slap a test app together, let us know your domain and we will add it to our whitelist. 
 
