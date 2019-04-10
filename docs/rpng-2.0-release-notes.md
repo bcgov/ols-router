@@ -34,49 +34,6 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
 
 
-
-## Features
-
-### Basic Routing
-1. Time-independent turn restrictions
-2. Shortest/fastest route
-3. Turn-by-turn directions including travel time and cardinal direction on each leg.
-4. Visit multiple waypoints in a specific order
-5. Find optimal order of multiple waypoints (aka Travelling Salesperson Problem)
-6. Find nearest location by road (e.g., find nearest of 160 medical diagnostic facilities to a given point location)
-7. U-turns restrictions
-8. Implicit turn restrictions (e.g., don't turn right at the stop light because there is a right-turn yield lane)
-8. Optionally start and end on the correct side of the street
-
-There are few time-independent turn-restrictions in the Integrated Transportation Network so their influence on route accuracy will be minimal.
-
-### Time-dependent routing
-
-1. Time-dependent turn-restrictions
-3. Turn costs
-4. Road events; suitable for demo purposes only due to lack of data
-5. Ferry schedules; suitable for demo purposes only due to lack of data
-6. Traffic congestion; suitable for demo purposes only due to lack of data
-
-
-### Truck routing
-1. Turn restrictions based on vehicle dimensions
-2. Road restrictions including height, width, length restrictions; suitable for demo purposes only
-3. Bridge weight restrictions; suitable for demo purposes only
-4. Designated truck routes; suitable for demo purposes only
-
-There are few road and bridge restrictions in the Integrated Transportation Network so their influence on route accuracy will be minimal.
-
-### More routing options
-1. Trip departure date/time
-2. Vehicle dimensions including overall height, overall width, overall length, and gross vehicle weight
-4. Disable advanced routing functions such as time-dependent turn restrictions, turn costs, road events, ferry schedules, and traffic congestion. By default, all advanced routing functions are turned off.
-
-### Location Services in Action application
-1. Added layers for traffic impactors, road and turn restrictions, and designated truck routes
-2. Simplified method of adding and moving route start, end, and way points. 
-
-
 ## Feature Matrix
 
 Feature                | Disabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
