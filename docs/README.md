@@ -1,7 +1,7 @@
 # BC Route Planner NG
 BC Route Planner NG is an open source route planner with support for time-dependent and vehicle size-dependent routing. Source code is licensed under Apache 2.0 and is available [here](https://github.com/bcgov/ols-router)
 
-See [Route Planner 2.0 in action](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst).
+See [Route Planner 2.0 in action](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
 
 BC Route Planner NG is in year two of a three year development project run by the Province of British Columbia. The BC Route Planner NG is a vital component of the free and open Frugal Maps BC Platform.
 
