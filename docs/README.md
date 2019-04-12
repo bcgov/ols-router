@@ -1,13 +1,13 @@
 # BC Route Planner NG
 BC Route Planner NG is an open source route planner with support for time-dependent and vehicle size-dependent routing. Source code is licensed under Apache 2.0 and is available [here](https://github.com/bcgov/ols-router)
 
-BC Route Planner NG is in year 2 of a three year development project run by the Province of British Columbia. The BC Route Planner NG is a vital component of the free and open Frugal Maps BC Platform.
+BC Route Planner NG is in year two of a three year development project run by the Province of British Columbia. The BC Route Planner NG is a vital component of the free and open Frugal Maps BC Platform.
 
-In year 1 (2018-19), we investigated the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, scheduled road events and construction, and ferry schedules. The first release includes components for which there is insufficient or no real data so that a stable API is available for developers sooner than later. Such components are turned off by default. Creating and managing data sources is out of scope of this project. Getting data custodians to put usable data APIs in place was not expected and didn't happen. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck. 
+In year one (2018-19), we investigated the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, scheduled road events and construction, and ferry schedules. The first release includes components for which there is insufficient or no real data so that a stable API is available for developers sooner than later. Such components are turned off by default. Creating and managing data sources is out of scope of this project. Getting data custodians to put usable data APIs in place was not expected and didn't happen. The performance goal of the first release of RPNG is under two seconds execution time for a single, two-point route for an oversized truck. 
 
-In year 2 (2019-2020), we will add support for vehicle-size dependent routing (aka truck routing), real-time road events, areas of exclusion,and new data sources. Truck routing takes vehicle and load dimensions and road restrictions into account. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides
+In year two (2019-2020), we will add support for vehicle-size dependent routing (aka truck routing), real-time road events, areas of exclusion,and new data sources. Truck routing takes vehicle and load dimensions and road restrictions into account. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides
 
-In year 3 (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
+In year three (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
 [Route Planner 2.0 release notes](rpng-2.0-release-notes.md)
 
