@@ -1,5 +1,5 @@
 # BC Route Planner
-BC Route Planner is an open source route planner with support for time-dependent routing and truck routing on the BC Integrated Transportation Network. [Source code](https://github.com/bcgov/ols-router)is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Route Planner version 2.0 will be released in May, 2019. [Here's a sneak peek](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
+BC Route Planner is an open source route planner with support for time-dependent routing and truck routing on the BC Integrated Transportation Network. [Source code](https://github.com/bcgov/ols-router) is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Route Planner version 2.0 will be released in May, 2019. [Here's a sneak peek](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
 
 ia and called Route Planner NG (RPNG). The BC Route Planner is a vital component of the free and open Frugal Maps BC Platform.
 
