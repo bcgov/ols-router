@@ -14,7 +14,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class RouterConfig {
-	public static final String VERSION = "1.5.1";
+	public static final String VERSION = "2.0.0";
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;

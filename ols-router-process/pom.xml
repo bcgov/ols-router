@@ -37,8 +37,8 @@
             <!-- automatically creates the classpath using all project dependencies,
                  also adding the project build directory -->
             <classpath />
-            <argument>ca.bc.gov.app.router.process.RouterProcess</argument>
-            <argument>C:/apps/bgeo/data/</argument>
+            <argument>ca.bc.gov.ols.router.process.RouterProcess</argument>
+            <argument>C:/apps/router/data/</argument>
           </arguments>
         </configuration>
       </plugin>
@@ -56,7 +56,6 @@
       <groupId>ca.bc.gov.ols</groupId>
       <artifactId>ols-router-core</artifactId>
       <version>${project.version}</version>
-      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
