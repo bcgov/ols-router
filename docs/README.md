@@ -9,6 +9,8 @@ In year two (2019-2020), we will add support for vehicle-size dependent routing 
 
 In year three (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
+[Route Planner 2.0 in action](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
+
 [Route Planner 2.0 release notes](rpng-2.0-release-notes.md)
 
 [Route Planner NG Acceptance Test Plan](rpng-atp.md)
