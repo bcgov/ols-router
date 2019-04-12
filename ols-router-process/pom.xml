@@ -38,7 +38,7 @@
                  also adding the project build directory -->
             <classpath />
             <argument>ca.bc.gov.ols.router.process.RouterProcess</argument>
-            <argument>C:/apps/router/data/</argument>
+            <argument>/data/router/</argument>
           </arguments>
         </configuration>
       </plugin>
