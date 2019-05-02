@@ -17,6 +17,8 @@ In year three (2020-2021), we will focus on incorporating user-requested enhance
 
 [Draft Integrated Transportation Network Data Model Gaps](ITN-Data-Mode-Gaps.md)
 
+[Draft Integrated Transportation Network Data Issues](itn-data-issues.md)
+
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
 Project status as of:<br>
