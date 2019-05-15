@@ -152,4 +152,7 @@ public class WeeklyTimeRange implements TemporalSet {
 		return new WeeklyTimeRange(daySet, Arrays.asList(timeRanges));
 	}
 
+	public static boolean isAlways(WeeklyTimeRange range) {
+		return (range != null && range.isAlways()); 
+	}
 }

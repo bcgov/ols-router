@@ -7,7 +7,7 @@ package ca.bc.gov.ols.router.data;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 
 public class TurnCost {
-	private final String idSeq;
+	private final int[] ids;
 	private byte cost = 0;
 	private WeeklyTimeRange restriction;
 	private TurnRestrictionType type;
@@ -15,7 +15,11 @@ public class TurnCost {
 	private String customDescription;
 	
 	public TurnCost(String idSeq, byte cost, WeeklyTimeRange restriction, TurnRestrictionType type, String sourceDescription, String customDescription) {
-		this.idSeq = idSeq;
+		String[] stringIds = idSeq.split("\\|");
+		ids = new int[stringIds.length];
+		for(int i = 0; i < stringIds.length; i++) {
+			ids[i] = Integer.parseInt(stringIds[i]);
+		}
 		this.cost = cost;
 		this.restriction = restriction;
 		this.setType(type);
@@ -24,7 +28,19 @@ public class TurnCost {
 	}
 
 	public TurnCost(int inSegId, int intId,	int outSegId, byte cost, WeeklyTimeRange restriction, TurnRestrictionType type, String sourceDescription, String customDescription) {
-		this.idSeq = inSegId + "|" + intId + "|" + outSegId;
+		ids = new int[3];
+		ids[0] = inSegId;
+		ids[1] = intId;
+		ids[2] = outSegId;
+		this.cost = cost;
+		this.restriction = restriction;
+		this.setType(type);
+		this.sourceDescription = sourceDescription;
+		this.customDescription = customDescription;
+	}
+
+	public TurnCost(int[] ids, byte cost, WeeklyTimeRange restriction, TurnRestrictionType type, String sourceDescription, String customDescription) {
+		this.ids = ids;
 		this.cost = cost;
 		this.restriction = restriction;
 		this.setType(type);
@@ -33,15 +49,23 @@ public class TurnCost {
 	}
 
 	public String getIdSeqString() {
-		return idSeq;
+		StringBuilder sb = new StringBuilder(64);
+		sb.append(ids[0] + "|" + ids[1] + "|" + ids[2]);
+		for(int i = 3; i < ids.length; i++) {
+			sb.append("|" + ids[i]);
+		}
+		return sb.toString();
 	}
 
-	public int[] getIdSeq() {
-		String[] stringIds = idSeq.split("\\|");
-		int[] ids = new int[stringIds.length];
-		for(int i = 0; i < stringIds.length; i++) {
-			ids[i] = Integer.parseInt(stringIds[i]);
+	public boolean sameTurn(TurnCost other) {
+		if(other.ids.length != ids.length) return false;
+		for(int i = 0; i < ids.length; i++) {
+			if(other.ids[i] != ids[i]) return false;
 		}
+		return true;
+	}
+	
+	public int[] getIdSeq() {
 		return ids;
 	}
 	
