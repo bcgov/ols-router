@@ -67,6 +67,7 @@ public class RouterProcess {
 	static int uTurnRestrictionCount = 0;
 	static int uTurnNonRestrictionCount = 0;
 	static int barricadedTurnCount = 0;
+	static int deadEndCount = 0;
 	static GeometryFactory geometryFactory;
 	//private XsvRowWriter trWriter;
 	
@@ -143,33 +144,42 @@ public class RouterProcess {
 			double maxHeight = Double.NaN;
 			if(!Double.isNaN(fromMaxHeight) && !Double.isNaN(toMaxHeight)) {
 				maxHeight = Math.min(fromMaxHeight, toMaxHeight);
-				} else if(!Double.isNaN(fromMaxHeight)) {
-					maxHeight = fromMaxHeight;
-				} else if(!Double.isNaN(toMaxHeight)) {
-					maxHeight = toMaxHeight;
-				}
+			} else if(!Double.isNaN(fromMaxHeight)) {
+				maxHeight = fromMaxHeight;
+			} else if(!Double.isNaN(toMaxHeight)) {
+				maxHeight = toMaxHeight;
+			} else {
+				// fallback for if we are using the _router output as input
+				maxHeight = rr.getDouble("vehicle_max_height");
+			}
 
 			double fromMaxWidth = rr.getDouble("from_vehicle_max_width");
 			double toMaxWidth = rr.getDouble("to_vehicle_max_width");
 			double maxWidth = Double.NaN;
 			if(!Double.isNaN(fromMaxWidth) && !Double.isNaN(toMaxWidth)) {
 				maxWidth = Math.min(fromMaxWidth, toMaxWidth);
-				} else if(!Double.isNaN(fromMaxWidth)) {
-					maxWidth = fromMaxWidth;
-				} else if(!Double.isNaN(toMaxWidth)) {
-					maxWidth = toMaxWidth;
-				}
+			} else if(!Double.isNaN(fromMaxWidth)) {
+				maxWidth = fromMaxWidth;
+			} else if(!Double.isNaN(toMaxWidth)) {
+				maxWidth = toMaxWidth;
+			} else {
+				// fallback for if we are using the _router output as input
+				maxWidth = rr.getDouble("vehicle_max_width");
+			}
 
 			Integer fromMaxWeight = rr.getInteger("from_vehicle_max_weight");
 			Integer toMaxWeight = rr.getInteger("to_vehicle_max_weight");
 			Integer maxWeight = null;
 			if(fromMaxWeight != null && toMaxWeight != null) {
 				maxWeight = Math.min(fromMaxWeight, toMaxWeight);
-				} else if(fromMaxWeight != null) {
-					maxWeight = fromMaxWeight;
-				} else if(toMaxWeight != null) {
-					maxWeight = toMaxWeight;
-				}
+			} else if(fromMaxWeight != null) {
+				maxWeight = fromMaxWeight;
+			} else if(toMaxWeight != null) {
+				maxWeight = toMaxWeight;
+			} else {
+				// fallback for if we are using the _router output as input
+				maxWeight = rr.getInteger("vehicle_max_weight");
+			}
 
 			boolean isTruckRoute = "Y".equals(rr.getString("truck_route_ind"));
 			
@@ -359,32 +369,6 @@ public class RouterProcess {
 	    				addTurnCost(turnCosts, tr);
 		        	}
 		        } // end loop over segments incident to the intersection
-		        
-		        // build dead-ended trees by working up from dead-ends
-		        if(ends.size() == 1) {
-		        	RpStreetSegment newDeadEnd = ends.get(0).getSegment();
-		        	int nextIntId = intersection.getId();
-		        	while(newDeadEnd != null) {
-			        	newDeadEnd.setIsDeadEnded();
-			        	if(newDeadEnd.getStartIntersectionId() == nextIntId) {
-			        		nextIntId = newDeadEnd.getEndIntersectionId(); 
-			        	} else {
-			        		nextIntId = newDeadEnd.getStartIntersectionId();
-			        	}
-			        	RpStreetIntersection nextIntersection = intersectionIdMap.get(nextIntId);
-			        	newDeadEnd = null;
-			        	for(RpStreetEnd end: nextIntersection.getEnds()) {
-			        		if(!end.getSegment().isDeadEnded()) {
-			        			if(newDeadEnd != null) {
-				        			// there is more than one new dead-end here, we're done
-			        				newDeadEnd = null; 
-			        				break;
-			        			}
-			        			newDeadEnd = end.getSegment();
-			        		}
-			        	}
-		        	}
-		        }
 		        
 		        // deal with ferry terminals
 		        if(ferryEnds.size() > 0 && nonFerryEnds.size() > 0) {
@@ -580,8 +564,67 @@ public class RouterProcess {
 		        	}
 	        	}
 
-		        
+		        handleDeadEnds(intersection, intersectionIdMap, turnCosts);
+		        		        
 		        return true;
+			}
+
+			private void handleDeadEnds(final RpStreetIntersection intersection, 
+					TIntObjectHashMap<RpStreetIntersection> intersectionIdMap,
+					TIntObjectHashMap<List<TurnCost>> turnCosts) {
+				// build dead-ended trees by working up from dead-ends
+				List<RpStreetEnd> ends = intersection.getEnds();
+				RpStreetEnd newDeadEnd = null;
+		        if(ends.size() == 1) {
+		        	newDeadEnd = ends.get(0);
+		        } else if(ends.size() > 1) {
+		        	for(RpStreetEnd possibleDeadEnd : ends) {
+		        		newDeadEnd = possibleDeadEnd;
+		        		// if every other end has a full-time turn restriction onto this end, it is a dead-end
+		        		for(RpStreetEnd in : ends) {
+		        			if(possibleDeadEnd == in) {
+		        				continue;
+		        			}
+		        			if(!checkTurnRestriction(turnCosts, in.getSegment().getSegmentId(), 
+		        					intersection.getId(), possibleDeadEnd.getSegment().getSegmentId())) {
+		        				newDeadEnd = null;
+			        			break;
+		        			}
+		        		}
+		        	}
+		        }
+	        	int nextIntId;
+	        	while(newDeadEnd != null) {
+		        	newDeadEnd.getSegment().setIsDeadEnded();
+		        	deadEndCount++;
+		        	nextIntId = newDeadEnd.getOtherEnd().getIntersectionId();
+		        	RpStreetIntersection nextIntersection = intersectionIdMap.get(nextIntId);
+		        	newDeadEnd = null;
+		        	for(RpStreetEnd end: nextIntersection.getEnds()) {
+		        		if(!end.getSegment().isDeadEnded()) {
+		        			if(newDeadEnd != null) {
+			        			// there is more than one new (non) dead-end here, we're done
+		        				newDeadEnd = null; 
+		        				break;
+		        			}
+		        			newDeadEnd = end;
+		        		}
+		        	}
+	        	}
+			}
+			
+			private boolean checkTurnRestriction(TIntObjectHashMap<List<TurnCost>> turnCosts,
+					int inSegId, int intId, int outSegId) {
+				List<TurnCost> tcs = turnCosts.get(inSegId);
+				if(tcs == null) return false;
+				for(TurnCost tc : tcs) {
+					int[] ids = tc.getIdSeq();
+					if(ids.length == 3 && ids[1] == intId && ids[2] == outSegId
+							&& WeeklyTimeRange.isAlways(tc.getRestriction())) {
+						return true;
+					}
+				}
+				return false;
 			}
 
 			private FerryRoute buildFerryRoute(RpStreetEnd ferryEnd, FerryRoute fr) {
@@ -644,6 +687,7 @@ public class RouterProcess {
 		logger.info("Number of u-turn restrictions added: {}", uTurnRestrictionCount);
 		logger.info("Number of u-turns not restricted based on angle: {}", uTurnNonRestrictionCount);
 		logger.info("Number of turns restricted due to barricades: {}", barricadedTurnCount);
+		logger.info("Number of dead-end segments: {}", deadEndCount);
 		
 		logger.info("Writing output segments...");
 		writeSegments(segments);
