@@ -1,5 +1,8 @@
  pipeline {
     agent any
+    options {
+    buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '1'))
+    }
     parameters {
     string(defaultValue: 'https://github.com/bcgov/ols-router.git', description: 'Source Code Repo URL', name: 'gitRepo')
     string(defaultValue: 'dev', description: 'Git Branch or Tag Name', name: 'gitBranch')
@@ -26,13 +29,13 @@
                 }
             }
         }
-        stage("Quality Gate") {
+       /* stage("Quality Gate") {
             steps {
              timeout(time: 1, unit: 'MINUTES') {
                    waitForQualityGate abortPipeline: false
              }
             }
-        }
+        } */
 
        stage ('create docker sidecar image') {
             steps {
