@@ -18,9 +18,9 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
    * sc – ferry schedules; disabled by default; disabled by default and only suitable for demos
    * tf – historic traffic congestion; disabled by default and only suitable for demos
    * ev – road events; disabled by default and only suitable for demos
-   * td – time-dependency; turning this off turns off sc, tf, and ev modules
-   * tr – turn restrictions; if td is off, time-dependent turn restrictions are ignored
-   * tc - turn costs
+   * td – time-dependency; disabling this disables sc, tf, and ev modules
+   * tr – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
+   * tc - turn costs (e.g., left turns take longer than right turns)
 
 3. Use the *departure* parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
 
