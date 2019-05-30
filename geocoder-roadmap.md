@@ -3,4 +3,4 @@
 |Version|4.0| | | |
 |Goal| Release as open source| | | |
 |Features|Source code released under Apache 2.0 license| | | |
-|Metrics|Geocoder is installed and configured successfully by at least one external developer| | | |
+|Metrics|Geocoder is installed and configured successfully by at least one developer external to government| | | |
