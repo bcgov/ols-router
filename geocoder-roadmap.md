@@ -2,5 +2,5 @@
 |--:|---|---|---|---|
 |Version|4.0| 4.1| | |
 |Goal| Release as open source|More robust address parsing | | |
-|Features|Source code released under Apache 2.0 license|  - new salvage mode for bad addresses<br> - handle glued words<br> - handle unit number stuck to civic number<BR> - ignore c/o occupant name<br> - return offending values in faults| | |
+|Features|Source code released under<br> Apache 2.0 license|  - new salvage mode for bad addresses<br> - handle glued words<br> - handle unit number stuck to civic number<BR> - ignore c/o occupant name<br> - return offending values in faults| | |
 |Metrics|Geocoder is installed and configured<br> by at least one developer external to government| | | |
