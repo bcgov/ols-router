@@ -3,6 +3,7 @@ name: Java CI
 on: [push]
 
 jobs:
+
   build:
 
     runs-on: ubuntu-latest
@@ -14,4 +15,4 @@ jobs:
       with:
         java-version: 1.11
     - name: Build with Maven
-      run: mvn clean package --file pom.xml
+      run: mvn clean package sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN --file pom.xml
