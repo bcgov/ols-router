@@ -20,12 +20,8 @@ jobs:
         java-version: ${{ matrix.java_version }}
     - name: Update Maven Release Version
       run: mvn versions:set -DnewVersion='${{ matrix.mvn_ver }}' -DgenerateBackupPoms=false --file pom.xml
-    - name: Build with Maven
+    - name: Build with Maven and Scan with SonarCloud
       env: 
-        SONAR_URL: ${{ secrets.SONAR_URL }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
-      run: mvn clean package --file pom.xml
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}
+        SONAR_URL: ${{ secrets.SONAR_CLOUD_URL }}
+        SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}    
+      run: mvn clean package org.sonarsource.scanner.maven:sonar -Dsonar.host.url=$SONAR_CLOUD_URL -Dsonar.login=$SONAR_CLOUD_TOKEN --file pom.xml
