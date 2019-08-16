@@ -24,8 +24,4 @@ jobs:
       env: 
         SONAR_URL: ${{ secrets.SONAR_CLOUD_URL }}
         SONAR_TOKEN: ${{ secrets.SONAR_CLOUD_TOKEN }}    
-      run: mvn clean package sonar:sonar \
-      -Dsonar.projectKey=ca.bc.gov.ols.router \
-      -Dsonar.organization=bcgov-oss \
-      -Dsonar.host.url=$SONAR_CLOUD_URL \
-      -Dsonar.login=$SONAR_CLOUD_TOKEN --file pom.xml
+      run: mvn clean package sonar:sonar -Dsonar.projectKey=ca.bc.gov.ols.router -Dsonar.organization=bcgov-oss -Dsonar.host.url=$SONAR_CLOUD_URL -Dsonar.login=$SONAR_CLOUD_TOKEN --file pom.xml
