@@ -1,6 +1,6 @@
 name: GitHub CI for Router
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
 
