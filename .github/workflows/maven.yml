@@ -34,7 +34,7 @@ jobs:
         
     steps:
     - name: mattermost-notification
-      uses: 8398a7/action-slack@v1
+      uses: 8398a7/action-slack@v1.0.1
       with:
         type: auto
       env:
