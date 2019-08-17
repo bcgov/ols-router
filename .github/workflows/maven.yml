@@ -1,4 +1,4 @@
-name: Java CI
+name: GitHub CI for Router
 
 on: [push]
 
@@ -10,7 +10,7 @@ jobs:
       matrix:
         java_version: [1.11]
         os: [ubuntu-latest]
-        mvn_ver: [2.0.0]
+        pom_ver: [2.0.0]
 
     steps:   
     - name: SCM Checkout
@@ -20,7 +20,7 @@ jobs:
       with:
         java-version: ${{ matrix.java_version }}
     - name: Update Maven Release Version
-      run: mvn versions:set -DnewVersion='${{ matrix.mvn_ver }}' -DgenerateBackupPoms=false --file pom.xml
+      run: mvn versions:set -DnewVersion='${{ matrix.pom_ver }}' -DgenerateBackupPoms=false --file pom.xml
     - name: Build with Maven and Scan with SonarQube
       env: 
         SONAR_URL: ${{ secrets.SONAR_URL }}
