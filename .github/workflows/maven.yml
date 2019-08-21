@@ -51,5 +51,4 @@ jobs:
       uses: actions/checkout@v1    
     - name: One Click Docker
       uses: pangzineng/Github-Action-One-Click-Docker@v1.1.1
-      args = "-f Dockerfile"
-    
+      args: [-f Dockerfile]
