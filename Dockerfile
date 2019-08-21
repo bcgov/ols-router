@@ -3,7 +3,7 @@ ADD . /app
 WORKDIR /app
 RUN mvn versions:set -DnewVersion='1' -DgenerateBackupPoms=false && mvn package
 
-FROM gcr.io/distroless/base
+FROM busybox
 RUN mkdir /app
 COPY --from=builder /app/ols-*/target/ols-*.war /app/
 RUN ls -la /app/
