@@ -5,5 +5,5 @@ RUN mvn clean package
 
 FROM gcr.io/distroless/base
 COPY --from=build-env /app/ols-*/target/ols-*.war /
-RUN chmod o+r $(ls /ols-*.war)
+RUN ls -l /ols-*.war
 CMD ["tail", "-f", "/dev/null"]
