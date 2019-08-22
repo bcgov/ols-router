@@ -1,6 +1,13 @@
 name: GitHub CI for Router
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - dev
+  pull_request:
+    branches:
+    - master
+    - dev
 
 jobs:
 
@@ -41,6 +48,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
       if: success()
 
+on:
+  push:
+    branches:
+    - dev
+jobs:
   dockerize:
     runs-on: ${{ matrix.os }}
     strategy:
