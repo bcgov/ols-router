@@ -127,6 +127,10 @@ public class FileRouterDataSource implements RouterDataSource {
 				continue;
 			}
 			String fullName = streetNameById.get(streetNameIdBySegmentId.get(segmentId));
+			if(fullName == null) {
+            	fullName = "unnamed";
+                logger.warn("SegmentId {} has no name; possible data error?", segmentId);
+            }
 			StreetSegment segment = new StreetSegment(segmentId, centerLine,  
 					startIntersectionId, endIntersectionId, fullName, roadClass,
 					travelDir, dividerType, startTrafficImpactor, endTrafficImpactor, 
