@@ -8,4 +8,9 @@ RUN set -x && \
     chmod -R 644 $JENKINS_REF_HOME && \
     chmod -R g+rwX $JENKINS_REF_HOME
 
+RUN pushd /usr/local/bin && \
+    curl -s -O https://dl.min.io/client/mc/release/linux-amd64/mc && \
+    chmod +x mc && \
+    popd
+
 USER 1001

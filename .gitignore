@@ -39,3 +39,4 @@ local.properties
 .settings/
 .loadpath
 *.launch
+node_modules/
