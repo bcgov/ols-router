@@ -90,15 +90,16 @@ The route resource represents the shortest or fastest route between given points
 3. Fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?routeDescription=fastest%20route%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
 
 4. Fastest route around a bridge for an overheight truck<br>
-https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1&correctSide=false&roundTrip=false<br>
+https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1<br>
 
 5. Fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001&correctSide=false&roundTrip=false<br>
+https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001<br>
 
-6. Fastest route for a truck following a truck route through Vancouver<br>
+6. Fastest route for a truck following a truck route through Fort St John<br>
+https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&followTruckRoute=true&truckRouteMultiplier=100<br>
 
 7. Fastest route from 976 Meares St, Victoria to 1175 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/route.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1&correctSide=true&roundTrip=false<br>
+   https://router.api.gov.bc.ca/route.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1&correctSide=true<br>
 
 
 ### HTTP response
@@ -241,7 +242,8 @@ https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.3
 5. Directions and fastest route around a bridge for an overweight truck<br>
 https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001&correctSide=false&roundTrip=false<br>
 
-6. Directions and fastest route for a truck following a truck route through Vancouver<br>
+6. Directions and fastest route for a truck following a truck route through Fort St John<br>
+https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&followTruckRoute=true&truckRouteMultiplier=100<br>
 
 7. Directions and fastest route from 976 Meares St, Victoria to 1175 Douglas St, Victoria on the correct side of the street<br>
    https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1&correctSide=true&roundTrip=false<br>
