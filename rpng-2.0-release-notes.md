@@ -30,7 +30,7 @@ https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
 
 6. Use the *truckRouteMultiplier* parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, you will find many designated truck routes in the Greater Vancouver area but nowhere else in the province.
 
-For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/api-specs/blob/master/router/router-developer-guide.md)
+For more information about the API, consult the [Route Planner Developer Guide](https://github.com/bcgov/ols-router/blob/master/router/router-developer-guide.md)
 
 
 ## Feature Matrix
