@@ -240,7 +240,7 @@ The directions resource represents the turn-by-turn directions, shortest or fast
 https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&height=5.1&correctSide=false&roundTrip=false<br>
 
 5. Directions and fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001&correctSide=false&roundTrip=false<br>
+https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001&correctSide=false&roundTrip=false<br>
 
 6. Directions and fastest route for a truck following a truck route through Fort St John<br>
 https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&followTruckRoute=true&truckRouteMultiplier=100<br>
