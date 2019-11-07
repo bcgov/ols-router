@@ -7,8 +7,7 @@ You must be a provincial government agency or an Integrated Transportation Netwo
 
 You will need an apikey header in your requests. Feel free to use a demo api key available from our rest api console (see link in the guide above).
  
-To see the new API in action, feel free to monitor http traffic in your chrome browser while running our demo app, located at our developer site:
-https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=dlv
+To see the new API in action, feel free to monitor http traffic in your chrome browser while running [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html)
 
 ## API Changes
 
