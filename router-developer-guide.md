@@ -93,7 +93,7 @@ The route resource represents the shortest or fastest route between given points
 https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&correctSide=false&roundTrip=false<br>
 
 5. Fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/truck/route.json?apikey=11dd756f680c47b5aef5093d95543738&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&weight=30001&correctSide=false&roundTrip=false<br>
+https://router.api.gov.bc.ca/truck/route.json?apikey=11dd756f680c47b5aef5093d95543738&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&weight=30001&correctSide=false&roundTrip=false<br>
 
 6. Fastest route for a truck following a truck route through Vancouver<br>
 
@@ -239,7 +239,7 @@ The directions resource represents the turn-by-turn directions, shortest or fast
 https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&correctSide=false&roundTrip=false<br>
 
 5. Directions and fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/directions.json?apikey=11dd756f680c47b5aef5093d95543738&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&weight=30001&correctSide=false&roundTrip=false<br>
+https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&weight=30001&correctSide=false&roundTrip=false<br>
 
 6. Directions and fastest route for a truck following a truck route through Vancouver<br>
 
