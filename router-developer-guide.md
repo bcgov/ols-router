@@ -89,6 +89,13 @@ The route resource represents the shortest or fastest route between given points
 
 3. Fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?routeDescription=fastest%20route%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
 
+4. Fastest route around a bridge for an overheight truck
+https://router.api.gov.bc.ca/truck/route.json?apikey=11dd756f680c47b5aef5093d95543738&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&correctSide=false&roundTrip=false<br>
+
+5. Fastest route around a bridge for an overweight truck
+
+6. Fastest route for a truck following a truck route through Vancouver
+
 ### HTTP response
 The route resource will return the following representation:
 
@@ -222,6 +229,14 @@ The directions resource represents the turn-by-turn directions, shortest or fast
 2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?routeDescription=directions%20Cand%20Cshortest%20route%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
 
 3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?routeDescription=directions%20Cand%20Cfastest%20route%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
+
+4. Directions and fastest route around a bridge for an overheight truck
+https://router.api.gov.bc.ca/truck/directions.json?apikey=11dd756f680c47b5aef5093d95543738&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&departure=2019-11-06T21%3A30%3A00-08%3A00&height=5.1&correctSide=false&roundTrip=false<br>
+
+5.Directions and fastest route around a bridge for an overweight truck
+
+6. Directions and fastest route for a truck following a truck route through Vancouver
+
 
 ### HTTP response
 The directions resource will return the following representation:
