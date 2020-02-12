@@ -17,6 +17,6 @@
 |13|Only one of four truck weights is represented|Truck permitting requires four: GVW, Single Axle, Tandem Axle, Tridem Axle.| Leave single weight value for now. Full dimension restrictions will come from a separate, MOTI restriction data service that ties road-restricting features to ITN road segments.
 |14| Only one height restriction represented|Height restrictions vary by lane and travel direction.|Leave single height value to represent minimum max height across all lanes and both directions. Detailed height restrictions will come from a separate, MOTI restriction data service that ties road-restricting features to ITN road segments.
 |15|No time-dependent max speed property|Can't represent school zone speed limits which are only in force during school hours| ?
-|16|NO implicit flag in turn restrictions|Can't tell if a given turn-restriction should have a sign on the ground for QA|Add implicit flag to turn restrictions|
+|16|NO implicit flag in turn restrictions|Can't tell if a given turn-restriction should have a sign on the ground for QA|Add implicit flag to turn restrictions| 
 |17|Access restriction codes need review|||
 |18|Turn-restrictions need a vehicle type property|Can't specify a truck-only turn restriction|add vehicle-type:String property with possible values of truck and any
