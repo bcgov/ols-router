@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+
+    Copyright 2008-2015, Province of British Columbia
+    All rights reserved.
+
+-->
+<web-app xmlns="
+       http://java.sun.com/xml/ns/javaee"
+       xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+       http://java.sun.com/xml/ns/javaee 
+       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+    id="rest" version="3.0">
+	<servlet>
+   		<servlet-name>dispatcher</servlet-name>
+      		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+			<load-on-startup>1</load-on-startup>
+ 			<init-param>
+      			<param-name>contextClass</param-name>
+      			<param-value>
+         			org.springframework.web.context.support.AnnotationConfigWebApplicationContext
+      			</param-value>
+  			</init-param>
+ 			<init-param>
+      			<param-name>contextConfigLocation</param-name>
+      			<param-value>ca.bc.gov.ols.router.admin</param-value>
+      		</init-param>
+  	</servlet>
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
