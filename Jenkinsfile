@@ -1,10 +1,13 @@
  pipeline {
     agent any
+    options {
+    buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '1'))
+    }
     parameters {
     string(defaultValue: 'https://github.com/bcgov/ols-router.git', description: 'Source Code Repo URL', name: 'gitRepo')
     string(defaultValue: 'dev', description: 'Git Branch or Tag Name', name: 'gitBranch')
     choice(name: 'pn', choices: ['ols-router-admin', 'ols-router-web'], description: 'Product Name to build, used by docker package') 
-    string(defaultValue: '4.0.0', description: 'Version Tag will be used by Arctifactory', name: 'mvnTag', trim: false)
+    string(defaultValue: '2.0.0-SNAPSHOT', description: 'Version Tag will be used by Arctifactory', name: 'mvnTag', trim: false)
     string(defaultValue: 'clean package -Pk8s -pl ${pn} -am', description: 'default maven life cycle goal', name: 'mvnGoal', trim: false)
     }
     stages {
@@ -26,13 +29,13 @@
                 }
             }
         }
-        stage("Quality Gate") {
+       /* stage("Quality Gate") {
             steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
+             timeout(time: 1, unit: 'MINUTES') {
+                   waitForQualityGate abortPipeline: false
+             }
             }
-        }
+        } */
 
        stage ('create docker sidecar image') {
             steps {

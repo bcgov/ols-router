@@ -1,0 +1,16 @@
+name: sidecar package
+on:
+  push:
+    branches:
+    - master
+jobs:
+  dockerize:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    steps:
+    - name: SCM Checkout
+      uses: actions/checkout@v1    
+    - name: One Click Docker
+      uses: pangzineng/Github-Action-One-Click-Docker@v1.1.1

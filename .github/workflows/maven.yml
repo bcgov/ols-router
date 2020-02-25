@@ -1,0 +1,49 @@
+name: GitHub CI for Router
+
+on:
+  push:
+    branches:
+    - dev
+  pull_request:
+    branches:
+    - master
+    - dev
+
+jobs:
+
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java_version: [1.11]
+        os: [ubuntu-latest]
+        pom_ver: [2.0.0]
+
+    steps:   
+    - name: SCM Checkout
+      uses: actions/checkout@v1
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java_version }}
+    - name: Update Maven Release Version
+      run: mvn versions:set -DnewVersion='${{ matrix.pom_ver }}' -DgenerateBackupPoms=false --file pom.xml
+    - name: Build with Maven and Scan with SonarQube
+      env: 
+        SONAR_URL: ${{ secrets.SONAR_URL }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    
+      run: mvn clean package sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_TOKEN --file pom.xml
+#    - uses: 8398a7/action-slack@v1
+#      with:
+#        type: failure
+#      env:
+#        SLACK_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
+#        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#      if: failure()
+#    - uses: 8398a7/action-slack@v1
+#      with:
+#        type: success
+#      env:
+#        SLACK_WEBHOOK_URL: ${{ secrets.MM_WEBHOOK }}
+#        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#      if: success()
