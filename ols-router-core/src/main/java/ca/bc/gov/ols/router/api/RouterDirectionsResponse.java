@@ -4,20 +4,22 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
-import ca.bc.gov.ols.router.directions.Notification;
+import ca.bc.gov.ols.router.directions.Partition;
+import ca.bc.gov.ols.router.notifications.Notification;
 
 public class RouterDirectionsResponse extends RouterRouteResponse {
 
 	private List<Direction> directions;
-	private List<Notification> notifications;
+	private Collection<Notification> notifications;
 	
 	public RouterDirectionsResponse(RoutingParameters params) {
 		super(params);
@@ -25,8 +27,8 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 	}
 	
 	public RouterDirectionsResponse(RoutingParameters params, double distance, double time, LineString path, 
-			List<Direction> directions, List<Notification> notifications) {
-		super(params, distance, time, path);
+			List<Partition> partitions, List<Direction> directions, Collection<Notification> notifications) {
+		super(params, distance, time, path, partitions);
 		this.directions = directions;
 		this.notifications = notifications;
 		for(Direction dir : directions) {
@@ -39,7 +41,7 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 		return directions;
 	}
 	
-	public List<Notification> getNotifications() {
+	public Collection<Notification> getNotifications() {
 		return notifications;
 	}
 

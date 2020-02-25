@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 
 public interface TemporalSet {
 
+	public static final TemporalSet ALWAYS = new Always();
+	
 	public boolean contains(LocalDateTime dateTime);
 	
 	public boolean isAlways();

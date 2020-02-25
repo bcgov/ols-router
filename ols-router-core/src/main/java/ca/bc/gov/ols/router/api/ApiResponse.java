@@ -6,12 +6,16 @@ package ca.bc.gov.ols.router.api;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
+import ca.bc.gov.ols.router.engine.basic.Attribute;
 
 public class ApiResponse {
 
@@ -22,7 +26,9 @@ public class ApiResponse {
 	
 	protected DistanceUnit distanceUnit;
 	protected RoutingCriteria criteria;
+	protected Set<RouteOption> enabledOptions;
 	protected String routeDescription;
+	protected EnumSet<Attribute> partition;
 
 	public ApiResponse(RoutingParameters params) {
 		timeStamp = LocalDateTime.now();
@@ -30,7 +36,9 @@ public class ApiResponse {
 		srsCode = params.getOutputSRS();
 		distanceUnit = params.getDistanceUnit();
 		criteria = params.getCriteria();
+		enabledOptions = params.getEnabledOptions();
 		routeDescription = params.getRouteDescription();
+		partition = params.getPartition();
 	}
 	
 	public LocalDateTime getTimeStamp() {
@@ -73,6 +81,10 @@ public class ApiResponse {
 		this.criteria = criteria;
 	}
 
+	public Set<RouteOption> getEnabledOptions() {
+		return enabledOptions;
+	}
+	
 	public DistanceUnit getDistanceUnit() {
 		return distanceUnit;
 	}
@@ -83,6 +95,10 @@ public class ApiResponse {
 
 	public void setRouteDescription(String routeDescription) {
 		this.routeDescription = routeDescription;
+	}
+	
+	public EnumSet<Attribute> getPartition() {
+		return partition;
 	}
 
 	public void reproject(GeometryReprojector gr) {

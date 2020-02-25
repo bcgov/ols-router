@@ -6,6 +6,6 @@
 --%>
 <%@ include file="header.jsp" %>
 <div class="bodyContent">
-<h1>Location Services Administration</h1>
+<h1>OLS Router Administration</h1>
 </div>
 <%@ include file="footer.jsp" %>

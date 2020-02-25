@@ -9,11 +9,11 @@
 <div class="bodyContent">
 <h1>Import Configuration</h1>
 <c:choose>
-  <c:when test="${!configuration.errors.isEmpty()}">
+  <c:when test="${!errors.isEmpty()}">
   <h2>Import Failed</h2>
   <p><strong>Errors</strong></p>
   <ul>
-  <c:forEach var="error" items="${configuration.errors}">
+  <c:forEach var="error" items="${errors}">
     <li>${error}</li>
   </c:forEach>  
   </ul>
@@ -22,10 +22,10 @@
   <h2>Import Successful</h2>
   </c:otherwise>
 </c:choose>
-<c:if test="${!configuration.messages.isEmpty()}">
+<c:if test="${!messages.isEmpty()}">
 	<p><strong>Messages</strong></p>
 	<ul>
-	<c:forEach var="msg" items="${configuration.messages}">
+	<c:forEach var="msg" items="${messages}">
   		<li>${msg}</li>
 	</c:forEach>
 	</ul>

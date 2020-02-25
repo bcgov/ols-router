@@ -50,9 +50,9 @@ public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<
 		@SuppressWarnings("resource")
 		JsonWriter jw = new JsonWriter(out);
 		jw.beginObject();
-		jw.name("disableOptions");
+		jw.name("enableOptions");
 		jw.beginArray();
-		for(RouteOption ro : response.getDisabledOptions()) {
+		for(RouteOption ro : response.getEnabledOptions()) {
 			jw.value(ro.toString());
 		}
 		jw.endArray();

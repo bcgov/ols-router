@@ -6,17 +6,25 @@ package ca.bc.gov.ols.router.api;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
-import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TurnDirection;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
+import ca.bc.gov.ols.router.data.enums.XingClass;
+import ca.bc.gov.ols.router.engine.basic.Attribute;
 
 public class RoutingParameters {
 	
@@ -35,25 +43,99 @@ public class RoutingParameters {
 	private List<Point> pointToPoints;
 	private Instant departure = Instant.now();
 	private boolean correctSide = false;
+	private VehicleType vehicleType = VehicleType.CAR;
 	private Double height;
 	private Double width;
 	private Double length;
 	private Double weight;
 	private boolean followTruckRoute = false;
 	private double truckRouteMultiplier = 2;
+	private static Map<TrafficImpactor,Double> defaultXingCostMap;
+	private Map<TrafficImpactor,Double> xingCostMap;
+	private static double defaultXingCostMultiplier = 1;
+	private double xingCostMultiplier = 1;
+	private static Map<VehicleType,Map<TurnDirection, Double>> defaultTurnCostMap;
+	private static Map<TurnDirection, Double> turnCostMap;
 	private String routeDescription;
 	private int maxPairs = Integer.MAX_VALUE;
 	private boolean roundTrip = false;
 	private int zoneCount = 1;
 	private int zoneSize = 0;
 	private boolean inbound = false;
-	private EnumSet<RouteOption> disabledOptions = EnumSet.noneOf(RouteOption.class);
+	private EnumSet<Attribute> partitionAttributes;
+	private EnumSet<RouteOption> enabledOptions;
+	private boolean setEnableCalled = false;
 	
-	
-	public RoutingParameters() {
-		setDisable(RouterConfig.getInstance().getDefaultDisableOptions());
+	static {
+		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
+		defaultXingCostMap = buildXingCostMap(xingCost);
+		if(xingCost.length == 4) {
+			defaultXingCostMultiplier = xingCost[3];
+		}
+		double[] turnCost = RouterConfig.getInstance().getDefaultTurnCost();
+		defaultTurnCostMap = buildVehicleTypeTurnCostMap(turnCost);
 	}
 	
+	public RoutingParameters() {
+		RouterConfig config = RouterConfig.getInstance();
+		enabledOptions = RouteOption.fromList(config.getDefaultEnableOptions());
+		xingCostMap = defaultXingCostMap;
+		xingCostMultiplier = defaultXingCostMultiplier;
+		turnCostMap = defaultTurnCostMap.get(vehicleType);
+	}
+
+	private static EnumMap<TrafficImpactor,Double> buildXingCostMap(double[] xingCost) {
+		EnumMap<TrafficImpactor,Double> xingCostMap = new EnumMap<TrafficImpactor, Double>(TrafficImpactor.class);
+		for(TrafficImpactor imp : TrafficImpactor.values()) {
+			xingCostMap.put(imp, 0.0);
+		}
+		if(xingCost.length == 4) {
+			xingCostMap.put(TrafficImpactor.YIELD, xingCost[0]);
+			xingCostMap.put(TrafficImpactor.ROUNDABOUT, xingCost[0]);
+			xingCostMap.put(TrafficImpactor.STOPSIGN, xingCost[1]);
+			xingCostMap.put(TrafficImpactor.LIGHT, xingCost[2]);
+		}
+		return xingCostMap;
+	}
+
+	private static Map<VehicleType,Map<TurnDirection, Double>> buildVehicleTypeTurnCostMap(double[] turnCost) {
+		EnumMap<VehicleType,Map<TurnDirection, Double>> turnCostMap = new EnumMap<VehicleType,Map<TurnDirection, Double>>(VehicleType.class);
+		for(VehicleType vehicleType : VehicleType.values()) {
+			Map<TurnDirection, Double> innerMap = new EnumMap<TurnDirection, Double>(TurnDirection.class);
+			for(TurnDirection turnDir : TurnDirection.values()) {
+				innerMap.put(turnDir, 0.0);
+			}
+			turnCostMap.put(vehicleType,innerMap);
+		}
+		if(turnCost.length == 4) {
+			turnCostMap.get(VehicleType.CAR).put(TurnDirection.LEFT, turnCost[0]);
+			turnCostMap.get(VehicleType.CAR).put(TurnDirection.RIGHT, turnCost[1]);
+			turnCostMap.get(VehicleType.TRUCK).put(TurnDirection.LEFT, turnCost[2]);
+			turnCostMap.get(VehicleType.TRUCK).put(TurnDirection.RIGHT, turnCost[3]);
+		}
+		return turnCostMap;
+	}
+	
+	private static Map<TurnDirection, Double> buildTurnCostMap(Double leftCost, Double rightCost) {
+		Map<TurnDirection, Double> turnCostMap = new EnumMap<TurnDirection, Double>(TurnDirection.class);
+		for(TurnDirection turnDir : TurnDirection.values()) {
+			switch(turnDir) {
+			case LEFT:
+				turnCostMap.put(turnDir, leftCost);
+				break;
+			case RIGHT:
+				turnCostMap.put(turnDir, rightCost);
+				break;
+			case UTURN:
+				turnCostMap.put(turnDir, 5.0);
+				break;
+			default:
+				turnCostMap.put(turnDir, 0.0);
+			}
+		}
+		return turnCostMap;
+	}
+
 	public int getOutputSRS() {
 		return outputSRS;
 	}
@@ -154,6 +236,15 @@ public class RoutingParameters {
 		this.correctSide = correctSide;
 	}
 
+	public VehicleType getVehicleType() {
+		return vehicleType;
+	}
+
+	public void setVehicleType(String vehicleType) {
+		this.vehicleType = VehicleType.convert(vehicleType);
+		turnCostMap = defaultTurnCostMap.get(this.vehicleType);
+	}
+
 	public Double getHeight() {
 		return height;
 	}
@@ -202,6 +293,27 @@ public class RoutingParameters {
 		this.truckRouteMultiplier = truckRouteMultiplier;
 	}
 
+	public double getXingCost(TrafficImpactor imp, XingClass xingClass) {
+		return xingClass.applyMultiplier(xingCostMap.get(imp), xingCostMultiplier);
+	}
+
+	public double getTurnCost(TurnDirection td, XingClass xingClass) {
+		return xingClass.applyMultiplier(turnCostMap.get(td), xingCostMultiplier);
+	}
+
+	public void setXingCost(double[] xingCost) {
+		xingCostMap = buildXingCostMap(xingCost);
+		if(xingCost.length == 4) {
+			xingCostMultiplier = xingCost[3];
+		}
+	}
+
+	public void setTurnCost(double[] turnCost) {
+		if(turnCost.length == 2) {
+			turnCostMap = buildTurnCostMap(turnCost[0], turnCost[1]);
+		}
+	}
+	
 	public String getRouteDescription() {
 		return routeDescription;
 	}
@@ -251,19 +363,38 @@ public class RoutingParameters {
 	}
 
 	public void setDisable(String disabledOptionList) {
-		disabledOptions = RouteOption.fromList(disabledOptionList);
+		if(setEnableCalled == false) {
+			enabledOptions = EnumSet.complementOf(RouteOption.fromList(disabledOptionList));
+		}
+	}
+	
+	public void setEnable(String enabledOptionList) {
+		setEnableCalled = true;
+		enabledOptions = RouteOption.fromList(enabledOptionList);
 	}
 
 	public void disableOption(RouteOption ro) {
-		disabledOptions.add(ro);
+		enabledOptions.remove(ro);
 	}
 
 	public void enableOption(RouteOption ro) {
-		disabledOptions.remove(ro);
+		enabledOptions.add(ro);
 	}
 
 	public boolean isEnabled(RouteOption ro) {
-		return !disabledOptions.contains(ro);
+		return enabledOptions.contains(ro);
+	}
+	
+	public Set<RouteOption> getEnabledOptions() {
+		return enabledOptions;
+	}
+	
+	public void setPartition(String partitionList) {
+		partitionAttributes = Attribute.fromList(partitionList);
+	}
+	
+	public EnumSet<Attribute> getPartition() {
+		return partitionAttributes;
 	}
 
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {

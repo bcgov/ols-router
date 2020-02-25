@@ -5,9 +5,9 @@
 package ca.bc.gov.ols.router.engine.graphhopper;
 
 import com.graphhopper.util.PointList;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Envelope;
 
 public class GraphHopperCoordinateSequence implements CoordinateSequence {
 	
@@ -20,6 +20,13 @@ public class GraphHopperCoordinateSequence implements CoordinateSequence {
 	public GraphHopperCoordinateSequence clone() {
 		return new GraphHopperCoordinateSequence(points.clone(false));
 	}
+
+	@Override
+	public CoordinateSequence copy() {
+		return new GraphHopperCoordinateSequence(points.clone(false));
+	}
+
+
 	
 	@Override
 	public int getDimension() {

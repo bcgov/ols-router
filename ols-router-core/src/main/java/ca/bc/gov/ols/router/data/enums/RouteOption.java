@@ -5,17 +5,19 @@
 package ca.bc.gov.ols.router.data.enums;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum RouteOption {
 	TIMEDEPENDENCY("td"),
-	TURNRESTRICTIONS("tr"),
 	TURNCOSTS("tc"),
+	TURNRESTRICTIONS("tr"),
+	XINGCOSTS("xc"),
 	EVENTS("ev"), 
 	TRAFFIC("tf"),
-	SCHEDULING("sc");
+	SCHEDULING("sc"); 
 	
 	private static final Logger logger = LoggerFactory.getLogger(RouteOption.class.getCanonicalName());
 	
@@ -67,5 +69,17 @@ public enum RouteOption {
 	@Override
 	public String toString() {
 		return abbr;
+	}
+
+	public static String setToString(Set<RouteOption> enabledOptions) {
+		StringBuilder sb = new StringBuilder();
+		for(RouteOption option : enabledOptions) {
+			sb.append(option.abbr);
+			sb.append(",");
+		}
+		if(sb.length() > 1) {
+			sb.setLength(sb.length() - 1);
+		}
+		return sb.toString();
 	}
 }

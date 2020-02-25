@@ -4,7 +4,7 @@
  */
 package ca.bc.gov.ols.router.data;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 public class StreetIntersection {
 	
