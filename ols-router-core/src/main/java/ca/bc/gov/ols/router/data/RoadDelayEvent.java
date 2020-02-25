@@ -4,6 +4,8 @@
  */
 package ca.bc.gov.ols.router.data;
 
+import java.time.LocalDateTime;
+
 import ca.bc.gov.ols.router.time.TemporalSet;
 
 /**
@@ -30,6 +32,11 @@ public class RoadDelayEvent extends RoadEvent {
 	 * @return the delay, in seconds
 	 */
 	public int getDelay() {
+		return delay;
+	}
+
+	@Override
+	public int getDelay(LocalDateTime dateTime) {
 		return delay;
 	}
 

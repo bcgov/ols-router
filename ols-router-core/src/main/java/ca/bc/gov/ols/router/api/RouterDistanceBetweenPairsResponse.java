@@ -6,9 +6,9 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
-import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 
 public class RouterDistanceBetweenPairsResponse extends ApiResponse {
@@ -33,7 +33,11 @@ public class RouterDistanceBetweenPairsResponse extends ApiResponse {
 	}
 
 	public void addResult(double distance, double time) {
-		errors[curResult] = null;
+		if(distance < 0 || time < 0) {
+			errors[curResult] = "No Route Found.";
+		} else {
+			errors[curResult] = null;
+		}
 		this.distance[curResult] = DistanceUnit.METRE.convertTo(distance, distanceUnit);
 		this.time[curResult] = time;
 		curResult++;

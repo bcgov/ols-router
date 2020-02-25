@@ -4,8 +4,8 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 
 public class SplitEdge {
 	private final int[] edgeIds;

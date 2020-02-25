@@ -9,7 +9,9 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import ca.bc.gov.ols.router.data.RoadClosureEvent;
 import ca.bc.gov.ols.router.data.RoadDelayEvent;
@@ -25,35 +27,28 @@ public class EventLookup {
 		eventMap = new TIntObjectHashMap<ArrayList<RoadEvent>>();
 	}
 	
+	public void addEvent(int edgeId, RoadEvent evt) {
+		if(edgeId == BasicGraph.NO_EDGE) return;
+		ArrayList<RoadEvent> eventList = eventMap.get(edgeId);
+		if(eventList == null) {
+			eventList = new ArrayList<RoadEvent>(1);
+			eventMap.put(edgeId, eventList);
+		}
+		eventList.add(evt);
+	}
+		
 	public void addEvent(List<Integer> edgeIds, RoadEvent evt) {
 		for(int edgeId : edgeIds) {
-			ArrayList<RoadEvent> eventList = eventMap.get(edgeId);
-			if(eventList == null) {
-				eventList = new ArrayList<RoadEvent>(1);
-				eventMap.put(edgeId, eventList);
-			}
-			eventList.add(evt);
+			addEvent(edgeId, evt);
 		}
 	}
 	
-	public int lookup(final int edgeId, final LocalDateTime dateTime) {
+	public List<RoadEvent> lookup(final int edgeId, final LocalDateTime dateTime) {
 		ArrayList<RoadEvent> eventList = eventMap.get(edgeId);
-		if(eventList != null) {
-			for(RoadEvent evt : eventList) {
-				if(evt.contains(dateTime)) {
-					if(evt instanceof RoadClosureEvent) {
-						LocalDateTime nextTime = evt.getTime().after(dateTime);
-						if(nextTime == null) {
-							return -1;
-						}
-						return (int) dateTime.until(nextTime, ChronoUnit.SECONDS);
-					} else if(evt instanceof RoadDelayEvent) {
-						return ((RoadDelayEvent)evt).getDelay();
-					}
-				} 
-			}
+		if(eventList == null) {
+			return Collections.emptyList();
 		}
-		return 0;
+		return eventList.stream().filter(r -> r.contains(dateTime)).collect(Collectors.toList());
 	}
 }
 

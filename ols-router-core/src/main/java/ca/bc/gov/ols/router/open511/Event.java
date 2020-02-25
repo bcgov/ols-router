@@ -8,7 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 import ca.bc.gov.ols.router.open511.enums.EventCertainty;
 import ca.bc.gov.ols.router.open511.enums.EventSeverity;

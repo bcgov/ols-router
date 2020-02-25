@@ -10,18 +10,19 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.strtree.ItemBoundable;
-import com.vividsolutions.jts.index.strtree.ItemDistance;
-import com.vividsolutions.jts.index.strtree.STRtree;
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.index.strtree.ItemBoundable;
+import org.locationtech.jts.index.strtree.ItemDistance;
+import org.locationtech.jts.index.strtree.STRtree;
 
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
-import ca.bc.gov.ols.router.util.IntObjectArrayMap;
+import ca.bc.gov.ols.util.IntObjectArrayMap;
 
 public class BasicGraph {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraph.class.getCanonicalName());
@@ -36,7 +37,7 @@ public class BasicGraph {
 	private IntObjectArrayMap<Node> nodes;
 	private IntObjectArrayMap<Edge> edges;
 	private STRtree spatialIndex;
-	private TurnCostLookup turnCostLookup;
+	private TurnLookup turnCostLookup;
 	private EventLookup eventLookup;
 	private TrafficLookup trafficLookup;
 	private ScheduleLookup scheduleLookup;
@@ -59,12 +60,13 @@ public class BasicGraph {
 	}
 	
 	public int[] addEdge(int fromNodeId, int toNodeId, LineString ls, 
-			boolean oneWay, short speedLimit, String name, 
+			boolean oneWay, short speedLimit, 
+			String leftLocality, String rightLocality, String name, 
 			TrafficImpactor fromImp, TrafficImpactor toImp,
-			double maxHeight, double maxWidth, Integer maxWeight, 
-			boolean isTruckRoute, boolean isDeadEnded) {
-		EdgeData data = new EdgeData(ls, speedLimit, name, fromImp, toImp,
-				maxHeight, maxWidth, maxWeight, isTruckRoute, isDeadEnded);
+			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
+		EdgeData data = new EdgeData(ls, speedLimit, leftLocality, rightLocality, name, fromImp, toImp,
+				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
 		if(!oneWay) {
@@ -134,11 +136,11 @@ public class BasicGraph {
 		return spatialIndex.query(env);
 	}
 		
-	public void setTurnCostLookup(TurnCostLookup lookup) {
+	public void setTurnCostLookup(TurnLookup lookup) {
 		turnCostLookup = lookup;
 	}
 	
-	public TurnCostLookup getTurnCostLookup() {
+	public TurnLookup getTurnLookup() {
 		return turnCostLookup;
 	}
 	
@@ -234,12 +236,28 @@ public class BasicGraph {
 		return edges.get(edgeId).data.name;
 	}
 
+	public String getLocality(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edges.get(edgeId).data.leftLocality;
+		}
+		return edge.data.rightLocality;
+	}
+
 	public TrafficImpactor getFromImpactor(int edgeId) {
-		return edges.get(edgeId).data.fromImp;
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edge.data.toImp;
+		}
+		return edge.data.fromImp;
 	}
 
 	public TrafficImpactor getToImpactor(int edgeId) {
-		return edges.get(edgeId).data.toImp;
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edge.data.fromImp;
+		}
+		return edge.data.toImp;
 	}
 
 	public double getMaxHeight(int edgeId) {
@@ -250,12 +268,32 @@ public class BasicGraph {
 		return edges.get(edgeId).data.maxWidth;
 	}
 
-	public Integer getMaxWeight(int edgeId) {
-		return edges.get(edgeId).data.maxWeight;
+	public Integer getFromMaxWeight(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edges.get(edgeId).data.toMaxWeight;
+		}
+		return edges.get(edgeId).data.fromMaxWeight;
+	}
+
+	public Integer getToMaxWeight(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edges.get(edgeId).data.fromMaxWeight;
+		}
+		return edges.get(edgeId).data.toMaxWeight;
 	}
 
 	public boolean isTruckRoute(int edgeId) {
 		return edges.get(edgeId).data.isTruckRoute;
+	}
+
+	public XingClass getXingClass(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edges.get(edgeId).data.fromXingClass;
+		}
+		return edges.get(edgeId).data.toXingClass;
 	}
 
 	public boolean isDeadEnded(int edgeId) {
@@ -304,32 +342,43 @@ class EdgeData {
 	final float fromAngle;
 	final float toAngle;
 	short speedLimit;
+	final String leftLocality;
+	final String rightLocality;
 	final String name;
 	final TrafficImpactor fromImp;
 	final TrafficImpactor toImp;
 	final double maxHeight;
 	final double maxWidth;
-	final Integer maxWeight;
+	final Integer fromMaxWeight;
+	final Integer toMaxWeight;
 	final boolean isTruckRoute;
+	final XingClass fromXingClass;
+	final XingClass toXingClass;
 	final boolean isDeadEnded;
 	
-	public EdgeData(LineString ls, short speedLimit, String name, 
+	public EdgeData(LineString ls, short speedLimit, 
+			String leftLocality, String rightLocality, String name, 
 			TrafficImpactor fromImp, TrafficImpactor toImp,
-			double maxHeight, double maxWidth, Integer maxWeight,
-			boolean isTruckRoute, boolean isDeadEnded) {
+			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
 		this.ls = ls;
 		this.length = ls.getLength();
 		this.fromAngle = (float) Angle.angle(ls.getCoordinateN(0), ls.getCoordinateN(1));
 		int numCoords = ls.getNumPoints();
 		this.toAngle = (float) Angle.angle(ls.getCoordinateN(numCoords-1), ls.getCoordinateN(numCoords-2));
 		this.speedLimit = speedLimit;
+		this.leftLocality = leftLocality;
+		this.rightLocality = rightLocality;
 		this.name = name;
 		this.fromImp = fromImp;
 		this.toImp = toImp;
 		this.maxHeight = maxHeight;     
 		this.maxWidth = maxWidth;      
-		this.maxWeight = maxWeight;    
+		this.fromMaxWeight = fromMaxWeight;    
+		this.toMaxWeight = toMaxWeight;    
 		this.isTruckRoute = isTruckRoute;
+		this.fromXingClass = fromXingClass;
+		this.toXingClass = toXingClass;
 		this.isDeadEnded = isDeadEnded;
 	}
 }

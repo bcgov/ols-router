@@ -4,6 +4,9 @@
  */
 package ca.bc.gov.ols.router.data;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 import ca.bc.gov.ols.router.time.TemporalSet;
 
 /**
@@ -17,6 +20,15 @@ public class RoadClosureEvent extends RoadEvent {
 
 	public RoadClosureEvent(TemporalSet time) {
 		super(time);
+	}
+
+	@Override
+	public int getDelay(LocalDateTime dateTime) {
+		LocalDateTime nextTime = time.after(dateTime);
+		if(nextTime == null) {
+			return -1;
+		}
+		return (int) dateTime.until(nextTime, ChronoUnit.SECONDS);
 	}
 
 }

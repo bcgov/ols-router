@@ -6,8 +6,8 @@ package ca.bc.gov.ols.router.data.vis;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 

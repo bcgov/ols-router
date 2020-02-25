@@ -1,2 +1,2 @@
 Copyright ${years}, ${owner}
- All rights reserved.
+All rights reserved.

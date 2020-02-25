@@ -6,7 +6,7 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 

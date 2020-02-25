@@ -7,7 +7,7 @@ package ca.bc.gov.ols.router.data.vis;
 import java.util.EnumMap;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 

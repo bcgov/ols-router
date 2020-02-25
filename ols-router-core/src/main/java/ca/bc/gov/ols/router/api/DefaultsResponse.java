@@ -2,7 +2,7 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.Set;
 
-import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 
 public class DefaultsResponse {
@@ -13,7 +13,7 @@ public class DefaultsResponse {
 		this.config = config;
 	}
 	
-	public Set<RouteOption> getDisabledOptions() {
-		return RouteOption.fromList(config.getDefaultDisableOptions());
+	public Set<RouteOption> getEnabledOptions() {
+		return RouteOption.fromList(config.getDefaultEnableOptions());
 	}
 }

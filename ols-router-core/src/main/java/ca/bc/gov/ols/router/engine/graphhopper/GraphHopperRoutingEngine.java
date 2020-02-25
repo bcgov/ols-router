@@ -34,15 +34,14 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
-import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.RoutingEngine;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
@@ -55,15 +54,16 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
-import ca.bc.gov.ols.router.datasources.RouterDataLoader;
-import ca.bc.gov.ols.router.datasources.RouterDataSource;
+import ca.bc.gov.ols.router.datasource.RouterDataLoader;
+import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.FinishDirection;
 import ca.bc.gov.ols.router.directions.StreetDirection;
 import ca.bc.gov.ols.router.directions.StreetDirectionType;
-import ca.bc.gov.ols.router.util.StopWatch;
+import ca.bc.gov.ols.util.StopWatch;
 
 public class GraphHopperRoutingEngine implements RoutingEngine {
 	private static final Logger logger = LoggerFactory.getLogger(GraphHopperRoutingEngine.class.getCanonicalName());
@@ -90,7 +90,8 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		
 		GraphHopperGraphBuilder graphBuilder = new GraphHopperGraphBuilder(reprojector);
 
-		RouterDataLoader.loadData(config, dataSource, graphBuilder); 
+		RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder);
+		loader.loadData();
 		graphHopper = new RouterGraphHopper(graphBuilder);
 	}
 
@@ -138,7 +139,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterRouteResponse(params, 
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()));
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null);
 		}
 		return response;
 	}
@@ -162,7 +163,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterDirectionsResponse(params,  
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), 
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null,
 					directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList());
 		}
 		return response;
@@ -232,7 +233,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalRouteResponse(params,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), visitOrder);
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, visitOrder);
 			}
 		} catch(Throwable t) {
 			response = new RouterOptimalRouteResponse(params);
@@ -262,7 +263,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalDirectionsResponse(params,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), 
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null,
 						directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList(), visitOrder);
 			}
 		} catch(Throwable t) {

@@ -7,11 +7,11 @@ package ca.bc.gov.ols.router;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.locationtech.jts.geom.GeometryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-
+import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.NavInfoParameters;
@@ -23,8 +23,10 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.datasources.RouterDataSource;
-import ca.bc.gov.ols.router.datasources.RouterDataSourceFactory;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
+import ca.bc.gov.ols.router.datasource.RouterDataSource;
+import ca.bc.gov.ols.router.datasource.RouterDataSourceFactory;
 import ca.bc.gov.ols.router.engine.basic.BasicGraphRoutingEngine;
 
 public class Router {
@@ -39,15 +41,19 @@ public class Router {
 
 	private RoutingEngine engine;
 
-	public Router(Properties props, GeometryFactory geometryFactory,
+	public Router(Properties bootstrapConfig, GeometryFactory gf,
 			GeometryReprojector reprojector) {
 		logger.debug("{} constructor called", getClass().getName());
-		this.geometryFactory = geometryFactory;
+		this.geometryFactory = gf;
 		this.reprojector = reprojector;
 
-		config = new CassandraRouterConfig(props, geometryFactory);
+		ConfigurationStore configStore = RouterConfigurationStoreFactory.getConfigurationStore(bootstrapConfig);
+		if(this.geometryFactory == null) {
+			this.geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, Integer.parseInt(configStore.getConfigParam("baseSrsCode").get()));
+		}
+		config = new RouterConfig(configStore, geometryFactory);
 
-		RouterDataSource dataSource = RouterDataSourceFactory.getRouterDataSource(props, config, geometryFactory);
+		RouterDataSource dataSource = RouterDataSourceFactory.getRouterDataSource(config, geometryFactory);
 
 		try {
 			//config.baseSrsCode = GraphHopperRoutingEngine.GH_SRS;

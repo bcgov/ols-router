@@ -22,7 +22,7 @@ import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
 
 import io.netty.util.collection.IntObjectHashMap;
-import io.netty.util.collection.IntObjectMap.Entry;
+import io.netty.util.collection.IntObjectMap.PrimitiveEntry;
 
 
 public class Isochrone extends AbstractRoutingAlgorithm {
@@ -106,7 +106,7 @@ public class Isochrone extends AbstractRoutingAlgorithm {
             buckets.add(new ArrayList<Double[]>());
         }
         final NodeAccess na = graph.getNodeAccess();
-        for(Entry<IsoLabel> entry : fromMap.entries()) {
+        for(PrimitiveEntry<IsoLabel> entry : fromMap.entries()) {
         	int nodeId = entry.key();
         	IsoLabel label = entry.value();
         	
@@ -142,7 +142,7 @@ public class Isochrone extends AbstractRoutingAlgorithm {
             list.add(new HashSet<Integer>());
         }
 
-        for(Entry<IsoLabel> entry : fromMap.entries()) {
+        for(PrimitiveEntry<IsoLabel> entry : fromMap.entries()) {
         	int nodeId = entry.key();
         	IsoLabel label = entry.value();
             if (finished()) {

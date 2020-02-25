@@ -6,18 +6,19 @@ package ca.bc.gov.ols.router.process;
 
 import java.util.EnumMap;
 
+import ca.bc.gov.ols.enums.DividerType;
+import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.data.StreetSegment;
-import ca.bc.gov.ols.router.data.enums.DividerType;
 import ca.bc.gov.ols.router.data.enums.End;
-import ca.bc.gov.ols.router.data.enums.RoadClass;
 import ca.bc.gov.ols.router.data.enums.SurfaceType;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enums.TravelDirection;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.XingClass;
 
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 
 public class RpStreetSegment extends StreetSegment {
 
@@ -27,23 +28,29 @@ public class RpStreetSegment extends StreetSegment {
 	private EnumMap<End,TurnTimeCode> rightTR;
 	
 	public RpStreetSegment(int segmentId, LineString centerLine, 
-			int startIntersectionId, int endIntersectionId, String name, RoadClass roadClass,
+			int startIntersectionId, int endIntersectionId, 
+			String leftLocality, String rightLocality, String name, RoadClass roadClass,
 			TravelDirection travelDirection, DividerType dividerType, 
 			TrafficImpactor startTrafficImpactor, TrafficImpactor endTrafficImpactor, 
 			short speedLimit, SurfaceType surfaceType, 
-			double maxHeight, double maxWidth, Integer maxWeight, boolean isTruckRoute,
+			double maxHeight, double maxWidth, 
+			Integer fromMaxWeight, Integer toMaxWeight, 
+			boolean isTruckRoute, 
 			String highwayRoute1, String highwayRoute2, String highwayRoute3,
 			boolean isDeadEnded, boolean virtual, 
 			TurnTimeCode fromLeftTR, TurnTimeCode fromCentreTR, TurnTimeCode fromRightTR, 
 			TurnTimeCode toLeftTR, TurnTimeCode toCentreTR, TurnTimeCode toRightTR) {
 		super(segmentId, centerLine, 
-			startIntersectionId, endIntersectionId, name, roadClass,
+			startIntersectionId, endIntersectionId, 
+			leftLocality, rightLocality, name, roadClass,
 			travelDirection, dividerType, 
 			startTrafficImpactor, endTrafficImpactor, 
 			speedLimit, surfaceType,
-			maxHeight, maxWidth, maxWeight, isTruckRoute, 
+			maxHeight, maxWidth, 
+			fromMaxWeight, toMaxWeight,
+			isTruckRoute, 
 			highwayRoute1, highwayRoute2, highwayRoute3,
-			isDeadEnded);
+			XingClass.SAME, XingClass.SAME, isDeadEnded);
 		
 		this.virtual = virtual;
 		leftTR = new EnumMap<End,TurnTimeCode>(End.class);
@@ -73,6 +80,17 @@ public class RpStreetSegment extends StreetSegment {
 	 */
 	private int calcAngle(Coordinate c1, Coordinate c2) {
 		return (int) Math.round(Angle.toDegrees(Angle.normalizePositive(Angle.angle(c1, c2))));
+	}
+	
+	public void setXingClass(End end, XingClass xingClass) {
+		switch(end) {
+		case FROM:
+			this.startXingClass = xingClass;
+			break;
+		case TO:
+			this.endXingClass = xingClass;
+			break;
+		}
 	}
 	
 	public void setIsDeadEnded() {
