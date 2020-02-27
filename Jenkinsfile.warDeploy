@@ -47,3 +47,4 @@ node ('master'){
               scp -r $WORKSPACE/ols-web/target/*.war app@${appServer}:/apps/geocat/webapps/pub#geocoder.war'''
     }
     */
+}
