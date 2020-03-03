@@ -47,22 +47,11 @@ parameters:
     name: APP_LABEL
     required: true
     value: ols-router-admin
-
-#  - description: The Url for the designated Artifactory server.
-#    displayName: Artifactory URL
-#    name: ARTIFACTORY_URL
-#    required: true
-#    value: delivery.apps.bcgov/artifactory/libs-snapshot-local/ca/bc/gov/ols
-#  - description: The App version. e.g 2.1.0-SNAPSHOT or 2.1.0-RC
-#    displayName: App Version
-#    name: APP_VERSION
-#    required: true
-#    value: 2.1.0-SNAPSHOT
-#  - description: The Snapshot version. e.g 2.1.0-20200227.003415-1
-#    displayName: Snapshot Version
-#    name: SNAPSHOT_VERSION
-#    required: true
-#    value: 2.1.0-20200227.003415-1
+  - description: The imageStream tag to use. e.g. 'latest' or 'qa'
+    displayName: ImageStream Tag
+    name: IMAGESTREAM_LABEL
+    required: true
+    value: latest
 
 objects:
 - apiVersion: extensions/v1beta1
@@ -136,7 +125,7 @@ objects:
           - cp
           - /ols-router-admin.war
           - /app/int.war
-          image: docker-registry.default.svc:5000/3aa7ll-tools/ols-router-admin-sidecar
+          image: docker-registry.default.svc:5000/3aa7ll-tools/ols-router-admin-sidecar:${IMAGESTREAM_LABEL}
           imagePullPolicy: Always
           name: war
           resources: {}
