@@ -54,6 +54,16 @@ parameters:
     name: CADDY_SERVICE_NAME
     required: true
     value: caddy
+  - description: The Minio minioAccessKey.
+    displayName: Minio Access Key - base64 encoded
+    name: MINIO_ACCESS_KEY
+    required: true
+    #value: cm91dGVyZGF0YQ==
+  - description: The Minio minioSecretKey.
+    displayName: Minio Secret Key
+    name: MINIO_SECRET_KEY
+    required: true
+    #value: cm91dGVyZGF0YUBnb3YuYmMuY2E=
   - description: The name of the minio service.
     displayName: Minio Service Name
     name: MINIO_SERVICE_NAME
@@ -369,8 +379,8 @@ objects:
     name: caddy-conf-${APPLICATION_NAME}
 - apiVersion: v1
   data:
-    minioAccessKey: cm91dGVyZGF0YQ==
-    minioSecretKey: cm91dGVyZGF0YUBnb3YuYmMuY2E=
+    minioAccessKey: ${MINIO_ACCESS_KEY}
+    minioSecretKey: ${MINIO_SECRET_KEY}
   kind: Secret
   metadata:
     labels:
