@@ -1,0 +1,98 @@
+apiVersion: v1
+kind: Template
+
+labels:
+  template: ols-router-admin-sidecar
+
+message: |-
+    The following Build Config has been created in your project:
+
+      ${BUILD_CONFIG_NAME}
+
+    This build config follows the pattern decribed here:
+
+    https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
+
+    For more information about using this template, including OpenShift considerations, please contact teh rocketchat community.
+metadata:
+  annotations:
+    description: |-
+      ols-router-admin-sidecar BuildConfig Template for use in OpenShift.
+
+    iconClass: icon-other-unknown
+    openshift.io/display-name: ols-router-admin-sidecar
+    openshift.io/documentation-url: https://github.com/bcgov/ols-router
+    openshift.io/long-description: >-
+      This template provides a parameterized BuildConfig for the ols-router-admin-sidecare containers.
+      The resulting BuildConfig, when run, created an imageStream containing the indicated version of the ols-router-admin WAR file.
+
+        * When the associated Deployment runs, this imageStream is used as an initContainer in a pod.
+        * It's purpose is to "copy the ols-router-admin.war to /app/ROOT.war"
+        * The long-running container then launches tomcat which subsequently loads the WAR, thus starting the application.
+
+      For details on the patter being used see:
+        https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
+    openshift.io/provider-display-name: DataBC-OLS
+    openshift.io/support-url: https://github.com/bcgov/ols-router
+    tags: router
+  name: ols-router-admin-sidecar-template
+
+parameters:
+  - description: The name of the Build Config to be created
+    displayName: BuildConfig Name
+    name: BUILD_CONFIG_NAME
+    required: true
+    value: ols-router-admin-sidecar
+  - description: The Url for the designated Artifactory server.
+    displayName: Artifactory URL
+    name: ARTIFACTORY_URL
+    required: true
+    value: delivery.apps.bcgov/artifactory/libs-snapshot-local/ca/bc/gov/ols
+  - description: The App version. e.g 2.1.0-SNAPSHOT or 2.1.0-RC
+    displayName: App Version
+    name: APP_VERSION
+    required: true
+    value: 2.1.0-SNAPSHOT
+  - description: The Snapshot version. e.g 2.1.0-20200227.003415-1
+    displayName: Snapshot Version
+    name: SNAPSHOT_VERSION
+    required: true
+    value: 2.1.0-20200227.003415-1
+
+objects:
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${BUILD_CONFIG_NAME}
+    name: ${BUILD_CONFIG_NAME}
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ols-router-admin-sidecar:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |
+        FROM busybox:latest
+        RUN wget -O ols-router-admin.war http://$ARTIFACTORY_URL/ols-router-admin/$APP_VERSION/ols-router-admin-$SNAPSHOT_VERSION.war
+        CMD ["tail", "-f", "/dev/null"]
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        env:
+        - name: ARTIFACTORY_URL
+          value: ${ARTIFACTORY_URL}
+        - name: APP_VERSION
+          value: ${APP_VERSION}
+        - name: SNAPSHOT_VERSION
+          value: ${SNAPSHOT_VERSION}
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+  status:
+    lastVersion: 4

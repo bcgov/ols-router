@@ -1,0 +1,159 @@
+apiVersion: v1
+kind: Template
+
+labels:
+  template: ols-router-admin
+
+message: |-
+    The following Deployment has been created in your project:
+
+      ${DEPLOYMENT_NAME}
+
+    This deployment follows the pattern decribed here:
+
+      https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
+
+    For more information about using this template, including OpenShift considerations, please contact teh rocketchat community.
+metadata:
+  annotations:
+    description: |-
+      ols-router-admin Deployment Template for use in OpenShift.
+
+    iconClass: icon-other-unknown
+    openshift.io/display-name: ols-router-admin
+    openshift.io/documentation-url: https://github.com/bcgov/ols-router
+    openshift.io/long-description: >-
+      This template provides a parameterized Deployment for the ols-router-admin pod.
+      The resulting Deployment, when run, will launch a pod hosting 2 containers:
+
+        1. An initContaner which "coppies the ols-router-admin.war to /app/ROOT.war" - to the shared emptyDir Volume.
+        2. A long-running container which then launches tomcat subsequently loading the WAR, thus starting the application.
+
+      For details on the pattern being used see:
+        https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
+    openshift.io/provider-display-name: DataBC-OLS
+    openshift.io/support-url: https://github.com/bcgov/ols-router
+    tags: router-admin
+  name: ols-router-admin-template
+
+parameters:
+  - description: The name of the Deployment to be created
+    displayName: Deployment Name
+    name: DEPLOYMENT_NAME
+    required: true
+    value: ols-router-admin
+  - description: The label to be applied to resulting pods
+    displayName: App Label
+    name: APP_LABEL
+    required: true
+    value: ols-router-admin
+
+#  - description: The Url for the designated Artifactory server.
+#    displayName: Artifactory URL
+#    name: ARTIFACTORY_URL
+#    required: true
+#    value: delivery.apps.bcgov/artifactory/libs-snapshot-local/ca/bc/gov/ols
+#  - description: The App version. e.g 2.1.0-SNAPSHOT or 2.1.0-RC
+#    displayName: App Version
+#    name: APP_VERSION
+#    required: true
+#    value: 2.1.0-SNAPSHOT
+#  - description: The Snapshot version. e.g 2.1.0-20200227.003415-1
+#    displayName: Snapshot Version
+#    name: SNAPSHOT_VERSION
+#    required: true
+#    value: 2.1.0-20200227.003415-1
+
+objects:
+- apiVersion: extensions/v1beta1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: ${DEPLOYMENT_NAME}
+      name: ${DEPLOYMENT_NAME}
+    name: ${DEPLOYMENT_NAME}
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ${APP_LABEL}
+        name: ${APP_LABEL}
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${APP_LABEL}
+          name: ${APP_LABEL}
+      spec:
+        containers:
+        - command:
+          - catalina.sh
+          - run
+          env:
+          - name: CATALINA_BASE
+            value: /usr/local/tomcat
+          - name: OLS_CASSANDRA_LOCAL_DATACENTER
+            value: DC1
+          - name: OLS_CASSANDRA_CONTACT_POINT
+            value: cassandra
+          - name: OLS_CASSANDRA_KEYSPACE
+            value: bgeo
+          image: tomcat:9-jre11-slim
+          imagePullPolicy: IfNotPresent
+          name: tomcat
+          ports:
+          - containerPort: 8080
+            name: catalina-http
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 4Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /usr/local/tomcat/logs
+            name: tc-work
+          - mountPath: /usr/local/tomcat/work
+            name: tc-work
+          - mountPath: /usr/local/tomcat/temp
+            name: tc-work
+          - mountPath: /usr/local/tomcat/conf/Catalina
+            name: tc-conf
+          - mountPath: /usr/local/tomcat/webapps
+            name: app-volume
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - /ols-router-admin.war
+          - /app/int.war
+          image: docker-registry.default.svc:5000/3aa7ll-tools/ols-router-admin-sidecar
+          imagePullPolicy: Always
+          name: war
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app
+            name: app-volume
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tc-work
+        - emptyDir: {}
+          name: tc-conf
+        - emptyDir: {}
+          name: app-volume
+  status: {}
