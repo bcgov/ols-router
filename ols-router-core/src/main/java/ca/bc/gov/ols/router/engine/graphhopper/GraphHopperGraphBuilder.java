@@ -288,4 +288,10 @@ public class GraphHopperGraphBuilder implements GraphBuilder {
 		
 	}
 
+	@Override
+	public void addLocalDistortionField(RowReader localDistortionFieldReader) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

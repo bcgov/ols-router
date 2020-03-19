@@ -25,6 +25,7 @@ import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.engine.basic.Attribute;
+import ca.bc.gov.ols.router.engine.basic.GlobalDistortionField;
 
 public class RoutingParameters {
 	
@@ -49,13 +50,15 @@ public class RoutingParameters {
 	private Double length;
 	private Double weight;
 	private boolean followTruckRoute = false;
-	private double truckRouteMultiplier = 2;
+	private double truckRouteMultiplier = 9;
 	private static Map<TrafficImpactor,Double> defaultXingCostMap;
 	private Map<TrafficImpactor,Double> xingCostMap;
 	private static double defaultXingCostMultiplier = 1;
 	private double xingCostMultiplier = 1;
 	private static Map<VehicleType,Map<TurnDirection, Double>> defaultTurnCostMap;
-	private static Map<TurnDirection, Double> turnCostMap;
+	private Map<TurnDirection, Double> turnCostMap;
+	private GlobalDistortionField globalDistortionField;
+	private static GlobalDistortionField defaultGlobalDistortionField;
 	private String routeDescription;
 	private int maxPairs = Integer.MAX_VALUE;
 	private boolean roundTrip = false;
@@ -65,6 +68,7 @@ public class RoutingParameters {
 	private EnumSet<Attribute> partitionAttributes;
 	private EnumSet<RouteOption> enabledOptions;
 	private boolean setEnableCalled = false;
+	private boolean turnCostsSet = false;
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -74,6 +78,7 @@ public class RoutingParameters {
 		}
 		double[] turnCost = RouterConfig.getInstance().getDefaultTurnCost();
 		defaultTurnCostMap = buildVehicleTypeTurnCostMap(turnCost);
+		defaultGlobalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField());
 	}
 	
 	public RoutingParameters() {
@@ -82,6 +87,8 @@ public class RoutingParameters {
 		xingCostMap = defaultXingCostMap;
 		xingCostMultiplier = defaultXingCostMultiplier;
 		turnCostMap = defaultTurnCostMap.get(vehicleType);
+		globalDistortionField = defaultGlobalDistortionField;
+		truckRouteMultiplier = config.getDefaultTruckRouteMultiplier();
 	}
 
 	private static EnumMap<TrafficImpactor,Double> buildXingCostMap(double[] xingCost) {
@@ -242,7 +249,9 @@ public class RoutingParameters {
 
 	public void setVehicleType(String vehicleType) {
 		this.vehicleType = VehicleType.convert(vehicleType);
-		turnCostMap = defaultTurnCostMap.get(this.vehicleType);
+		if(!turnCostsSet) {
+			turnCostMap = defaultTurnCostMap.get(this.vehicleType);
+		}
 	}
 
 	public Double getHeight() {
@@ -310,8 +319,17 @@ public class RoutingParameters {
 
 	public void setTurnCost(double[] turnCost) {
 		if(turnCost.length == 2) {
+			turnCostsSet = true;
 			turnCostMap = buildTurnCostMap(turnCost[0], turnCost[1]);
 		}
+	}
+	
+	public GlobalDistortionField getGlobalDistortionField() {
+		return globalDistortionField;
+	}
+	
+	public void setGdf(String gdfString) {
+		globalDistortionField = new GlobalDistortionField(gdfString);
 	}
 	
 	public String getRouteDescription() {

@@ -29,5 +29,7 @@ public interface GraphBuilder {
 	public abstract void addSchedules(GtfsDaoImpl gtfs, RowReader mappingReader) throws IOException;
 
 	public abstract void addTruckNotices(RowReader truckNoticeReader, RowReader truckNoticeMappingReader);
+
+	public abstract void addLocalDistortionField(RowReader localDistortionFieldReader);
 	
 }

@@ -359,6 +359,11 @@ public class FileRouterDataSource implements RouterDataSource {
 	}
 
 	@Override
+	public RowReader getLocalDistortionFieldReader() throws IOException {
+		return getXsvRowReader("local_distortion_fields");
+	}
+
+	@Override
 	public GtfsDaoImpl getGtfs() throws IOException {
 		GtfsReader reader = new GtfsReader();
 	    reader.setInputSource(new UrlCsvInputSource(config.getDataSourceBaseFileUrl() + "gtfs/"));

@@ -17,11 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
@@ -58,6 +60,7 @@ import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.TruckNoticeType;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
 import ca.bc.gov.ols.router.data.vis.VisTurnRestriction;
@@ -92,6 +95,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	private List<Integer> ferryEdges;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<RoadTruckNoticeEvent> truckNoticeIdMap = new TIntObjectHashMap<RoadTruckNoticeEvent>();
+	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();
 	
 	
 	public BasicGraphBuilder(RouterConfig config, GeometryReprojector reprojector) {
@@ -115,7 +119,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		boolean oneWay = seg.getTravelDirection() != TravelDirection.BIDIRECTIONAL;
 		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, ls, oneWay, seg.getSpeedLimit(), 
 				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(), 
-				seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
+				seg.getRoadClass(), seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
 				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), seg.isDeadEnded());
 		edgeIdBySegId.put(seg.getSegmentId(), edgeIds);
@@ -467,6 +471,8 @@ public class BasicGraphBuilder implements GraphBuilder {
 			if(type != null && description != null && !description.isBlank()) {
 				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(TemporalSet.ALWAYS, type, description);
 				truckNoticeIdMap.put(id, event);
+			} else {
+				logger.warn("Invalid Truck Notice ({},{},{})", id, type, description);
 			}
 		}
 
@@ -481,6 +487,31 @@ public class BasicGraphBuilder implements GraphBuilder {
 					eventLookup.addEvent(edgeId, truckNoticeIdMap.get(noticeId));
 				}
 			}
+		}
+	}
+
+	@Override
+	public void addLocalDistortionField(RowReader localDistortionFieldReader) {
+		while(localDistortionFieldReader.next()) {
+			int segId = localDistortionFieldReader.getInt("STREET_SEGMENT_ID");
+			Set<VehicleType> vehicleTypes = VehicleType.fromList(localDistortionFieldReader.getString("VEHICLE_TYPES"));
+			Double frictionFactor = localDistortionFieldReader.getDouble("FRICTION_FACTOR");
+			int[] edgeIds = edgeIdBySegId.get(segId);
+			if(edgeIds == null) {
+				logger.warn("local distortion field references unknown street_segment_id {}", segId);
+			} else {
+				for(int edgeId : edgeIds) {
+					EnumMap<VehicleType, Double> frictionFactors = localDistortionField.get(edgeId);
+					if(frictionFactors == null) {
+						frictionFactors = new EnumMap<VehicleType, Double>(VehicleType.class);
+						localDistortionField.put(edgeId, frictionFactors);
+					}
+					for(VehicleType type : vehicleTypes) {
+						frictionFactors.put(type, frictionFactor);
+					}
+				}
+			}
+			
 		}
 	}
 
@@ -503,6 +534,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
 		graph.setTrafficLookup(trafficLookupBuilder.build());
+		graph.setLocalDistortionField(localDistortionField);
 		buildTurnRestrictionLayer();
 		layers.buildIndexes();
 		graph.setVisLayers(layers);
