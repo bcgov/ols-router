@@ -61,6 +61,8 @@ public class RouterDataLoader {
 		graphBuilder.addTraffic(dataSource.getTrafficReader());
 		
 		graphBuilder.addTruckNotices(dataSource.getTruckNoticeReader(), dataSource.getTruckNoticeMappingReader());
+		
+		graphBuilder.addLocalDistortionField(dataSource.getLocalDistortionFieldReader());
 
 		graphBuilder.addSchedules(dataSource.getGtfs(), dataSource.getGTFSMappingReader());
 

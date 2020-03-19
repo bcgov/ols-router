@@ -40,5 +40,7 @@ public interface RouterDataSource {
 	RowReader getTruckNoticeReader() throws IOException;
 
 	RowReader getTruckNoticeMappingReader() throws IOException;
+
+	RowReader getLocalDistortionFieldReader() throws IOException;
 	
 }

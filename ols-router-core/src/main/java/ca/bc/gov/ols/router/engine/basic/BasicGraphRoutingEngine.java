@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.locationtech.jts.algorithm.Angle;
@@ -262,7 +263,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	}
 
 	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
-		params.disableOption(RouteOption.TIMEDEPENDENCY);
+		params.disableOption(RouteOption.TIME_DEPENDENCY);
 		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide());
 
 		// shortcut the 2-point case
@@ -401,13 +402,14 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// impactors
 			if(params.getTypes().contains(NavInfoType.IMP) && !graph.getReversed(edgeId)) {
+				EnumSet<TrafficImpactor> visImps = EnumSet.of(TrafficImpactor.YIELD, TrafficImpactor.STOPSIGN, TrafficImpactor.LIGHT, TrafficImpactor.BARRICADE, TrafficImpactor.ROUNDABOUT);
 				TrafficImpactor fromImp = graph.getFromImpactor(edgeId);
-				if(fromImp == TrafficImpactor.YIELD || fromImp == TrafficImpactor.STOPSIGN || fromImp == TrafficImpactor.LIGHT || fromImp == TrafficImpactor.BARRICADE) {
+				if(visImps.contains(fromImp)) {
 					Coordinate c = lil.extractPoint(offset);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.IMP, fromImp.name(), null, 90));
 				}
 				TrafficImpactor toImp = graph.getToImpactor(edgeId);
-				if(toImp == TrafficImpactor.YIELD || toImp == TrafficImpactor.STOPSIGN || toImp == TrafficImpactor.LIGHT || toImp == TrafficImpactor.BARRICADE) {
+				if(visImps.contains(toImp)) {
 					Coordinate c = lil.extractPoint(-offset);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.IMP, toImp.name(), null, 90));
 				}

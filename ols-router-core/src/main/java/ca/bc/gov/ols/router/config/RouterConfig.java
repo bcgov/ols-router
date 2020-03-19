@@ -45,6 +45,8 @@ public class RouterConfig {
 	protected String defaultEnableOptions = "tc,xc,tr";
 	protected double[] defaultXingCost = {5,7,10,1.5};
 	protected double[] defaultTurnCost = {3,1,5,2};
+	protected String defaultGlobalDistortionField = "";
+	private double defaultTruckRouteMultiplier = 9;
 		
 	public RouterConfig() {
 		INSTANCE = this;
@@ -104,6 +106,12 @@ public class RouterConfig {
 					break;
 				case "defaultTurnCost":
 					defaultTurnCost = Arrays.asList(value.split(",")).stream().mapToDouble(Double::parseDouble).toArray();
+					break;
+				case "defaultGlobalDistortionField":
+					defaultGlobalDistortionField = value;
+					break;
+				case "defaultTruckRouteMultiplier":
+					defaultTruckRouteMultiplier = Double.parseDouble(value);
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -188,6 +196,14 @@ public class RouterConfig {
 
 	public double[] getDefaultTurnCost() {
 		return defaultTurnCost;
+	}
+
+	public String getDefaultGlobalDistortionField() {
+		return defaultGlobalDistortionField;
+	}
+
+	public double getDefaultTruckRouteMultiplier() {
+		return defaultTruckRouteMultiplier;
 	}
 
 	
