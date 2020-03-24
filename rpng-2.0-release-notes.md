@@ -1,7 +1,7 @@
-# Route Planner 2.0 Release Notes
+# Route Planner 2.1 Release Notes
 
 ## Overview
-Route Planner 2.0 is the first release of Route Planner Next Generation. We took what we learned from using the excellent [Graph Hopper](https://github.com/graphhopper/graphhopper) open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source [Jsprit](https://github.com/graphhopper/jsprit) library for route optimization.
+Route Planner 2.1 is the second release of Route Planner Next Generation. We took what we learned from using the excellent [Graph Hopper](https://github.com/graphhopper/graphhopper) open source library and built a new, open-source route planner from scratch. RPNG focusses on time-dependent routing and commercial vehicle routing. We still use the open-source [Jsprit](https://github.com/graphhopper/jsprit) library for route optimization.
 
 You must be a provincial government agency or an Integrated Transportation Network partner to use this API in your applications. Note that we currently restrict the http origin of router requests to the gov.bc.ca domain so if you're government business area is outside of that domain, let us know your domain and we will add it to our whitelist. 
 
@@ -9,7 +9,27 @@ You will need an apikey header in your requests. Feel free to use a demo api key
  
 To see the new API in action, visit [Location Services in Action](https://ols-demo.apps.gov.bc.ca/index.html). Feel free to monitor network traffic in your browser to see the new route planner requests.
 
-## API Changes
+API Changes
+
+## Route Planner 2.1
+1. Route Planner 2.1 is backward compatible with Route Planner 2.0.
+
+2. Enable intersection crossing costs to more accurate model different combinations of major and minor road crossings
+
+3. Enable the global distortion field (see item 5) which allows to router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
+
+4. Enable local distortion fields (see item 5) to allow particular truck routes to be favoured over others nearby. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
+
+5. Use the *enable* parameter to specify feature options as follows:
+   * td – time-dependency; disabling this disables sc, tf, and ev modules
+   * tr – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
+   * tc - turn costs (e.g., left turns take longer than right turns)
+   * xc - crossing costs(e.g., crossing a major road on a minor road takes longer than the other way around)
+   * sc – ferry schedules; disabled by default; <b>uses dummy data so is only suitable for demos</b>
+   * tf – historic traffic congestion; disabled by default; <b>uses dummy data so is only suitable for demos</b>
+   * ev – road events; disabled by default; <b>uses dummy data so is only suitable for demos</b>
+   * gdf - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones
+   * ldf - local distortion field; applies friction factors to specific road segments to make specific truck routes more attractive than others
 
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
