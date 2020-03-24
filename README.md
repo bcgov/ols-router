@@ -11,7 +11,7 @@ In year three (2020-2021), we will focus on incorporating user-requested enhance
 
 [Route Planner 2.0 in action](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
 
-[Route Planner 2.0 release notes](rpng-2.0-release-notes.md)
+[Route Planner 2.0 release notes](rpng-release-notes.md)
 
 [Route Planner NG Acceptance Test Plan](rpng-atp.md)
 
