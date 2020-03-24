@@ -14,9 +14,9 @@ API Changes
 ## Route Planner 2.1
 1. Route Planner 2.1 is backward compatible with Route Planner 2.0.
 
-2. Enable intersection crossing costs to more accurate model different combinations of major and minor road crossings
+2. Enable intersection crossing costs to more accurately model all combinations of major and minor road crossings.
 
-3. Enable the global distortion field (see item 5) which allows to router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
+3. Enable the global distortion field (see item 5) to allow the router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
 
 4. Enable local distortion fields (see item 5) to allow particular truck routes to be favoured over others nearby. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
 
@@ -31,6 +31,12 @@ API Changes
    * gdf - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones
    * ldf - local distortion field; applies friction factors to specific road segments to make specific truck routes more attractive than others
 
+6. The disable parameter is now deprecated. Use the enable parameter instead.
+
+
+ 
+
+## Route Planner 2.0
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
 2. Use the new *departure* parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
