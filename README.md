@@ -5,7 +5,9 @@ The BC Route Planner is being developed by the Province of British Columbia in a
 
 In year one (2018-19), we investigated the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, scheduled road events and construction, and ferry schedules. The first release includes components for which there is insufficient or no real data so that a stable API is available for developers sooner than later. Such components are turned off by default. Creating and managing data sources is out of scope of this project. Getting data custodians to put usable data APIs in place was not expected and didn't happen. The performance goal of the Route Planner 2.0, the first release of RPNG, is under two seconds execution time for a single, two-point route for an oversized truck.
 
-In year two (2019-2020), we will add support for vehicle-size dependent routing (aka truck routing), real-time road events, areas of exclusion,and new data sources. Truck routing takes vehicle and load dimensions and road restrictions into account. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides
+In year two (2019-2020), we added support for vehicle-size dependent routing (aka truck routing).Truck routing takes vehicle and load dimensions and road restrictions into account. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides
+
+In year three (2020), we will add support for real-time road events and ferry schedules. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides.
 
 In year three (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
