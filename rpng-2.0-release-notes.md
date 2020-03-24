@@ -9,9 +9,9 @@ You will need an apikey header in your requests. Feel free to use a demo api key
  
 To see the new API in action, visit [Location Services in Action](https://ols-demo.apps.gov.bc.ca/index.html). Feel free to monitor network traffic in your browser to see the new route planner requests.
 
-API Changes
+## API Changes
 
-## Route Planner 2.1
+### Route Planner 2.1
 1. Route Planner 2.1 is backward compatible with Route Planner 2.0.
 
 2. Enable intersection crossing costs (see item 5) to more accurately model all combinations of major and minor road crossings.
@@ -36,9 +36,7 @@ API Changes
 6. The disable parameter is now deprecated. Use the enable parameter instead.
 
 
- 
-
-## Route Planner 2.0
+### Route Planner 2.0
 1. Route Planner 2.0 is backward compatible with Route Planner 1.x .
 
 2. Use the new *departure* parameter to specify departure date and time as in 2019-02-28T11:36:00-08:00  
