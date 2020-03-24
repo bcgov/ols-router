@@ -25,11 +25,13 @@ API Changes
    * tr – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
    * tc - turn costs (e.g., left turns take longer than right turns)
    * xc - crossing costs(e.g., crossing a major road on a minor road takes longer than the other way around)
+   * gdf - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones
+   * ldf - local distortion field; applies friction factors to specific road segments to make specific truck routes more attractive than others   
    * sc – ferry schedules; disabled by default; <b>uses dummy data so is only suitable for demos</b>
    * tf – historic traffic congestion; disabled by default; <b>uses dummy data so is only suitable for demos</b>
    * ev – road events; disabled by default; <b>uses dummy data so is only suitable for demos</b>
-   * gdf - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones
-   * ldf - local distortion field; applies friction factors to specific road segments to make specific truck routes more attractive than others
+   
+   The default value enable is gdf,ldf,tr,xc,tc
 
 6. The disable parameter is now deprecated. Use the enable parameter instead.
 
