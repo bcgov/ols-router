@@ -14,7 +14,7 @@ API Changes
 ## Route Planner 2.1
 1. Route Planner 2.1 is backward compatible with Route Planner 2.0.
 
-2. Enable intersection crossing costs to more accurately model all combinations of major and minor road crossings.
+2. Enable intersection crossing costs (see item 5) to more accurately model all combinations of major and minor road crossings.
 
 3. Enable the global distortion field (see item 5) to allow the router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
 
