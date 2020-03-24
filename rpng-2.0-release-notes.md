@@ -31,7 +31,7 @@ API Changes
    * tf – historic traffic congestion; disabled by default; <b>uses dummy data so is only suitable for demos</b>
    * ev – road events; disabled by default; <b>uses dummy data so is only suitable for demos</b>
    
-   The default value enable is gdf,ldf,tr,xc,tc
+   The default value of enable is gdf,ldf,tr,xc,tc
 
 6. The disable parameter is now deprecated. Use the enable parameter instead.
 
