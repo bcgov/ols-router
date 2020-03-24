@@ -1,5 +1,5 @@
 # BC Route Planner
-BC Route Planner is an open source route planner with support for time-dependent routing and truck routing on the BC Integrated Transportation Network. [Source code](https://github.com/bcgov/ols-router) is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Route Planner version 2.0 was released on June 11, 2019. To see it in use by an application, visit [Location Services in Action](https://ols-demo.apps.gov.bc.ca/index.html).
+BC Route Planner is an open source route planner with support for time-dependent routing and truck routing on the BC Integrated Transportation Network. [Source code](https://github.com/bcgov/ols-router) is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0). Route Planner version 2.1 was released on March 31, 2020. To see it in use by an application, visit [Location Services in Action](https://ols-demo.apps.gov.bc.ca/index.html?rt=dlv&gc=dlv).
 
 The BC Route Planner is being developed by the Province of British Columbia in a three-year project called Route Planner NG (RPNG). We are just wrapping up year one.
 
@@ -9,9 +9,9 @@ In year two (2019-2020), we will add support for vehicle-size dependent routing 
 
 In year three (2020-2021), we will focus on incorporating user-requested enhancements, making routes more realistic, and improving performance.
 
-[Route Planner 2.0 in action](https://office.refractions.net/~chodgson/gc/ols-demo/index.html?rt=tst)
+[Route Planner 2.1 in action](https://ols-demo.apps.gov.bc.ca/index.html?rt=dlv&gc=dlv)
 
-[Route Planner 2.0 release notes](rpng-release-notes.md)
+[Route Planner release notes](rpng-release-notes.md)
 
 [Route Planner NG Acceptance Test Plan](rpng-atp.md)
 
