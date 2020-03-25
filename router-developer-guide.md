@@ -51,34 +51,34 @@ Here is a sample json response:
 
     {
     
-  "routeDescription": "fastest distance in km and html",
-  "searchTimestamp": "2020-03-25 0:45:48",
-  "executionTime": 59,
-  "version": "2.1.0",
-  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
-  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
-  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
-  "srsCode": 4326,
-  "criteria": "shortest",
-  "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "mi",
-  "points": [
-    [
-      -123.70794,
-      48.77869
-    ],
-    [
-      -123.53785,
-      48.38201
-    ]
-  ],
-  "routeFound": true,
-  "distance": 34.303,
-  "time": 3123.1975685413017,
-  "timeText": "52 minutes 3 seconds"
+  	"routeDescription": "fastest distance in km and html",
+  	"searchTimestamp": "2020-03-25 0:45:48",
+ 	 "executionTime": 59,
+  	"version": "2.1.0",
+  	"disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+  	"privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+  	"copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
+ 	 "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+	  "srsCode": 4326,
+  	"criteria": "shortest",
+  	"enable": "gdf,ldf,tc,tr,xc",
+  	"distanceUnit": "mi",
+  	"points": [
+    	[
+      	-123.70794,
+      	  48.77869
+    	],
+    	[
+      	-123.53785,
+      	  48.38201
+    	]
+        ],
+  	"routeFound": true,
+ 	 "distance": 34.303,	
+	 "time": 3123.1975685413017,
+ 	 "timeText": "52 minutes 3 seconds"
 
-    }
+    	}
 
 
 ## Route Resource
