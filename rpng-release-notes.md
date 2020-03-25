@@ -18,7 +18,7 @@ To see the new API in action, visit [Location Services in Action](https://ols-de
 
 3. Enable the global distortion field (see item 5) to allow the router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
 
-4. Enable local distortion fields (see item 5) to allow particular truck routes to be favoured over others nearby. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
+4. Enable local distortion fields (see item 5) to steer trucks away from particular roads or truck routes. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
 
 5. Use the *enable* parameter to specify feature options as follows:
    * td – time-dependency; disabling this disables sc, tf, and ev modules
