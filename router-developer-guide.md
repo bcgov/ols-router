@@ -96,7 +96,7 @@ https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-123.392803
 https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&weight=30001<br>
 
 6. Fastest route for a truck following a truck route through Fort St John<br>
-https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&followTruckRoute=true&truckRouteMultiplier=100<br>
+https://router.api.gov.bc.ca/truck/route.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&followTruckRoute=true<br>
 
 7. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
    https://router.api.gov.bc.ca/route.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true<br>
@@ -243,7 +243,7 @@ https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.3
 https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001<br>
 
 6. Directions and fastest route for a truck following a truck route through Fort St John<br>
-https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest<br>
+https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&followTruckRoute=true<br>
 
 7. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
    https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true<br>
