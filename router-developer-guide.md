@@ -34,8 +34,11 @@ Attribute Name |	Type
 [version](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#version) | String 
 [disclaimer](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#disclaimer) | String
 [privacyStatement](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#privacyStatement) | String
+[copyrightNotice](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightNotice) | String
+[copyrightLicense](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#criteria) | String
+[enable](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#routeFound) | Boolean
@@ -43,43 +46,10 @@ Attribute Name |	Type
 [time](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#time) | Integer
 [timeText](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#timeText) | String
 
+
 Here is a sample json response:
 
-    {
-    
-        "routeDescription": "shortest distance in km and json",
-        "searchTimestamp": "2016-03-30 11:18:07.752",
-        "executionTime": ​1,
-        "version": "2.0.0",
-        "disclaimer": "http://www2.gov.bc.ca/gov/content/home/disclaimer",
-        "privacyStatement": "http://www2.gov.bc.ca/gov/content/home/privacy",
-        "copyrightNotice": "Copyright 2016 Province of British Columbia - Access only",
-        "copyrightLicense": "http://www2.gov.bc.ca/gov/content/home/copyright",
-        "srsCode": ​4326,
-        "criteria": "shortest",
-        "distanceUnit":"km",
-        "points": 
-    
-    [
-    
-    [
-    
-        ​-123.1485847,
-        ​55.3933927
-    
-    ],
-    
-            [
-                ​-123.1515025,
-                ​55.3913904
-            ]
-        ],
-        "routeFound:true"
-        "distance": ​1.17,
-        "time": ​95,
-        "timeText": "1 minutes 35 seconds"
-    
-    }
+
 
 
 ## Route Resource
@@ -262,127 +232,200 @@ Attribute Name |	Type
 [version](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#version) | String 
 [disclaimer](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#disclaimer) | String
 [privacyStatement](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#privacyStatement) | String
+[copyrightNotice](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightNotice) | String
+[copyrightLicense](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#criteria) | String
+[enable](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distance) | String
 [time](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#time) | Integer
 [timeText](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#timeText) | String
-[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | Polyline
-[directions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | list of String
+[partition](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#partition) | String
+[partitions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#partitions) | String
+[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | String
+[notifications](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#notifications) | String
+[directions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#directions) | String
 
 Here is a sample json response:
 
+{
+  "routeDescription": null,
+  "searchTimestamp": "2020-03-25 0:23:45",
+  "executionTime": 2,
+  "version": "2.1.0",
+  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
+  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+  "srsCode": 4326,
+  "criteria": "fastest",
+  "enable": "gdf,ldf,tc,tr,xc",
+  "distanceUnit": "km",
+  "points": [
+    [
+      -123.36894,
+      48.44801
+    ],
+    [
+      -123.36842,
+      48.44551
+    ]
+  ],
+  "routeFound": true,
+  "distance": 0.567,
+  "time": 118.14001527680067,
+  "timeText": "1 minute 58 seconds",
+  "partition": "isTruckRoute",
+  "partitions": [
     {
-    
-        "routeDescription": "shortest distance in km and json",
-        "searchTimestamp": "2016-03-30 11:19:40.879",
-        "executionTime": ​1,
-        "version": "2.0.0",
-        "disclaimer": "http://www2.gov.bc.ca/gov/content/home/disclaimer",
-        "privacyStatement": "http://www2.gov.bc.ca/gov/content/home/privacy",
-        "copyrightNotice": "Copyright 2016 Province of British Columbia - Access only",
-        "copyrightLicense": "http://www2.gov.bc.ca/gov/content/home/copyright",
-        "srsCode": ​4326,
-        "criteria": "shortest",
-        "distanceUnit":"km",
-        "points": 
-    
-    [
-    
-    [
-    
-        ​-123.1485847,
-        ​55.3933927
-    
-    ],
-    
-        [
-            ​-123.1515025,
-            ​55.3913904
-        ]
-    
-    ],
-    "routeFound:true",
-    "distance": ​1.17,
-    "time": ​95,
-    "timeText": "1 minutes 35 seconds",
-    "route": 
-    [
-    
-    [
-    
-        ​-123.14858470195041,
-        ​55.39339267997931
-    
-    ],
-    [
-    
-        ​-123.14840793196278,
-        ​55.39338712528468
-    
-    ],
-    [
-    
-        ​-123.14761109235013,
-        ​55.39341636881418
-    
-    ],
-    [
-    
-        ​-123.14668144613537,
-        ​55.393617534494794
-    
-    ],
-    [
-    
-        ​-123.14503449525762,
-        ​55.39417521046494
-    
-    ],
-    [
-    
-        ​-123.14390833997521,
-        ​55.39236304295874
-    
-    ],
-    [
-    
-        ​-123.14305692485847,
-        ​55.39099288115634
-    
-    ],
-    [
-    
-        ​-123.1446450161482,
-        ​55.39068293699658
-    
-    ],
-    [
-    
-        ​-123.14784075650216,
-        ​55.390523867097286
-    
-    ],
-    
-        [
-            ​-123.15160701279896,
-            ​55.3907106829186
-        ]
-    
-    ],
-    "directions": 
-    
-        [
-            "Continue onto Columbia Dr for 250 m",
-            "Turn right onto Hwy 39 for 400 m",
-            "Turn right onto Alberta Dr for 550 m",
-            "Finish!"
-        ]
-    
+      "index": 0,
+      "isTruckRoute": false
+    },
+    {
+      "index": 1,
+      "isTruckRoute": true
+    },
+    {
+      "index": 4,
+      "isTruckRoute": false
     }
+  ],
+  "route": [
+    [
+      -123.36898,
+      48.44817
+    ],
+    [
+      -123.36814,
+      48.44827
+    ],
+    [
+      -123.36813,
+      48.44823
+    ],
+    [
+      -123.36786,
+      48.44766
+    ],
+    [
+      -123.36681,
+      48.44588
+    ],
+    [
+      -123.3668,
+      48.44575
+    ],
+    [
+      -123.36683,
+      48.44568
+    ],
+    [
+      -123.36687,
+      48.44563
+    ],
+    [
+      -123.367,
+      48.44556
+    ],
+    [
+      -123.36792,
+      48.44544
+    ],
+    [
+      -123.36797,
+      48.44588
+    ],
+    [
+      -123.36822,
+      48.44583
+    ],
+    [
+      -123.36823,
+      48.4456
+    ],
+    [
+      -123.36837,
+      48.44558
+    ],
+    [
+      -123.36844,
+      48.44556
+    ]
+  ],
+  "notifications": [
+    
+  ],
+  "directions": [
+    {
+      "type": "START",
+      "name": "Tolmie Ave",
+      "distance": 0.063,
+      "time": 14,
+      "heading": "EAST",
+      "text": "Head east on Tolmie Ave for 65 m (14 seconds)",
+      "point": [
+        -123.36898,
+        48.44817
+      ]
+    },
+    {
+      "type": "TURN_RIGHT",
+      "name": "Blanshard St",
+      "distance": 0.283,
+      "time": 26,
+      "text": "Turn right onto Blanshard St for 300 m (26 seconds)",
+      "point": [
+        -123.36814,
+        48.44827
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "turning lane",
+      "distance": 0.041,
+      "time": 13,
+      "text": "Continue onto turning lane for 40 m (13 seconds)",
+      "point": [
+        -123.36681,
+        48.44588
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Finlayson St",
+      "distance": 0.069,
+      "time": 5,
+      "text": "Continue onto Finlayson St for 70 m (5 seconds)",
+      "point": [
+        -123.367,
+        48.44556
+      ]
+    },
+    {
+      "type": "TURN_RIGHT",
+      "name": "mall access",
+      "distance": 0.111,
+      "time": 61,
+      "text": "Turn right onto mall access for 100 m (1 minute 1 second)",
+      "point": [
+        -123.36792,
+        48.44544
+      ]
+    },
+    {
+      "type": "FINISH",
+      "text": "Finish!",
+      "point": [
+        -123.36844,
+        48.44556
+      ]
+    }
+  ]
+}
+
 
     
 ## optimalRoute Resource
