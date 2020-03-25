@@ -279,6 +279,7 @@ Attribute Name |	Type
 [directions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#directions) | String
 
 Here is a sample json response:
+```
 
 {
   "routeDescription": null,
@@ -455,6 +456,7 @@ Here is a sample json response:
   ]
 }
 
+```
 
     
 ## optimalRoute Resource
