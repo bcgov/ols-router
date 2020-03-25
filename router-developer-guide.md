@@ -95,12 +95,12 @@ https://router.api.gov.bc.ca/truck/route.json?points=-123.392803%2C48.4330137%2C
 5. Fastest route around a bridge for an overweight truck<br>
 https://router.api.gov.bc.ca/truck/route.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&weight=30001&apikey=myapikey<br>
 
-6. Fastest route for a truck following truck routes from Surrey to Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-122.86088693886998%2C49.183102043951244%2C-122.9994489%2C49.2203318&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
-
-
-7. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
+6. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
    https://router.api.gov.bc.ca/route.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true&apikey=myapikey<br>
+   
+7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
+   
 
 
 ### HTTP response
@@ -129,7 +129,7 @@ Attribute Name |	Type
 [partitions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#partitions) | String
 [route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | List of Point
 
-Here is a sample json response:
+Here is a sample json response for example 7 above:
 ```
 {
   "routeDescription": null,
