@@ -49,7 +49,8 @@ Attribute Name |	Type
 
 Here is a sample json response:
 
-{
+    {
+    
   "routeDescription": "fastest distance in km and html",
   "searchTimestamp": "2020-03-25 0:45:48",
   "executionTime": 59,
@@ -76,7 +77,8 @@ Here is a sample json response:
   "distance": 34.303,
   "time": 3123.1975685413017,
   "timeText": "52 minutes 3 seconds"
-}
+
+    }
 
 
 ## Route Resource
