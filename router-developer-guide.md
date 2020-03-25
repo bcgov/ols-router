@@ -226,11 +226,11 @@ https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.3
 5. Directions and fastest route around a bridge for an overweight truck<br>
 https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001<br>
 
-6. Directions and fastest route for a truck following a truck route through Fort St John<br>
-https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-120.82180023193361%2C56.25665624446577%2C-120.82269587495833%2C56.262691074109405&criteria=fastest&followTruckRoute=true<br>
-
-7. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/directions.json?apikey=myapikey&points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true<br>
+6. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
+   https://router.api.gov.bc.ca/route.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true&apikey=myapikey<br>
+   
+7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
 
 
 ### HTTP response
@@ -266,8 +266,8 @@ Here is a sample json response:
 ```
 {
   "routeDescription": null,
-  "searchTimestamp": "2020-03-25 0:23:45",
-  "executionTime": 2,
+  "searchTimestamp": "2020-03-25 15:50:49",
+  "executionTime": 3,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
@@ -279,170 +279,130 @@ Here is a sample json response:
   "distanceUnit": "km",
   "points": [
     [
-      -123.36894,
-      48.44801
+      -123.11389,
+      49.26111
     ],
     [
-      -123.36842,
-      48.44551
+      -123.11166,
+      49.26551
     ]
   ],
   "routeFound": true,
-  "distance": 0.567,
-  "time": 118.14001527680067,
-  "timeText": "1 minute 58 seconds",
-  "partition": "isTruckRoute",
-  "partitions": [
-    {
-      "index": 0,
-      "isTruckRoute": false
-    },
-    {
-      "index": 1,
-      "isTruckRoute": true
-    },
-    {
-      "index": 4,
-      "isTruckRoute": false
-    }
-  ],
+  "distance": 0.874,
+  "time": 131.30227738040392,
+  "timeText": "2 minutes 11 seconds",
   "route": [
     [
-      -123.36898,
-      48.44817
+      -123.11297,
+      49.2611
     ],
     [
-      -123.36814,
-      48.44827
+      -123.11297,
+      49.26129
     ],
     [
-      -123.36813,
-      48.44823
+      -123.11291,
+      49.26221
     ],
     [
-      -123.36786,
-      48.44766
+      -123.11289,
+      49.26318
     ],
     [
-      -123.36681,
-      48.44588
+      -123.11478,
+      49.2632
     ],
     [
-      -123.3668,
-      48.44575
+      -123.11476,
+      49.26404
     ],
     [
-      -123.36683,
-      48.44568
+      -123.11474,
+      49.26493
     ],
     [
-      -123.36687,
-      48.44563
+      -123.11473,
+      49.2653
     ],
     [
-      -123.367,
-      48.44556
+      -123.11473,
+      49.26538
     ],
     [
-      -123.36792,
-      48.44544
+      -123.11467,
+      49.26576
     ],
     [
-      -123.36797,
-      48.44588
+      -123.11279,
+      49.26573
     ],
     [
-      -123.36822,
-      48.44583
-    ],
-    [
-      -123.36823,
-      48.4456
-    ],
-    [
-      -123.36837,
-      48.44558
-    ],
-    [
-      -123.36844,
-      48.44556
+      -123.11165,
+      49.26569
     ]
   ],
-  "notifications": [
-    
-  ],
+  "notifications": [],
   "directions": [
     {
       "type": "START",
-      "name": "Tolmie Ave",
-      "distance": 0.063,
-      "time": 14,
-      "heading": "EAST",
-      "text": "Head east on Tolmie Ave for 65 m (14 seconds)",
+      "name": "Yukon St",
+      "distance": 0.231,
+      "time": 30,
+      "heading": "NORTH",
+      "text": "Head north on Yukon St for 250 m (30 seconds)",
       "point": [
-        -123.36898,
-        48.44817
+        -123.11297,
+        49.2611
+      ]
+    },
+    {
+      "type": "TURN_LEFT",
+      "name": "Broadway",
+      "distance": 0.138,
+      "time": 28,
+      "text": "Turn left onto Broadway for 150 m (28 seconds)",
+      "point": [
+        -123.11289,
+        49.26318
       ]
     },
     {
       "type": "TURN_RIGHT",
-      "name": "Blanshard St",
-      "distance": 0.283,
-      "time": 26,
-      "text": "Turn right onto Blanshard St for 300 m (26 seconds)",
+      "name": "Cambie St",
+      "distance": 0.285,
+      "time": 44,
+      "text": "Turn right onto Cambie St for 300 m (44 seconds)",
       "point": [
-        -123.36814,
-        48.44827
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "turning lane",
-      "distance": 0.041,
-      "time": 13,
-      "text": "Continue onto turning lane for 40 m (13 seconds)",
-      "point": [
-        -123.36681,
-        48.44588
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Finlayson St",
-      "distance": 0.069,
-      "time": 5,
-      "text": "Continue onto Finlayson St for 70 m (5 seconds)",
-      "point": [
-        -123.367,
-        48.44556
+        -123.11478,
+        49.2632
       ]
     },
     {
       "type": "TURN_RIGHT",
-      "name": "mall access",
-      "distance": 0.111,
-      "time": 61,
-      "text": "Turn right onto mall access for 100 m (1 minute 1 second)",
+      "name": "6th Ave",
+      "distance": 0.221,
+      "time": 30,
+      "text": "Turn right onto 6th Ave for 200 m (30 seconds)",
       "point": [
-        -123.36792,
-        48.44544
+        -123.11467,
+        49.26576
       ]
     },
     {
       "type": "FINISH",
       "text": "Finish!",
       "point": [
-        -123.36844,
-        48.44556
+        -123.11165,
+        49.26569
       ]
     }
   ]
 }
-
 ```
 
-    
+
 ## optimalRoute Resource
+
 The optimalRoute resource represents the shortest or fastest route between a start point and a series of end points reordered to minimize total route distance or time. Here are some examples:
 
 1. Shortest optimal route in km and json between the following addresses in Victoria, BC:
