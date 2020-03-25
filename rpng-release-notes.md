@@ -24,7 +24,7 @@ To see the new API in action, visit [Location Services in Action](https://ols-de
    * td – time-dependency; disabling this disables sc, tf, and ev modules
    * tr – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
    * tc - turn costs (e.g., left turns take longer than right turns)
-   * xc - crossing costs(e.g., crossing a major road on a minor road takes longer than the other way around)
+   * xc - crossing costs (e.g., crossing a major road on a minor road takes longer than the other way around)
    * gdf - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones
    * ldf - local distortion field; applies friction factors to specific road segments to make specific truck routes more attractive than others   
    * sc – ferry schedules; disabled by default; <b>uses dummy data so is only suitable for demos</b>
