@@ -132,7 +132,8 @@ Attribute Name |	Type
 Here is a sample json response for example 7 above:
 ```
 {
-  "routeDescription": null,
+
+  "routeDescription": "in Vancouver,fastest route,follow truck route,partition by truck,ferry,locality",
   "searchTimestamp": "2020-03-25 15:32:28",
   "executionTime": 2,
   "version": "2.1.0",
@@ -214,23 +215,23 @@ Here is a sample json response for example 7 above:
 ##  Directions Resource
 The directions resource represents the turn-by-turn directions, shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Directions and shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.json?routeDescription=directions%20Cand%20Cshortest%20route%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+1. Directions and shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
    
-2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?routeDescription=directions%20Cand%20Cshortest%20route%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
 
-3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?routeDescription=directions%20Cand%20Cfastest%20route%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
+3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
 
 4. Directions and fastest route around a bridge for an overheight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&height=5.1<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&height=5.1&apikey=myapikey<br>
 
 5. Directions and fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?apikey=myapikey&points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&disable=sc%2Ctf%2Cev%2Ctd%2C&weight=30001<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&weight=30001&apikey=myapikey<br>
 
-6. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/route.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true&apikey=myapikey<br>
+6. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
+   https://router.api.gov.bc.ca/directions.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&height=5.1&correctSide=true&apikey=myapikey<br>
    
-7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
+7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
 
 
 ### HTTP response
@@ -265,7 +266,7 @@ Here is a sample json response:
 
 ```
 {
-  "routeDescription": null,
+  "routeDescription": "in Vancouver,directions and fastest route,follow truck route,partition by truck,ferry,locality",
   "searchTimestamp": "2020-03-25 15:50:49",
   "executionTime": 3,
   "version": "2.1.0",
