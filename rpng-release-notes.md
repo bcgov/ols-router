@@ -71,7 +71,7 @@ Feature                | Enabled<br>by Default| Feature Quality | Data Needed   
 |----------------------|:---------:|------------------|-----------------------|----------------------|
 Correct-side routing|Yes|Good|Road geometry from ITN and address ranges from BC Address Geocoder|Excellent|
 Time independent turn restrictions|Yes|Supports restrictions on U-Turns,left-turns, right-turns, and straight-throughs.|[Implicit restrictions](https://www.mapbox.com/mapping/mapping-for-navigation/implicit-restrictions/)<br>Explicit restrictions from ITN (e.g., based on observed road signs)|Implicit restrictions: high<br> Explicit restrictions: Good in Metropolitan Vancouver area. Poor everywhere else
-Start time|No|Good|All time-dependent data|variable|
+Start time|No|Good|All time-dependent data|Variable|
 Time-dependent turn-restrictions|No|Functionally good but demo only due to poor data|Time-dependent turn restrictions from ITN|Poor. There are many missing time-dependent turn-restrictions in the data.
 Turn costs|Yes|Acceptable|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable, turn-costs have been coarsely-tuned. 
 Truck routes|Yes|Good; Only supports a basic truck route, not weight or height corridors hazardous material routes, or evacuation routes|Truck routes from ITN| Good in Metropolitan Vancouver area, all highways in province are truck routes but no local truck routes outside Metro Vancouver
