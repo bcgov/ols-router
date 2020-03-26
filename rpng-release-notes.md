@@ -60,7 +60,7 @@ The partitions are returned in a separate partitions parameter; the route output
 
 5. You can specify truck dimensions with the *height* (OAH in metres), *width* (OAW in metres), and *weight* (GVW in kg) parameters. Note that truck routing <b>uses dummy road height/weight data so is only suitable for demos</b>
 
-6. Use the *truckRouteMultiplier* parameter to specify how strongly a route should be attracted to designated truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, you will find many designated truck routes in the Greater Vancouver area but nowhere else in the province.
+6. Use the *truckRouteMultiplier* parameter to specify how strongly a route should be attracted to truck routes; 10 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, you will find many truck routes in the Greater Vancouver area but nowhere else in the province.
 
 For more information about the API, consult the [Route Planner Developer Guide](https://bcgov.github.io/ols-router/router-developer-guide.html)
 
@@ -74,7 +74,7 @@ Time independent turn restrictions|Yes|Supports restrictions on U-Turns,left-tur
 Start time|No|Good|All time-dependent data|variable|
 Time-dependent turn-restrictions|No|Functionally good but demo only due to poor data|Time-dependent turn restrictions from ITN|Poor. There are many missing time-dependent turn-restrictions in the data.
 Turn costs|Yes|Acceptable|Turn cost estimates by<br>turn type (left,right,straight)<br>traffic impactor (yield, stop, light)<br> intersection approach/departure (slowing down,speeding up)| acceptable, turn-costs have been coarsely-tuned. 
-Designated truck routes|Yes|Good; Only supports a basic designated truck route, not weight or height corridors hazardous material routes, or evacuation routes|Designated truck routes from ITN| Good in Metropolitan Vancouver area, all highways in province are truck routes but no local truck routes outside Metro Vancouver
+Truck routes|Yes|Good; Only supports a basic truck route, not weight or height corridors hazardous material routes, or evacuation routes|Truck routes from ITN| Good in Metropolitan Vancouver area, all highways in province are truck routes but no local truck routes outside Metro Vancouver
 Scheduled Road Events|No|Demo only; no real-time event monitoring, only full road closure events, not lane closures or info events| Scheduled road closure events from static Open511 file loaded on reboot|Good for some events; too much descriptive text, not enough structured time intervals
 Historic traffic congestion|No|Demo only|historic traffic data for each road segment in urban areas|Poor; In the absense of real data, simulated traffic peaks were generated for rush hour only.
 Hard road restrictions|Yes|Demo only; no support for height/weight restrictions by lane or rig type|road minimum height and weight(GVW) from ITN<br>road width|Height, weight: Unknown; very few values<br>width: no data in ITN, demo data only
