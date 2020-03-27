@@ -16,6 +16,7 @@ Term | Definition
 <a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the Router Web Service
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise
 <a name="routeFound">routeFound</a> | true if a route that connects all points has been found; false otherwise
+<a name="searchTimeStamp">searchTimeStamp</a> | date and time request was processed
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
 <a name="srsCode">srsCode</a> | The EPSG code of the spatial reference system used to state the coordination location of all geometry features in HTTP response. Allowed values are:<br>3005: BC Albers<br>4326: WGS 84 (default)<br>26907-26911: NAD83/UTM Zones 7N through 11N<br>32607-32611: WGS84/UTM Zones 7N through 11N<br>26707-26711: NAD27/UTM Zones 7N through 11N
 <a name="route">route</a> | route geometry (polyline)
