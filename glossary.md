@@ -7,7 +7,7 @@ Term | Definition
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is shortest
 <a name="directions">directions</a> | Turn-by-turn directions
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
-<a name="distance">distance</a> | Length of the best route found by the BC Route Planner API (in distanceUnit units)
+<a name="distance">distance</a> | Length of the best route found(in distanceUnit units)
 <a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance property. Allowed values are km (kilometres) and mi (miles). Default is km.
 <a name="executionTime">executionTime</a> | Request execution time in milliseconds
 <a name="enable">enable</a> | Enable optional routing features; specified as a comma-separated list of feature codes which are as follows:<br><br>**td** – time-dependency including honouring route start time and time-dependent turn-restrictions<br><br>**tr** – turn restrictions including no-left, no-right, no-straight-through, no-U-turn; time-dependent turn restrictions only work if td is enabled too<br><br>**tc** - turn costs (e.g., left turns take longer than right turns)<br><br>**xc** - crossing costs (e.g., crossing a major road on a minor road takes longer than the other way around)<br><br>**gdf** - global distortion field; applies friction factors to road segments by ITN road class; this makes major roads more attractive than minor ones when routing trucks<br><br>**ldf** - local distortion fields; applies friction factors to specific road segments to make them less attractive to trucks<br><br>**sc** – ferry schedules; only works if td is enabled too; only suitable for demos since it uses dummy data<br><br>**tf** – historic traffic congestion; only works if td is enabled too; only suitable for demos since it uses dummy data<br><br>**ev** – road events; only works if td is enabled too; only suitable for demos since it uses dummy data<br><br>The default value of enable is gdf,ldf,tr,xc,tc
@@ -19,13 +19,13 @@ Term | Definition
 <a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the BC Route Planner API
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise
 <a name="routeFound">routeFound</a> | true if a route that visits origin, all waypoints, and destination has been found; false otherwise
-<a name="route">route</a> | route geometry represented as a list of points.
+<a name="route">route</a> | Geometry of the best route found; represented as a list of points.
 <a name="routeDescription">routeDescription</a> | A short description of the nature of the requested route. This will be echoed in the returned route representation for use in your application. For example:<br>Fastest route from 1002 Johnson St, Victoria to 1105 Royal Ave, New Westminster
 <a name="searchTimestamp">searchTimeStamp</a> | date and time request was processed
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
 <a name="srsCode">srsCode</a> | The EPSG code of the spatial reference system used to state the coordinate location of all geometry features in HTTP response. Allowed values are:<br>3005: BC Albers<br>4326: WGS 84 (default)<br>26907-26911: NAD83/UTM Zones 7N through 11N<br>32607-32611: WGS84/UTM Zones 7N through 11N<br>26707-26711: NAD27/UTM Zones 7N through 11N
-<a name="time">time</a> | Route duration (in seconds)
-<a name="timeText">timeText</a> | Route duration in structured English (e.g., 1 hour and 15 minutes)
+<a name="time">time</a> | Duration of the best route found (in seconds)
+<a name="timeText">timeText</a> | Duration of the best route found in structured English (e.g., 1 hour and 15 minutes)
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
 <a name="version">version</a> | Software version of the BC Route Planner API
 <a name="visitOrder">visitOrder</a> | Represents the position in the optimal order each input point should appear in. For example, a visitOrder of [0,3,2,4,1] means input point 0 is output point 0, input point 1 is output point 3, input point 2 is output point 2, input point 3 is output point 4, and input point 4 is output point 1
