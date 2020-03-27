@@ -26,7 +26,6 @@ The distance resource represents the length and duration of the shortest or fast
 ### HTTP Response
 The distance resource will return the following representation:
 
-https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
 
 Attribute Name |	Type
 ---------------------: | --- |
