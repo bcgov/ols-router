@@ -129,7 +129,7 @@ Attribute Name |	Type
 [partitions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#partitions) | String
 [route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | List of Point
 
-Here is a sample json response for example 7 above:
+Here is a sample json response above:
 ```
 {
 
@@ -266,7 +266,7 @@ Here is a sample json response:
 
 ```
 {
-  "routeDescription": null,
+  "routeDescription": "in Vancouver,fastest route,follow truck route,partition by truck,ferry,locality",
   "searchTimestamp": "2020-03-25 15:50:49",
   "executionTime": 3,
   "version": "2.1.0",
