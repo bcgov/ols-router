@@ -6,9 +6,9 @@ Term | Definition
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is shortest
 <a name="directions">directions</a> | Turn-by-turn directions
-<a name="disclaimer">disclaimer</a> | Legal disclaimer of the Route Planner API
+<a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
 <a name="distance">distance</a> | Route length (in distanceUnit units)
-<a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance propertyerm. Allowed values are km (kilometres) and mi (miles). Default is km.
+<a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance property. Allowed values are km (kilometres) and mi (miles). Default is km.
 <a name="executionTime">executionTime</a> | Request execution time in milliseconds
 <a name="fromPoints">fromPoints</a> | A list of origin points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
 <a name="maxPairs">maxPairs</a> | Maximum number of (from,to) pairs to return for each point in fromPoints. pairs are selected in nearest to farthest order. For example, given 1 fromPoints, 10 toPoints, and maxPairs=1, betweenPairs will return the pair with the shortest distance or fastest time
