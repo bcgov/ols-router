@@ -100,7 +100,7 @@ https://router.api.gov.bc.ca/truck/route.json?points=-123.392803%2C48.4330137%2C
 https://router.api.gov.bc.ca/truck/route.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&weight=30001&followTruckRoute=true&apikey=myapikey<br>
    
 7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality&apikey=myapikey<br>
    
 
 
@@ -232,7 +232,7 @@ https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.43301
 https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&followTruckRoute=true&weight=30001&apikey=myapikey<br>
    
 7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality&apikey=myapikey<br>
 
 
 ### HTTP response
