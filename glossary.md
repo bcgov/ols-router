@@ -16,7 +16,7 @@ Term | Definition
 <a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the Router Web Service
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise
 <a name="routeFound">routeFound</a> | true if a route that connects all points has been found; false otherwise
-<a name="route">route</a> | route geometry (polyline)
+<a name="route">route</a> | route geometry represented as a lists of points.
 <a name="routeDescription">routeDescription</a> | A short description of the nature of the requested route. This will be echoed in the returned route representation for use in your application. For example:<br>Fastest route from 1002 Johnson St, Victoria to 1105 Royal Ave, New Westminster
 <a name="searchTimestamp">searchTimeStamp</a> | date and time request was processed
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
