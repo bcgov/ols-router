@@ -15,7 +15,7 @@ Term | Definition
 <a name="outputFormat">outputFormat</a> | Format of representation. Allowed values are json, html, and kml. Default is json.
 <a name="outputSRS">outputSRS</a> | The EPSG code of the spatial reference system used to state the coordination location of a named feature. It is ignored if KML output is specified since KML only supports 4326 (WGS84). Allowed values are:<br>3005: BC Albers<br>4326: WGS 84 (default)<br>26907-26911: NAD83/UTM Zones 7N through 11N<br>32607-32611: WGS84/UTM Zones 7N through 11N<br>26707-26711: NAD27/UTM Zones 7N through 11N
 <a name="points">points</a> | A list of origin point, any number of waypoints, and destination point in visiting order. Points are specified as X1,Y1,...Xn,Yn where X and Y are values in the projection specified by the 'outputSRS' parameter. If no outputSRS is given, X is treated as longitude and Y is treated as latitude.<br>Here is an example:<br>-123.707942,48.778691,-123.537850,48.382005<br><br>To make a round trip, just add the start point as in:<br>-123.707942,48.778691,-123.537850,48.382005,-123.707942,48.778691
-<a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the Router Web Service
+<a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the BC Route Planner API
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise
 <a name="routeFound">routeFound</a> | true if a route that connects all points has been found; false otherwise
 <a name="route">route</a> | route geometry represented as a list of points.
