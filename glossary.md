@@ -9,7 +9,7 @@ Term | Definition
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the Router Web Service
 <a name="distance">distance</a> | Route length (in distanceUnit units)
 <a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance propertyerm. Allowed values are km (kilometres) and mi (miles). Default is km.
-<a name="executionTime">executionTime</a> | Query execution time in milliseconds
+<a name="executionTime">executionTime</a> | Request execution time in milliseconds
 <a name="fromPoints">fromPoints</a> | A list of origin points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
 <a name="maxPairs">maxPairs</a> | Maximum number of (from,to) pairs to return for each point in fromPoints. pairs are selected in nearest to farthest order. For example, given 1 fromPoints, 10 toPoints, and maxPairs=1, betweenPairs will return the pair with the shortest distance or fastest time
 <a name="outputFormat">outputFormat</a> | Format of representation. Allowed values are json, html, and kml. Default is json.
