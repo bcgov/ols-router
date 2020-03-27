@@ -561,9 +561,9 @@ Attribute Name |	Type
 [distance](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distance) | String
 [time](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#time) | Integer
 [timeText](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#timeText) | String
-[visitOrder](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#visitOrder) | list of Integer
-[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | Polyline
-[directions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | list of String
+[visitOrder](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#visitOrder) | List of Integer
+[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | List of Point
+[directions](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | List
 
 Here is a sample json response:
 
@@ -573,7 +573,7 @@ Here is a sample json response:
 	"executionTime": 325,
 	"routingExecutionTime": 15,
 	"optimizationExecutionTime": 304,
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"disclaimer": "http://www2.gov.bc.ca/gov/content/home/disclaimer",
 	"privacyStatement": "http://www2.gov.bc.ca/gov/content/home/privacy",
 	"copyrightNotice": "Copyright 2015 Province of British Columbia - Open Government License",
