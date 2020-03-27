@@ -20,7 +20,7 @@ To see the new API in action, visit [Location Services in Action](https://ols-de
 
 4. Enable local distortion fields to steer trucks away from particular roads or truck routes. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
 
-5. Use the *enable* parameter to turn on optional features including honouring route start time, turn restrictions, turn costs, intersection crossing costs, global and local distortion fields, ferry schedules, historic traffic congestion, and road events. For further details, see https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable
+5. Use the *enable* parameter to turn on optional features including honouring route start time, turn restrictions, turn costs, intersection crossing costs, global and local distortion fields, ferry schedules (demo use only), historic traffic congestion (demo use only), and road events(demo use only). For further details, see https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable
 
 6. The disable parameter is now deprecated. Use the enable parameter instead.
 
