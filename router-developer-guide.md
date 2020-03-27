@@ -23,6 +23,8 @@ The distance resource represents the length and duration of the shortest or fast
 
 3. Length of fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.html?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=mi&apikey=myapikey<br>
 
+
+
 ### HTTP Response
 The distance resource will return the following representation:
 
