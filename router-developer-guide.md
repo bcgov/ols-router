@@ -266,7 +266,7 @@ Here is a sample json response:
 
 ```
 {
-  "routeDescription": "in Vancouver,directions and fastest route,follow truck route,partition by truck,ferry,locality",
+  "routeDescription": null,
   "searchTimestamp": "2020-03-25 15:50:49",
   "executionTime": 3,
   "version": "2.1.0",
