@@ -4,7 +4,7 @@ Term | Definition
 ----: | -----------
 <a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner API
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API
-<a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is shortest
+<a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is fastest
 <a name="directions">directions</a> | Turn-by-turn directions
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
 <a name="distance">distance</a> | Length of the best route found (in distanceUnit units)
