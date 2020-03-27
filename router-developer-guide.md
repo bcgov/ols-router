@@ -26,17 +26,19 @@ The distance resource represents the length and duration of the shortest or fast
 ### HTTP Response
 The distance resource will return the following representation:
 
+https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
+
 Attribute Name |	Type
 ---------------------: | --- |
-[routeDescription](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#routeDescription) | String
-[searchTimestamp](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#searchTimestamp) | Datetime
-[executionTime](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#executionTime) | Real
-[version](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#version) | String 
-[disclaimer](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#disclaimer) | String
-[privacyStatement](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#privacyStatement) | String
-[copyrightNotice](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightNotice) | String
-[copyrightLicense](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightLicense) | String
-[srsCode](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#srsCode) | Integer
+[routeDescription](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeDescription) | String
+[searchTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#searchTimestamp) | Datetime
+[executionTime](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#executionTime) | Real
+[version](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#version) | String 
+[disclaimer](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disclaimer) | String
+[privacyStatement](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#privacyStatement) | String
+[copyrightNotice](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightNotice) | String
+[copyrightLicense](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightLicense) | String
+[srsCode](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distanceUnit) | String
