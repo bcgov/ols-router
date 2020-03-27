@@ -221,14 +221,14 @@ The directions resource represents the turn-by-turn directions, shortest or fast
 
 3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnit=mi&apikey=myapikey<br>
 
-4. Directions and fastest route around a bridge for an overheight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&height=5.1&apikey=myapikey<br>
+4. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
+   https://router.api.gov.bc.ca/directions.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&followTruckRoute=true&correctSide=true&apikey=myapikey<br>
 
-5. Directions and fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&weight=30001&apikey=myapikey<br>
+5. Directions and fastest route around a bridge for an overheight truck<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&criteria=fastest&followTruckRoute=true&height=5.1&apikey=myapikey<br>
 
-6. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/directions.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&criteria=fastest&correctSide=true&apikey=myapikey<br>
+6. Directions and fastest route around a bridge for an overweight truck<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&criteria=fastest&followTruckRoute=true&weight=30001&apikey=myapikey<br>
    
 7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&criteria=fastest&followTruckRoute=true&partition:isTruckRoute,isFerry,locality&apikey=myapikey<br>
