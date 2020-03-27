@@ -419,14 +419,19 @@ https://router.api.gov.bc.ca/optimalRoute.kml?criteria=fastest&points=-123.36516
 ### HTTP response
 The optimalRoute resource will return the following representation:
 
+
 Attribute Name |	Type
 ---------------------: | --- |
 [routeDescription](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#routeDescription) | String
 [searchTimestamp](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#searchTimestamp) | Datetime
 [executionTime](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#executionTime) | Real
+[routingExecutionTime](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#executionTime) | Real
+[optimizationExecutionTime](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#executionTime) | Real
 [version](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#version) | String 
 [disclaimer](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#disclaimer) | String
 [privacyStatement](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#privacyStatement) | String
+[copyrightNotice](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightNotice) | String
+[copyrightLicense](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#criteria) | String
 [distanceUnit](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distanceUnit) | String
@@ -435,8 +440,8 @@ Attribute Name |	Type
 [distance](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distance) | String
 [time](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#time) | Integer
 [timeText](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#timeText) | String
-[visitOrder](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#visitOrder) | list of Integer
-[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | Polyline
+[visitOrder](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#visitOrder) | List of Integer
+[route](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#route) | List of Point
 
 
 Here is a sample json response:
@@ -544,6 +549,8 @@ Attribute Name |	Type
 [version](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#version) | String 
 [disclaimer](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#disclaimer) | String
 [privacyStatement](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#privacyStatement) | String
+[copyrightNotice](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightNotice) | String
+[copyrightLicense](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#criteria) | String
 [distanceUnit](https://github.com/bcgov/DBC-APIM/blob/master/api-specs/router/glossary.md#distanceUnit) | String
