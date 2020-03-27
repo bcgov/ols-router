@@ -2,8 +2,8 @@
 # Glossary of Terms
 Term | Definition
 ----: | -----------
-<a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the Route Planner
-<a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the Route Planner
+<a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner
+<a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is shortest
 <a name="directions">directions</a> | Turn-by-turn directions
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the Router Web Service
