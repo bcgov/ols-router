@@ -24,5 +24,5 @@ Term | Definition
 <a name="time">time</a> | Route duration (in seconds)
 <a name="timeText">timeText</a> | Route duration in structured English (e.g., 1 hour and 15 minutes)
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
-<a name="version">version</a> | Software version of the Router Web Service
+<a name="version">version</a> | Software version of the BC Route Planner API
 <a name="visitOrder">visitOrder</a> | Represents the position in the optimal order each input point should appear in. For example, a visitOrder of [0,3,2,4,1] means input point 0 is output point 0, input point 1 is output point 3, input point 2 is output point 2, input point 3 is output point 4, and input point 4 is output point 1
