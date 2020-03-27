@@ -18,7 +18,7 @@ Term | Definition
 <a name="points">points</a> | A list of origin point, any number of waypoints, and destination point in visiting order. Points are specified as X1,Y1,...Xn,Yn where X and Y are values in the projection specified by the 'outputSRS' parameter. If no outputSRS is given, X is treated as longitude and Y is treated as latitude.<br>Here is an example:<br>-123.707942,48.778691,-123.537850,48.382005<br><br>To make a round trip, just add the start point as in:<br>-123.707942,48.778691,-123.537850,48.382005,-123.707942,48.778691
 <a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the BC Route Planner API
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise
-<a name="routeFound">routeFound</a> | true if a route that connects all points has been found; false otherwise
+<a name="routeFound">routeFound</a> | true if a route that visits origin, all waypoints, and destination has been found; false otherwise
 <a name="route">route</a> | route geometry represented as a list of points.
 <a name="routeDescription">routeDescription</a> | A short description of the nature of the requested route. This will be echoed in the returned route representation for use in your application. For example:<br>Fastest route from 1002 Johnson St, Victoria to 1105 Royal Ave, New Westminster
 <a name="searchTimestamp">searchTimeStamp</a> | date and time request was processed
