@@ -292,9 +292,9 @@ Here is a sample json response:
 
 ```
 {
-  "routeDescription": "in Vancouver,fastest route,follow truck route,partition by truck,ferry,locality",
-  "searchTimestamp": "2020-03-25 15:50:49",
-  "executionTime": 3,
+  "routeDescription": null,
+  "searchTimestamp": "2020-03-28 0:27:26",
+  "executionTime": 4,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
@@ -318,6 +318,27 @@ Here is a sample json response:
   "distance": 0.874,
   "time": 131.30227738040392,
   "timeText": "2 minutes 11 seconds",
+  "partition": "isFerry,isTruckRoute,locality",
+  "partitions": [
+    {
+      "index": 0,
+      "isFerry": false,
+      "isTruckRoute": false,
+      "locality": "Vancouver"
+    },
+    {
+      "index": 3,
+      "isFerry": false,
+      "isTruckRoute": true,
+      "locality": "Vancouver"
+    },
+    {
+      "index": 9,
+      "isFerry": false,
+      "isTruckRoute": false,
+      "locality": "Vancouver"
+    }
+  ],
   "route": [
     [
       -123.11297,
@@ -428,6 +449,7 @@ Here is a sample json response:
 ```
 
 
+ 
 ## optimalRoute Resource
 
 The optimalRoute resource represents the shortest or fastest route between a start point and a series of end points reordered to minimize total route distance or time. Here are some examples:
