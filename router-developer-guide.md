@@ -288,7 +288,7 @@ Attribute Name |	Type
 [notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) | String
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#directions) | String
 
-Here is a sample json response:
+Here is a sample json response that includes multiple partitions:
 
 ```
 {
@@ -448,6 +448,108 @@ Here is a sample json response:
 }
 ```
 
+And here's a json response that includes notifications:
+
+```
+{
+  "routeDescription": null,
+  "searchTimestamp": "2020-03-28 1:11:14",
+  "executionTime": 0,
+  "version": "2.1.0",
+  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
+  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+  "srsCode": 4326,
+  "criteria": "fastest",
+  "enable": "gdf,ldf,tc,tr,xc",
+  "distanceUnit": "km",
+  "points": [
+    [
+      -123.03949,
+      49.32174
+    ],
+    [
+      -123.03755,
+      49.32279
+    ]
+  ],
+  "routeFound": true,
+  "distance": 0.253,
+  "time": 49.480167042076786,
+  "timeText": "49 seconds",
+  "route": [
+    [
+      -123.03948,
+      49.32177
+    ],
+    [
+      -123.03847,
+      49.32175
+    ],
+    [
+      -123.03843,
+      49.32278
+    ],
+    [
+      -123.03755,
+      49.32277
+    ]
+  ],
+  "notifications": [],
+  "directions": [
+    {
+      "type": "START",
+      "name": "15th St",
+      "distance": 0.074,
+      "time": 19,
+      "heading": "EAST",
+      "text": "Head east on 15th St for 75 m (19 seconds)",
+      "point": [
+        -123.03948,
+        49.32177
+      ]
+    },
+    {
+      "type": "TURN_LEFT",
+      "name": "Mountain Hwy",
+      "distance": 0.115,
+      "time": 20,
+      "text": "Turn left onto Mountain Hwy for 100 m (20 seconds)",
+      "point": [
+        -123.03847,
+        49.32175
+      ],
+      "notifications": [
+        {
+          "type": "TruckRestriction",
+          "message": "No Vehicles with a GVW of 10,000 kg or more are allowed to operate or be present on this road in the southbound direction"
+        }
+      ]
+    },
+    {
+      "type": "TURN_RIGHT",
+      "name": "16th St",
+      "distance": 0.064,
+      "time": 10,
+      "text": "Turn right onto 16th St for 65 m (10 seconds)",
+      "point": [
+        -123.03843,
+        49.32278
+      ]
+    },
+    {
+      "type": "FINISH",
+      "text": "Finish!",
+      "point": [
+        -123.03755,
+        49.32277
+      ]
+    }
+  ]
+}
+
+```
 
  
 ## optimalRoute Resource
