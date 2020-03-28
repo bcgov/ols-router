@@ -6,7 +6,7 @@ Term | Definition
 <a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner API
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is fastest
-<a name="directions">directions</a> | A structured list of turn-by-turn directions including notifications
+<a name="directions">directions</a> | A structured sequence of turn-by-turn directions including notifications
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
 <a name="distance">distance</a> | Length of the best route found (in distanceUnit units)
 <a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance property. Allowed values are km (kilometres) and mi (miles). Default is km.
