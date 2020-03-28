@@ -133,11 +133,11 @@ Attribute Name |	Type
 [route](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List of Point
 
 Here is a sample json response above:
+
 ```
 {
-
-  "routeDescription": "in Vancouver,fastest route,follow truck route,partition by truck,ferry,locality",
-  "searchTimestamp": "2020-03-25 15:32:28",
+  "routeDescription": null,
+  "searchTimestamp": "2020-03-27 22:54:30",
   "executionTime": 2,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
@@ -162,6 +162,27 @@ Here is a sample json response above:
   "distance": 0.874,
   "time": 131.30227738040392,
   "timeText": "2 minutes 11 seconds",
+  "partition": "isFerry,isTruckRoute,locality",
+  "partitions": [
+    {
+      "index": 0,
+      "isFerry": false,
+      "isTruckRoute": false,
+      "locality": "Vancouver"
+    },
+    {
+      "index": 3,
+      "isFerry": false,
+      "isTruckRoute": true,
+      "locality": "Vancouver"
+    },
+    {
+      "index": 9,
+      "isFerry": false,
+      "isTruckRoute": false,
+      "locality": "Vancouver"
+    }
+  ],
   "route": [
     [
       -123.11297,
@@ -213,7 +234,9 @@ Here is a sample json response above:
     ]
   ]
 }
+
 ```
+ 
 
 ##  Directions Resource
 The directions resource represents the turn-by-turn directions, shortest or fastest route between given points and the length and duration of that route. Here are some examples:
