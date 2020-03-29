@@ -295,19 +295,21 @@ Attribute Name |	Type
 [notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) | String
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#directions) | String
 
-Here is a sample json request that includes multiple partitions:
+Here is a sample json request for a route that includes multiple partitions:
 
 ```
-blah blah
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
+
+https://router-dev.pathfinder..gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
 ```
 
-and here is the route planner api's response:
+and here's the response:
 
 ```
 {
   "routeDescription": null,
-  "searchTimestamp": "2020-03-28 0:27:26",
-  "executionTime": 4,
+  "searchTimestamp": "2020-03-29 22:52:31",
+  "executionTime": 3,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
@@ -461,11 +463,12 @@ and here is the route planner api's response:
 }
 ```
 
+
 Here's a sample json request for directions and a route in Vancouver that has notifications:
 
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
 
-and here's the route planner's response:
+and here's the response:
 
 ```
 {
