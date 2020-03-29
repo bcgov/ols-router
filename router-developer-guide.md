@@ -57,12 +57,12 @@ Attribute Name |	Type
 [timeText](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#timeText) | String
 
 
-Here is a sample json request for the distance of fastest route in km:
+Here is a sample request for the distance of fastest route in km and in json:
 ```
 https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=km
 ```
 
-and here is the response:
+and here is the json response:
 
 ```
 {
@@ -99,23 +99,23 @@ and here is the response:
 ## Route Resource
 The route resource represents the shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+1. Shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km<br>
    
-2. Shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+2. Shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km<br>
 
-3. Fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&distanceUnit=mi&apikey=myapikey<br>
+3. Fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&distanceUnit=mi<br>
 
 4. Fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/route.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&correctSide=true&apikey=myapikey<br>
+   https://router.api.gov.bc.ca/route.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&correctSide=true<br>
 
 5. Fastest route around a bridge for an overheight truck following truck routes<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&height=5.1&followTruckRoute=true&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&height=5.1&followTruckRoute=true<br>
 
 6. Fastest route around a bridge for an overweight truck following truck routes<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&weight=30001&followTruckRoute=true&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&weight=30001&followTruckRoute=true<br>
    
 7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality<br>
    
 
 
@@ -145,13 +145,20 @@ Attribute Name |	Type
 [partitions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#partitions) | String
 [route](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List of Point
 
-Here is a sample json response above:
+
+Here is a request for fastest route in vancouver with partitions in json:
+
+```
+https://router-dev.pathfinder.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
+```
+
+and here's the json response:
 
 ```
 {
   "routeDescription": null,
-  "searchTimestamp": "2020-03-27 22:54:30",
-  "executionTime": 2,
+  "searchTimestamp": "2020-03-29 23:38:35",
+  "executionTime": 4,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
@@ -247,7 +254,6 @@ Here is a sample json response above:
     ]
   ]
 }
-
 ```
  
 
@@ -301,12 +307,12 @@ Attribute Name |	Type
 [notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) | String
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#directions) | String
 
-Here is a sample json request for a route that includes multiple partitions:
+
+Here is a sample request for a route in json that includes multiple partitions:
 
 ```
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
 
-https://router-dev.pathfinder..gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
 ```
 
 and here's the response:
@@ -470,11 +476,11 @@ and here's the response:
 ```
 
 
-Here's a sample json request for directions and a route in Vancouver that has notifications:
+Here's a sample request for directions and a route in Vancouver and in json that has notifications:
 
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
 
-and here's the response:
+and here's the json response:
 
 ```
 {
