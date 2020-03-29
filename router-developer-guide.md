@@ -449,12 +449,14 @@ Here is a sample json response that includes multiple partitions:
 ```
 
 And here's a json response that includes notifications:
+https://routertst.pathfinder.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266
+&followTruckRoute=true&partition=isTruckRoute
 
 ```
 {
   "routeDescription": null,
-  "searchTimestamp": "2020-03-28 1:11:14",
-  "executionTime": 0,
+  "searchTimestamp": "2020-03-29 20:54:12",
+  "executionTime": 96,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
@@ -466,90 +468,583 @@ And here's a json response that includes notifications:
   "distanceUnit": "km",
   "points": [
     [
-      -123.03949,
-      49.32174
+      -123.07393,
+      49.28496
     ],
     [
-      -123.03755,
-      49.32279
+      -123.02775,
+      49.31553
     ]
   ],
   "routeFound": true,
-  "distance": 0.253,
-  "time": 49.480167042076786,
-  "timeText": "49 seconds",
+  "distance": 8.441,
+  "time": 746.5539234474583,
+  "timeText": "12 minutes 27 seconds",
+  "partition": "isTruckRoute",
+  "partitions": [
+    {
+      "index": 0,
+      "isTruckRoute": false
+    },
+    {
+      "index": 1,
+      "isTruckRoute": true
+    },
+    {
+      "index": 88,
+      "isTruckRoute": false
+    }
+  ],
   "route": [
     [
-      -123.03948,
-      49.32177
+      -123.07371,
+      49.28424
     ],
     [
-      -123.03847,
-      49.32175
+      -123.0758,
+      49.28397
     ],
     [
-      -123.03843,
-      49.32278
+      -123.07595,
+      49.28455
     ],
     [
-      -123.03755,
-      49.32277
+      -123.07605,
+      49.28469
+    ],
+    [
+      -123.07623,
+      49.28478
+    ],
+    [
+      -123.07644,
+      49.2848
+    ],
+    [
+      -123.07653,
+      49.28478
+    ],
+    [
+      -123.07666,
+      49.28475
+    ],
+    [
+      -123.07687,
+      49.28461
+    ],
+    [
+      -123.07703,
+      49.28436
+    ],
+    [
+      -123.07705,
+      49.28422
+    ],
+    [
+      -123.07709,
+      49.28381
+    ],
+    [
+      -123.07711,
+      49.28306
+    ],
+    [
+      -123.07713,
+      49.2822
+    ],
+    [
+      -123.07711,
+      49.28181
+    ],
+    [
+      -123.07711,
+      49.28158
+    ],
+    [
+      -123.0771,
+      49.28134
+    ],
+    [
+      -123.07412,
+      49.28131
+    ],
+    [
+      -123.07263,
+      49.28129
+    ],
+    [
+      -123.0704,
+      49.28125
+    ],
+    [
+      -123.06829,
+      49.28124
+    ],
+    [
+      -123.06557,
+      49.28121
+    ],
+    [
+      -123.06363,
+      49.28119
+    ],
+    [
+      -123.06169,
+      49.28118
+    ],
+    [
+      -123.05976,
+      49.28117
+    ],
+    [
+      -123.05784,
+      49.28117
+    ],
+    [
+      -123.05654,
+      49.28117
+    ],
+    [
+      -123.05458,
+      49.28117
+    ],
+    [
+      -123.05197,
+      49.28116
+    ],
+    [
+      -123.04934,
+      49.28116
+    ],
+    [
+      -123.04666,
+      49.28115
+    ],
+    [
+      -123.04403,
+      49.28116
+    ],
+    [
+      -123.03884,
+      49.28116
+    ],
+    [
+      -123.03619,
+      49.28116
+    ],
+    [
+      -123.03414,
+      49.28116
+    ],
+    [
+      -123.03233,
+      49.28115
+    ],
+    [
+      -123.03191,
+      49.28115
+    ],
+    [
+      -123.03177,
+      49.28115
+    ],
+    [
+      -123.03168,
+      49.28114
+    ],
+    [
+      -123.03152,
+      49.28114
+    ],
+    [
+      -123.03148,
+      49.28114
+    ],
+    [
+      -123.03128,
+      49.28114
+    ],
+    [
+      -123.03128,
+      49.28119
+    ],
+    [
+      -123.0313,
+      49.28138
+    ],
+    [
+      -123.03142,
+      49.28303
+    ],
+    [
+      -123.03137,
+      49.28371
+    ],
+    [
+      -123.03142,
+      49.28551
+    ],
+    [
+      -123.03139,
+      49.28583
+    ],
+    [
+      -123.03116,
+      49.28646
+    ],
+    [
+      -123.03089,
+      49.28686
+    ],
+    [
+      -123.03081,
+      49.28694
+    ],
+    [
+      -123.03073,
+      49.28701
+    ],
+    [
+      -123.03068,
+      49.28705
+    ],
+    [
+      -123.03053,
+      49.2872
+    ],
+    [
+      -123.03,
+      49.28771
+    ],
+    [
+      -123.02843,
+      49.28905
+    ],
+    [
+      -123.02831,
+      49.28916
+    ],
+    [
+      -123.02654,
+      49.29064
+    ],
+    [
+      -123.02631,
+      49.29096
+    ],
+    [
+      -123.0262,
+      49.29119
+    ],
+    [
+      -123.02613,
+      49.29158
+    ],
+    [
+      -123.02609,
+      49.2924
+    ],
+    [
+      -123.02616,
+      49.29535
+    ],
+    [
+      -123.02638,
+      49.30257
+    ],
+    [
+      -123.0264,
+      49.30306
+    ],
+    [
+      -123.02661,
+      49.30368
+    ],
+    [
+      -123.02667,
+      49.30386
+    ],
+    [
+      -123.02716,
+      49.30459
+    ],
+    [
+      -123.02732,
+      49.30482
+    ],
+    [
+      -123.02736,
+      49.30488
+    ],
+    [
+      -123.0274,
+      49.30498
+    ],
+    [
+      -123.02763,
+      49.30544
+    ],
+    [
+      -123.0278,
+      49.30602
+    ],
+    [
+      -123.02785,
+      49.30679
+    ],
+    [
+      -123.0278,
+      49.3081
+    ],
+    [
+      -123.0278,
+      49.30953
+    ],
+    [
+      -123.02768,
+      49.31011
+    ],
+    [
+      -123.02756,
+      49.31057
+    ],
+    [
+      -123.02741,
+      49.3109
+    ],
+    [
+      -123.02731,
+      49.31104
+    ],
+    [
+      -123.02713,
+      49.31118
+    ],
+    [
+      -123.02689,
+      49.31129
+    ],
+    [
+      -123.0263,
+      49.31142
+    ],
+    [
+      -123.02583,
+      49.31162
+    ],
+    [
+      -123.02551,
+      49.31184
+    ],
+    [
+      -123.02526,
+      49.31229
+    ],
+    [
+      -123.02518,
+      49.31239
+    ],
+    [
+      -123.02506,
+      49.31271
+    ],
+    [
+      -123.02436,
+      49.31393
+    ],
+    [
+      -123.0245,
+      49.31396
+    ],
+    [
+      -123.02486,
+      49.31405
+    ],
+    [
+      -123.02516,
+      49.31412
+    ],
+    [
+      -123.02552,
+      49.31413
+    ],
+    [
+      -123.02566,
+      49.31414
+    ],
+    [
+      -123.02629,
+      49.31399
+    ],
+    [
+      -123.02688,
+      49.31366
+    ],
+    [
+      -123.02722,
+      49.31345
+    ],
+    [
+      -123.02774,
+      49.31311
+    ],
+    [
+      -123.02773,
+      49.31393
+    ],
+    [
+      -123.0277,
+      49.31553
     ]
   ],
   "notifications": [],
   "directions": [
     {
       "type": "START",
-      "name": "15th St",
-      "distance": 0.074,
-      "time": 19,
-      "heading": "EAST",
-      "text": "Head east on 15th St for 75 m (19 seconds)",
+      "name": "Stewart St",
+      "distance": 0.155,
+      "time": 15,
+      "heading": "WEST",
+      "text": "Head west on Stewart St for 150 m (15 seconds)",
       "point": [
-        -123.03948,
-        49.32177
-      ]
-    },
-    {
-      "type": "TURN_LEFT",
-      "name": "Mountain Hwy",
-      "distance": 0.115,
-      "time": 20,
-      "text": "Turn left onto Mountain Hwy for 100 m (20 seconds)",
-      "point": [
-        -123.03847,
-        49.32175
+        -123.07371,
+        49.28424
       ],
       "notifications": [
         {
           "type": "TruckRestriction",
-          "message": "No Vehicles with a GVW of 10,000 kg or more are allowed to operate or be present on this road in the southbound direction"
+          "message": "Restricted Access - Port of Vancouver"
         }
       ]
     },
     {
       "type": "TURN_RIGHT",
-      "name": "16th St",
-      "distance": 0.064,
-      "time": 10,
-      "text": "Turn right onto 16th St for 65 m (10 seconds)",
+      "name": "Clark Dr",
+      "distance": 0.519,
+      "time": 50,
+      "text": "Turn right onto Clark Dr for 500 m (50 seconds)",
       "point": [
-        -123.03843,
-        49.32278
+        -123.0758,
+        49.28397
+      ]
+    },
+    {
+      "type": "TURN_LEFT",
+      "name": "Hastings St",
+      "distance": 3.337,
+      "time": 297,
+      "text": "Turn left onto Hastings St for 3.3 km (4 minutes 57 seconds)",
+      "point": [
+        -123.0771,
+        49.28134
+      ]
+    },
+    {
+      "type": "TURN_LEFT",
+      "name": "Hastings St Onramp",
+      "distance": 0.944,
+      "time": 106,
+      "text": "Turn left onto Hastings St Onramp for 950 m (1 minute 46 seconds)",
+      "point": [
+        -123.03128,
+        49.28114
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Trans-Canada Hwy",
+      "distance": 0.262,
+      "time": 13,
+      "text": "Continue onto Trans-Canada Hwy for 250 m (13 seconds)",
+      "point": [
+        -123.02843,
+        49.28905
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Ironworkers Memorial Bridge",
+      "distance": 1.418,
+      "time": 73,
+      "text": "Continue onto Ironworkers Memorial Bridge for 1.4 km (1 minute 13 seconds)",
+      "point": [
+        -123.02631,
+        49.29096
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Trans-Canada Hwy",
+      "distance": 0.665,
+      "time": 34,
+      "text": "Continue onto Trans-Canada Hwy for 650 m (34 seconds)",
+      "point": [
+        -123.02661,
+        49.30368
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Lillooet Rd Offramp",
+      "distance": 0.299,
+      "time": 33,
+      "text": "Continue onto Lillooet Rd Offramp for 300 m (33 seconds)",
+      "point": [
+        -123.0278,
+        49.30953
+      ]
+    },
+    {
+      "type": "CONTINUE",
+      "name": "Lillooet Rd",
+      "distance": 0.281,
+      "time": 52,
+      "text": "Continue onto Lillooet Rd for 300 m (52 seconds)",
+      "point": [
+        -123.02583,
+        49.31162
+      ],
+      "notifications": [
+        {
+          "type": "TruckRestriction",
+          "message": "No Vehicles with a GVW of 30,000 kg or more are allowed to operate or be present on this road"
+        }
+      ]
+    },
+    {
+      "type": "TURN_LEFT",
+      "name": "Old Lillooet Rd",
+      "distance": 0.291,
+      "time": 36,
+      "text": "Turn left onto Old Lillooet Rd for 300 m (36 seconds)",
+      "point": [
+        -123.02436,
+        49.31393
+      ]
+    },
+    {
+      "type": "TURN_SHARP_RIGHT",
+      "name": "Premier St",
+      "distance": 0.269,
+      "time": 37,
+      "text": "Turn sharp right onto Premier St for 250 m (37 seconds)",
+      "point": [
+        -123.02774,
+        49.31311
       ]
     },
     {
       "type": "FINISH",
       "text": "Finish!",
       "point": [
-        -123.03755,
-        49.32277
+        -123.0277,
+        49.31553
       ]
     }
   ]
 }
-
 ```
+
 
  
 ## optimalRoute Resource
