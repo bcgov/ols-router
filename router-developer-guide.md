@@ -463,7 +463,7 @@ and here is the route planner api's response:
 
 Here's a sample json request for directions and a route in Vancouver that has notifications:
 
-https://routertst.pathfinder.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
 
 and here's the route planner's response:
 
