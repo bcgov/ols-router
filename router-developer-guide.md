@@ -6,13 +6,20 @@ This guide is aimed at developers and web masters who would like to incorporate 
 The BC Route Planner REST API lets you integrate basic routing between BC locations into your own applications. This document defines aspects of the REST API that are not covered in the [Swagger definition](https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). You can explore the API in the [API Console](https://catalogue.data.gov.bc.ca/dataset/bc-route-planner/resource/82cd3194-0955-4d7e-b35a-78a98fda153a/view/80721e92-1a39-4300-ac76-6cfb09493d81). For a list of the latest changes to the Route Planner API, see [Route Planner Release Notes](https://bcgov.github.io/ols-router/rpng-release-notes.html)
 <br>
 
-Your application can store router results or display them on any web map.
+Your application can store router results or display them on any web map. The BC Route Planner API supports GET and POST requests. POST should be used when you have many waypoints to visit.
 
 ## Limitations of Route Planner API v2.1
 Route Planner API v2.1 is backward-compatible with v2.0. There are still severe limitations on the new features and data in Route Planner v2.1 . For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
 
 ## API Key
 Use of the BC Route Planner REST API is currently restricted to government. If you are working on a government application that needs routing, please visit [here](https://github.com/bcgov/gwa/wiki/Developer-Guide#developer-api-keys) to find out how to get an API key.
+
+Every route planner request needs an apikey header that contains your api key as follows:
+```
+apiKey: <myapikey>
+```	
+Do not put the apiKey in the request URL because it will expose your api key.
+
 
 ## Distance Resource
 The distance resource represents the length and duration of the shortest or fastest route between given points. Here are some examples:
@@ -288,7 +295,13 @@ Attribute Name |	Type
 [notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) | String
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#directions) | String
 
-Here is a sample json response that includes multiple partitions:
+Here is a sample json request that includes multiple partitions:
+
+```
+blah blah
+```
+
+and here is the route planner api's response:
 
 ```
 {
@@ -448,9 +461,11 @@ Here is a sample json response that includes multiple partitions:
 }
 ```
 
-And here's a json response that includes notifications:
-https://routertst.pathfinder.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266
-&followTruckRoute=true&partition=isTruckRoute
+Here's a sample json request for directions and a route in Vancouver that has notifications:
+
+https://routertst.pathfinder.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
+
+and here's the route planner's response:
 
 ```
 {
