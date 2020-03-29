@@ -14,7 +14,7 @@ Route Planner API v2.1 is backward-compatible with v2.0. There are still severe 
 ## API Key
 Use of the BC Route Planner REST API is currently restricted to government. If you are working on a government application that needs routing, please visit [here](https://github.com/bcgov/gwa/wiki/Developer-Guide#developer-api-keys) to find out how to get an API key.
 
-Every route planner request needs an apikey header that contains your api key as follows:
+Every route planner request needs an apiKey header that contains your api key as follows:
 ```
 apiKey: <myapikey>
 ```	
