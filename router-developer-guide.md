@@ -59,7 +59,7 @@ Attribute Name |	Type
 
 Here is a sample json request for the distance of fastest route in km:
 ```
-https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=km
+https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=km
 ```
 
 and here is the response:
