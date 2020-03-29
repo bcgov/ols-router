@@ -24,11 +24,11 @@ Do not put the apiKey in the request URL because it will expose your api key.
 ## Distance Resource
 The distance resource represents the length and duration of the shortest or fastest route between given points. Here are some examples:
 
-1. Length of shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+1. Length of shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km<br>
    
-2. Length of shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.kml?routeDescription=shortest%20distance%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+2. Length of shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.kml?routeDescription=shortest%20distance%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km<br>
 
-3. Length of fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.html?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=mi&apikey=myapikey<br>
+3. Length of fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.html?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=mi<br>
 
 
 
@@ -57,22 +57,27 @@ Attribute Name |	Type
 [timeText](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#timeText) | String
 
 
-Here is a sample json response:
+Here is a sample json request for the distance of fastest route in km:
+```
+https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=fastest&distanceUnit=km
+```
+
+and here is the response:
 
 ```
 {
-  "routeDescription": "fastest distance in km and html",
-  "searchTimestamp": "2020-03-25 0:45:48",
-  "executionTime": 59,
+  "routeDescription": "fastest distance in km and json",
+  "searchTimestamp": "2020-03-29 23:27:48",
+  "executionTime": 51,
   "version": "2.1.0",
   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
   "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
   "srsCode": 4326,
-  "criteria": "shortest",
+  "criteria": "fastest",
   "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "mi",
+  "distanceUnit": "km",
   "points": [
     [
       -123.70794,
@@ -84,11 +89,12 @@ Here is a sample json response:
     ]
   ],
   "routeFound": true,
-  "distance": 34.303,
-  "time": 3123.1975685413017,
-  "timeText": "52 minutes 3 seconds"
+  "distance": 56.118,
+  "time": 3189.2243494173135,
+  "timeText": "53 minutes 9 seconds"
 }
 ```
+
 
 ## Route Resource
 The route resource represents the shortest or fastest route between given points and the length and duration of that route. Here are some examples:
