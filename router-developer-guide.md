@@ -24,7 +24,7 @@ Do not put the apiKey in the request URL because it will expose your api key.
 ## Distance Resource
 The distance resource represents the length and duration of the shortest or fastest route between given points. Here are some examples:
 
-1. Length of shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output coordinate reference system (e.g., 3005). By default, the output CRS is Geographics (e.g., 4326)<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
+1. Length of shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default, the output SRS is Geographics (e.g., 4326)<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest&outputSRS=3005<br>
    
 2. Length of shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.kml?routeDescription=shortest%20distance%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
 
@@ -58,9 +58,8 @@ Attribute Name |	Type
 
 
 Here is a sample request for the distance of fastest route in km and in json:
-```
+
 https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=fastest
-```
 
 and here is the json response:
 
@@ -99,7 +98,7 @@ and here is the json response:
 ## Route Resource
 The route resource represents the shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output coordinate reference system (e.g., 3005). By default the output CRS is geographics (e.g., 4326<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
+1. Shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default the output SRS is Geographics (e.g., 4326<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
    
 2. Shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortestbr>
 
@@ -148,9 +147,8 @@ Attribute Name |	Type
 
 Here is a request for fastest route in vancouver with partitions in json:
 
-```
 https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
-```
+
 
 and here's the json response:
 
@@ -260,20 +258,20 @@ and here's the json response:
 ##  Directions Resource
 The directions resource represents the turn-by-turn directions, shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Directions and shortest route in km and json between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+1. Directions and shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for an output spatial reference system of BC Albers (e.g., 3005). By default, the output SRS is Geographics (e.g., 4326)<br>https://router.api.gov.bc.ca/directions.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
    
-2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&criteria=shortest&distanceUnits=km&apikey=myapikey<br>
+2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
 
-3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=4326&distanceUnit=mi&apikey=myapikey<br>
+3. Directions and fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.html?points=-123.707942%2C48.778691%2C-123.537850%2C48.38200&distanceUnit=mi<br>
 
 4. Directions and fastest route from 976 Meares St, Victoria to 1200 Douglas St, Victoria on the correct side of the street<br>
-   https://router.api.gov.bc.ca/directions.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&followTruckRoute=true&correctSide=true&apikey=myapikey<br>
+   https://router.api.gov.bc.ca/directions.json?points=-123.3575846%2C48.4233118%2C-123.3651354%2C48.4255742&followTruckRoute=true&correctSide=true<br>
 
 5. Directions and fastest route around a bridge for an overheight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&followTruckRoute=true&height=5.1&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.4330137%2C-123.3940682%2C48.4360118&followTruckRoute=true&height=5.1<br>
 
 6. Directions and fastest route around a bridge for an overweight truck<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&followTruckRoute=true&weight=30001&apikey=myapikey<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&followTruckRoute=true&weight=30001<br>
    
 7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality&apikey=myapikey<br>
@@ -310,10 +308,8 @@ Attribute Name |	Type
 
 Here is a sample request for a route in json that includes multiple partitions:
 
-```
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
 
-```
 
 and here's the response:
 
@@ -1085,11 +1081,11 @@ The optimalRoute resource represents the shortest or fastest route between a sta
 
 1200 Douglas St, 1020 View St, 851 Broughton St, 835 Fisgard St, and 707 Fort St 
 
-https://router.api.gov.bc.ca/optimalRoute.json?criteria=shortest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465&roundTrip=false&apikey=myapikey
+https://router.api.gov.bc.ca/optimalRoute.json?criteria=shortest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465
    
 2. Fastest optimal route in km and kml between same addresses as example 1
 
-https://router.api.gov.bc.ca/optimalRoute.kml?criteria=fastest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465&roundTrip=false&apikey=myapikey
+https://router.api.gov.bc.ca/optimalRoute.kml?points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465
 
 ### HTTP response
 The optimalRoute resource will return the following representation:
@@ -1207,11 +1203,11 @@ The optimalDirections resource represents the turn-by-turn directions, shortest 
 
 1200 Douglas St, 1020 View St, 851 Broughton St, 835 Fisgard St, and 707 Fort St 
 
-https://router.api.gov.bc.ca/optimalDirections.json?criteria=shortest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465&roundTrip=false&apikey=myapikey
+https://router.api.gov.bc.ca/optimalDirections.json?criteria=shortest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465
    
 2. Fastest optimal route and directions in km and kml between same addresses as example 1
 
-https://router.api.gov.bc.ca/optimalDirections.kml?criteria=fastest&points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465&roundTrip=false&apikey=myapikey
+https://router.api.gov.bc.ca/optimalDirections.kml?points=-123.3651694%2C48.4254488%2C-123.3558749%2C48.4244505%2C-123.3605707%2C48.4232329%2C-123.3600244%2C48.4291533%2C-123.3647879%2C48.4245465
 
 ### HTTP response
 The optimalDirections resource will return the following representation:
