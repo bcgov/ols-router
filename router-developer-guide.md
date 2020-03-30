@@ -311,7 +311,7 @@ Here is a sample request for a route in json that includes multiple partitions:
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
 
 
-and here's the response:
+and here's the json response:
 
 ```
 {
