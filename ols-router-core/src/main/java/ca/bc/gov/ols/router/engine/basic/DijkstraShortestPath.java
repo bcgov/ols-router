@@ -175,7 +175,7 @@ public class DijkstraShortestPath {
 			for(int edgeId = graph.nextEdge(nodeId, BasicGraph.NO_EDGE); edgeId != BasicGraph.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
 				// if we've already been to this non-end, non-internal edge
 				List<Integer> endEdges = endEdgesById.get(edgeId);
-				if(endEdges == null && edgeIdVisisted[edgeId] && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) {
+				if(endEdges == null && edgeIdVisisted[edgeId] && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId) || isLoop(edgeId, walker))) {
 					// skip it
 					continue;
 				}
@@ -339,6 +339,16 @@ public class DijkstraShortestPath {
 			}
 		}
 		return paths;
+	}
+	
+	private boolean isLoop(int edgeId, DijkstraWalker walker) {
+		for(int count = 1; count < 6 && walker != null; count++) {
+			if(walker.getEdgeId() == edgeId) {
+				return true;
+			}
+			walker = walker.getFrom();
+		}
+		return false;
 	}
 	
 	private double getAngle(int fromEdgeId, int toEdgeId) {
