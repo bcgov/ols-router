@@ -115,11 +115,13 @@ public enum DistanceUnit {
 				intDist = (int)Math.round(dist);
 			}
 			sb.append(nf.format(intDist));
-		} else if(dist < 10) {
-			// allow one digit of fractional km/miles
-			nf.setMaximumFractionDigits(1);
+		} else {
+			if(dist < 10) {
+				// allow one digit of fractional km/miles
+				nf.setMaximumFractionDigits(1);
+			}
 			sb.append(nf.format(dist));
-		}
+		} 
 		sb.append(" " + unit.abbr());
 		return sb.toString();		
 	}

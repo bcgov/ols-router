@@ -4,8 +4,8 @@
  */
 package ca.bc.gov.ols.router.directions;
 
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.geom.Coordinate;
 
 public enum CardinalDirection {
 	NORTH,

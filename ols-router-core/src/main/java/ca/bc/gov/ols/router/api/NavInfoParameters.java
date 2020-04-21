@@ -8,12 +8,12 @@ import java.time.Instant;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 
-import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 
 public class NavInfoParameters {

@@ -3,7 +3,7 @@
   <parent>
     <groupId>ca.bc.gov.ols</groupId>
     <artifactId>ols-router</artifactId>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>2.1.1-SNAPSHOT</version>
   </parent>
   <artifactId>ols-router-admin</artifactId>
   <packaging>war</packaging>
@@ -14,19 +14,6 @@
     <springframework.security.version>5.1.2.RELEASE</springframework.security.version>
   </properties>
 
-  <build>
-   <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/resources-filtered</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
-  
   <dependencies>
     <dependency>
 	  <groupId>org.slf4j</groupId>
@@ -43,6 +30,11 @@
       <artifactId>log4j-slf4j-impl</artifactId>
       <version>2.11.1</version>
     </dependency>
+    <dependency>
+      <groupId>ca.bc.gov.ols</groupId>
+      <artifactId>ols-router-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
      <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
@@ -53,16 +45,6 @@
 	  <artifactId>opencsv</artifactId>
 	  <version>2.0</version>
     </dependency>  
-	<dependency>
-	  <groupId>com.datastax.cassandra</groupId>
-	  <artifactId>cassandra-driver-core</artifactId>
-	  <version>3.0.2</version>
-	</dependency>
-	<dependency>
-	  <groupId>com.datastax.cassandra</groupId>
-	  <artifactId>cassandra-driver-mapping</artifactId>
-	  <version>3.0.2</version>
-	</dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-servlet-api</artifactId>

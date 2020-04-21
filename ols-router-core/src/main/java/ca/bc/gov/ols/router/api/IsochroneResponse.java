@@ -6,7 +6,7 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.List;
 
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 public class IsochroneResponse extends ApiResponse {
 	private List<Geometry> polygons;

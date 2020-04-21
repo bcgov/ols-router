@@ -4,7 +4,7 @@
  */
 package ca.bc.gov.ols.router.directions;
 
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.api.ApiResponse;
 

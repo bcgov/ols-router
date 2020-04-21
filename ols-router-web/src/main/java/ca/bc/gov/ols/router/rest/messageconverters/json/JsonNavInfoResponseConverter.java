@@ -16,8 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
 
 import com.google.gson.stream.JsonWriter;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.GeometryReprojector;

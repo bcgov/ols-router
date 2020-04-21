@@ -4,6 +4,9 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class DijkstraWalker implements Comparable<DijkstraWalker>{
 	private final int edgeId;
@@ -67,4 +70,28 @@ public class DijkstraWalker implements Comparable<DijkstraWalker>{
 		return Double.compare(cost, other.cost);
 	}
 
+	public List<Integer> getEdgeChain() {
+		ArrayList<Integer> chain = new ArrayList<Integer>();
+		buildEdgeChain(chain);
+		return chain;
+	}
+	
+	private void buildEdgeChain(List<Integer> chain) {
+		chain.add(edgeId);
+		if(from != null) {
+			from.buildEdgeChain(chain);
+		}
+	}
+	
+	public List<Integer> checkForDuplicateEdges() {
+		List<Integer> dups = new ArrayList<Integer>();
+		List<Integer> chain = getEdgeChain();
+		HashSet<Integer> set = new HashSet<Integer>(chain.size());
+		for(Integer edgeId : chain) {
+			if(!set.add(edgeId)) {
+				dups.add(edgeId);
+			}
+		}
+		return dups;
+	}
 }

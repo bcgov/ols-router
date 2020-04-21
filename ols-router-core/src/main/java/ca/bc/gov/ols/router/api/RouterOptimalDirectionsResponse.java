@@ -4,12 +4,14 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.util.Collection;
 import java.util.List;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.directions.Direction;
-import ca.bc.gov.ols.router.directions.Notification;
+import ca.bc.gov.ols.router.directions.Partition;
+import ca.bc.gov.ols.router.notifications.Notification;
 
 
 public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse implements RouterOptimizedResponse{
@@ -24,8 +26,8 @@ public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse im
 	}
 	
 	public RouterOptimalDirectionsResponse(RoutingParameters params, double distance, double time, LineString path, 
-			List<Direction> directions, List<Notification> notifications, int[] visitOrder) {
-		super(params, distance, time, path, directions, notifications);
+			List<Partition> partitions, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
+		super(params, distance, time, path, partitions, directions, notifications);
 		this.visitOrder = visitOrder;
 	}
 

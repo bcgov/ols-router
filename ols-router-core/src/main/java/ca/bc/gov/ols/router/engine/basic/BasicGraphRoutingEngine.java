@@ -10,8 +10,17 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.algorithm.Distance;
+import org.locationtech.jts.algorithm.Orientation;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.linearref.LengthIndexedLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +39,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.algorithm.CGAlgorithms;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
-import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.RoutingEngine;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
@@ -51,15 +52,16 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
-import ca.bc.gov.ols.router.datasources.RouterDataLoader;
-import ca.bc.gov.ols.router.datasources.RouterDataSource;
-import ca.bc.gov.ols.router.util.LineStringSplitter;
-import ca.bc.gov.ols.router.util.StopWatch;
+import ca.bc.gov.ols.router.datasource.RouterDataLoader;
+import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.util.TimeHelper;
+import ca.bc.gov.ols.util.LineStringSplitter;
+import ca.bc.gov.ols.util.StopWatch;
 
 public class BasicGraphRoutingEngine implements RoutingEngine {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraphRoutingEngine.class.getCanonicalName());
@@ -76,7 +78,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		this.gf = geometryFactory;
 		
 		BasicGraphBuilder graphBuilder = new BasicGraphBuilder(config, reprojector); 
-		RouterDataLoader.loadData(config, dataSource, graphBuilder);
+		RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder);
+		loader.loadData();
 		graph = graphBuilder.build();
 	}
 	
@@ -106,7 +109,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcRoute(gf);
-			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute());
+			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
@@ -125,7 +128,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDirections(gf);
-			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getDirections(), em.getNotifications());
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
@@ -148,7 +151,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcRoute(gf);
-			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), visitOrder);
+			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalRouteResponse(params);
 		} catch(Throwable t) {
@@ -174,7 +177,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcDirections(gf);
 			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
-					em.getRoute(), em.getDirections(), em.getNotifications(), visitOrder);
+					em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalDirectionsResponse(params);
 		} catch(Throwable t) {
@@ -260,7 +263,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	}
 
 	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
-		params.disableOption(RouteOption.TIMEDEPENDENCY);
+		params.disableOption(RouteOption.TIME_DEPENDENCY);
 		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide());
 
 		// shortcut the 2-point case
@@ -372,8 +375,6 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		List<Integer> edgeIds = graph.findEdgesWithin(params.getEnvelope());
 		LocalDateTime dateTime = LocalDateTime.ofInstant(params.getDeparture(), RouterConfig.DEFAULT_TIME_ZONE);
 		for(int edgeId : edgeIds) {
-			TrafficImpactor fromImp = graph.getFromImpactor(edgeId);
-			TrafficImpactor toImp = graph.getToImpactor(edgeId);
 			LineString ls = graph.getLineString(edgeId);
 			LengthIndexedLine lil = new LengthIndexedLine(ls);
 			double offset = 10;
@@ -401,11 +402,14 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// impactors
 			if(params.getTypes().contains(NavInfoType.IMP) && !graph.getReversed(edgeId)) {
-				if(fromImp == TrafficImpactor.YIELD || fromImp == TrafficImpactor.STOPSIGN || fromImp == TrafficImpactor.LIGHT || fromImp == TrafficImpactor.BARRICADE) {
+				EnumSet<TrafficImpactor> visImps = EnumSet.of(TrafficImpactor.YIELD, TrafficImpactor.STOPSIGN, TrafficImpactor.LIGHT, TrafficImpactor.BARRICADE, TrafficImpactor.ROUNDABOUT);
+				TrafficImpactor fromImp = graph.getFromImpactor(edgeId);
+				if(visImps.contains(fromImp)) {
 					Coordinate c = lil.extractPoint(offset);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.IMP, fromImp.name(), null, 90));
 				}
-				if(toImp == TrafficImpactor.YIELD || toImp == TrafficImpactor.STOPSIGN || toImp == TrafficImpactor.LIGHT || toImp == TrafficImpactor.BARRICADE) {
+				TrafficImpactor toImp = graph.getToImpactor(edgeId);
+				if(visImps.contains(toImp)) {
 					Coordinate c = lil.extractPoint(-offset);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.IMP, toImp.name(), null, 90));
 				}
@@ -414,7 +418,6 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			if(params.getTypes().contains(NavInfoType.HR)) {
 				double maxHeight = graph.getMaxHeight(edgeId);
 				double maxWidth = graph.getMaxWidth(edgeId);
-				Integer maxWeight = graph.getMaxWeight(edgeId);
 				StringBuilder sb = new StringBuilder();
 				if(!Double.isNaN(maxHeight)) {
 					sb.append("Max Height:" + maxHeight + "\n");
@@ -422,13 +425,18 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 				if(!Double.isNaN(maxWidth)) {
 					sb.append("Max Width:" + maxWidth + "\n");
 				}	
-				if(maxWeight != null) {
-					sb.append("Max Weight:" + maxWeight + "\n");
-				}
 				String hardList = sb.toString();
 				if(!hardList.isEmpty()) {
 					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
+				}
+				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
+				if(fromMaxWeight != null) {
+					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
+				}
+				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
+				if(toMaxWeight != null) {
+					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
 				}
 			}
 			// Truck Routes
@@ -517,12 +525,12 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		Coordinate coord = pt.getCoordinate();
 		// brute force approach!
 		for (int i = 0; i < coord0.length - 1; i++) {
-			double dist = CGAlgorithms.distancePointLine(coord, coord0[i], coord0[i + 1] );
+			double dist = Distance.pointToSegment(coord, coord0[i], coord0[i + 1]);
 			if (dist < minDistance) {
 				minDistance = dist;
 				nearestPointIdx = i;
 			}
 		}
-		return CGAlgorithms.computeOrientation(coord0[nearestPointIdx], coord0[nearestPointIdx+1], pt.getCoordinate());
+		return Orientation.index(coord0[nearestPointIdx], coord0[nearestPointIdx+1], pt.getCoordinate());
 	  }
 }

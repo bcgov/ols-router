@@ -4,9 +4,9 @@
  */
 package ca.bc.gov.ols.router.api;
 
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LengthIndexedLine;
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.linearref.LengthIndexedLine;
 
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;

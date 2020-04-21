@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 
 import ca.bc.gov.ols.router.time.TemporalSet;
 
-public class RoadEvent {
+abstract public class RoadEvent {
 
-	private final TemporalSet time;
+	protected final TemporalSet time;
 	
 	public RoadEvent(TemporalSet time) {
 		this.time = time;
@@ -23,5 +23,7 @@ public class RoadEvent {
 	public TemporalSet getTime() {
 		return time;
 	}
-	
+
+	abstract public int getDelay(LocalDateTime dateTime);	
+
 }

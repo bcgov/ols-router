@@ -6,10 +6,12 @@ package ca.bc.gov.ols.router.rest.messageconverters.json;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import ca.bc.gov.ols.router.Router;
-import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.RouterDirectionsResponse;
@@ -17,18 +19,24 @@ import ca.bc.gov.ols.router.api.RouterDistanceBetweenPairsResponse;
 import ca.bc.gov.ols.router.api.RouterDistanceResponse;
 import ca.bc.gov.ols.router.api.RouterOptimizedResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
+import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
-import ca.bc.gov.ols.router.directions.Notification;
+import ca.bc.gov.ols.router.directions.Partition;
+import ca.bc.gov.ols.router.directions.StartDirection;
+import ca.bc.gov.ols.router.engine.basic.Attribute;
+import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.router.rest.messageconverters.ConverterHelper;
 import ca.bc.gov.ols.router.util.TimeHelper;
 
 import com.google.gson.stream.JsonWriter;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 public class JsonConverterHelper extends ConverterHelper {
 
@@ -62,6 +70,7 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.name("copyrightLicense").value(config.getCopyrightLicense());
 		jw.name("srsCode").value(response.getSrsCode());
 		jw.name("criteria").value(response.getCriteria().toString());
+		jw.name("enable").value(RouteOption.setToString(response.getEnabledOptions()));
 		jw.name("distanceUnit").value(response.getDistanceUnit().abbr());
 	}
 	
@@ -135,6 +144,29 @@ public class JsonConverterHelper extends ConverterHelper {
 			}
 			jw.endArray();
 		}
+		List<Partition> parts = response.getPartitions();
+		if(parts != null && !parts.isEmpty()) {
+			jw.name("partition").value(String.join(",", response.getPartition().parallelStream().map(Attribute::toString).collect(Collectors.toList())));
+			jw.name("partitions");
+			jw.beginArray();
+			for(Partition p : parts) {
+				jw.beginObject();
+				jw.name("index").value(p.getIndex());
+				for(Entry<Attribute, Object> entry : p.getValues().entrySet()) {
+					jw.name(entry.getKey().toString());
+					Object val = entry.getValue();
+					if(val == null) {
+						jw.jsonValue(null);
+					} else if(val instanceof Boolean) {
+						jw.jsonValue(val.toString());
+					} else {
+						jw.value(val.toString());
+					}
+				}
+				jw.endObject();
+			}
+			jw.endArray();
+		}
 		jw.name("route");
 		
 		jw.beginArray();
@@ -155,6 +187,16 @@ public class JsonConverterHelper extends ConverterHelper {
 		for(Direction dir : response.getDirections()) {
 			jw.beginObject();
 			jw.name("type").value(dir.getType());
+			if(dir instanceof AbstractTravelDirection) {
+				AbstractTravelDirection td = (AbstractTravelDirection)dir;
+				jw.name("name").value(td.getStreetName());
+				jw.name("distance").jsonValue(response.getDistanceUnit().formatForDisplay(td.getDistance()));
+				jw.name("time").value(Math.round(td.getTime()));
+				if(dir instanceof StartDirection) {
+					StartDirection sd = (StartDirection)dir;
+					jw.name("heading").value(sd.getHeading().toString());
+				}
+			}
 			jw.name("text").value(dir.format(response));
 			jw.name("point");
 			coordinate(jw, dir.getPoint().getX(), dir.getPoint().getY());
@@ -185,7 +227,7 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.endArray();
 	}
 	
-	public static void notifications(JsonWriter jw, List<Notification> notifications) throws IOException {
+	public static void notifications(JsonWriter jw, Collection<Notification> notifications) throws IOException {
 		if(notifications == null) return;
 		jw.name("notifications");
 		jw.beginArray();

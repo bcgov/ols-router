@@ -13,7 +13,7 @@
     stages {
         stage ('code checkout') {
             steps {
-                git branch: '${gitBranch}', url: "${gitRepo}"
+                git branch: '${gitBranch}', url: '${gitRepo}'
             }
         }
       

@@ -4,32 +4,43 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
+import org.locationtech.jts.algorithm.Angle;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.algorithm.Angle;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.datasources.StartDirection;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.data.RoadEvent;
+import ca.bc.gov.ols.router.data.RoadTruckNoticeEvent;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.CardinalDirection;
 import ca.bc.gov.ols.router.directions.Direction;
-import ca.bc.gov.ols.router.directions.EventWaitNotification;
 import ca.bc.gov.ols.router.directions.FerryDirection;
-import ca.bc.gov.ols.router.directions.FerryWaitNotification;
 import ca.bc.gov.ols.router.directions.FinishDirection;
-import ca.bc.gov.ols.router.directions.Notification;
-import ca.bc.gov.ols.router.directions.OversizeNotification;
+import ca.bc.gov.ols.router.directions.Partition;
+import ca.bc.gov.ols.router.directions.StartDirection;
 import ca.bc.gov.ols.router.directions.StopoverDirection;
 import ca.bc.gov.ols.router.directions.StreetDirection;
 import ca.bc.gov.ols.router.directions.StreetDirectionType;
+import ca.bc.gov.ols.router.notifications.EventWaitNotification;
+import ca.bc.gov.ols.router.notifications.FerryWaitNotification;
+import ca.bc.gov.ols.router.notifications.Notification;
+import ca.bc.gov.ols.router.notifications.OversizeNotification;
+import ca.bc.gov.ols.router.notifications.TruckNotification;
 
 public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
@@ -39,15 +50,19 @@ public class EdgeMerger {
 	private final RoutingParameters params;
 	private boolean calcRoute = false;
 	private boolean calcDirections = false;
+	private EnumSet<Attribute> partitionAttributes = null;
 	private double dist = 0;
 	private double time = 0;
 	private LineString route;
 	private List<Direction> directions;
-	private List<Notification> notifications;
+	private Set<Notification> notifications;
+	private List<Partition> partitions;
+	private EnumMap<Attribute,Object> partitionValues = null;
 	
 	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
 		this.edgeLists = edgeLists;
 		this.graph = graph;
+		partitionAttributes = params.getPartition();
 		this.params = params;
 	}
 
@@ -56,8 +71,13 @@ public class EdgeMerger {
 		AbstractTravelDirection curDir = null;
 		if(calcDirections) {
 			directions = new ArrayList<Direction>();
-			notifications = new ArrayList<Notification>();
+			notifications = new HashSet<Notification>();
 		}
+		if(partitionAttributes != null) {
+			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
+			partitions = new ArrayList<Partition>();
+		}
+		
 		// for each edgeList (ie. each leg of the route)
 		for(int edgeListIdx = 0; edgeListIdx < edgeLists.length; edgeListIdx++) {
 			EdgeList edges = edgeLists[edgeListIdx];
@@ -90,6 +110,20 @@ public class EdgeMerger {
 				// if this is the very first edge, add the first coord
 				if(edgeListIdx == 0 && edgeIdx == edges.size()-1) {
 					firstOffset = 0;
+				}
+				
+				if(partitionAttributes != null) {
+					boolean changed = false;
+					for(Attribute attr : partitionAttributes) {
+						Object val = attr.get(graph, edgeId);
+						if(!Objects.equals(val, partitionValues.get(attr))) {
+							changed = true;
+							partitionValues.put(attr, val);
+						}
+					}
+					if(changed) {
+						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionAttributes, graph, edgeId));
+					}
 				}
 				
 				// if we traversed the edge forward
@@ -141,6 +175,7 @@ public class EdgeMerger {
 						directions.add(curDir);
 					}
 				}
+				
 				int waitTime = edges.waitTime(edgeIdx);
 				double edgeDist;
 				double edgeTime;
@@ -157,6 +192,12 @@ public class EdgeMerger {
 				time += edgeTime;
 				edgeTime = edgeTime - waitTime;
 				
+				if(dist == Double.MAX_VALUE) {
+					dist = -1;
+					time = -1;
+					return;
+				}
+
 				if(calcDirections) {
 					curDir.addDistance(edgeDist);
 					curDir.addTime(edgeTime);
@@ -166,6 +207,12 @@ public class EdgeMerger {
 						} else {
 							curDir.addNotification(new EventWaitNotification(waitTime));
 						}
+					}
+					// find and add truck notifications
+					if(params.getVehicleType() == VehicleType.TRUCK) {
+						LocalDateTime currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(time)), RouterConfig.DEFAULT_TIME_ZONE);
+						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime); 
+						events.stream().filter(e -> e instanceof RoadTruckNoticeEvent).map(e -> new TruckNotification((RoadTruckNoticeEvent)e)).forEach(curDir::addNotification);
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
 				}
@@ -178,11 +225,6 @@ public class EdgeMerger {
 				}
 			}
 			
-		}
-		if(dist == Double.MAX_VALUE) {
-			dist = -1;
-			time = -1;
-			return;
 		}
 		if(calcDirections) {
 			// add final finish direction
@@ -218,8 +260,16 @@ public class EdgeMerger {
 		return directions;
 	}
 
-	public List<Notification> getNotifications() {
+	public Set<Notification> getNotifications() {
 		return notifications;
+	}
+
+	public void setPartition(EnumSet<Attribute> partitionAttributes) {
+		this.partitionAttributes = partitionAttributes;
+	}
+
+	public List<Partition> getPartitions() {
+		return partitions;
 	}
 
 	public void calcDistance() {
@@ -236,7 +286,5 @@ public class EdgeMerger {
 		calcDirections  = true;
 		mergeEdges(gf);
 	}
-
-	
 
 }

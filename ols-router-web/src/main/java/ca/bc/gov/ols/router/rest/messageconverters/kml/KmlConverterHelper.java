@@ -10,7 +10,6 @@ import java.io.Writer;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import ca.bc.gov.ols.router.Router;
-import ca.bc.gov.ols.router.RouterConfig;
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.RouterDirectionsResponse;
@@ -18,12 +17,13 @@ import ca.bc.gov.ols.router.api.RouterDistanceBetweenPairsResponse;
 import ca.bc.gov.ols.router.api.RouterDistanceResponse;
 import ca.bc.gov.ols.router.api.RouterOptimizedResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.rest.messageconverters.ConverterHelper;
 import ca.bc.gov.ols.router.util.TimeHelper;
 
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.Point;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Point;
 
 public class KmlConverterHelper extends ConverterHelper {
 

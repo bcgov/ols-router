@@ -22,7 +22,9 @@ public class RouterApplication {
 	
 	public RouterApplication() {
 		logger.info("RouterApplication() constructor called");
-		router = RouterFactory.getRouterFromProperties(reprojector);
+		RouterFactory routerFactory = new RouterFactory();
+		routerFactory.setGeometryReprojector(reprojector);
+		router = routerFactory.getRouter();
 	}
 	
 	@Bean

@@ -19,7 +19,7 @@ import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Component;
 
 import ca.bc.gov.ols.router.Router;
-import ca.bc.gov.ols.router.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.rest.exceptions.ErrorMessage;
 
 @Component

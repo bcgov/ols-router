@@ -4,6 +4,48 @@
  */
 package ca.bc.gov.ols.router.process;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ca.bc.gov.ols.config.ConfigurationStore;
+import ca.bc.gov.ols.enums.DividerType;
+import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.TravelDirection;
+import ca.bc.gov.ols.router.RouterFactory;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
+import ca.bc.gov.ols.router.data.TurnClass;
+import ca.bc.gov.ols.router.data.TurnRestriction;
+import ca.bc.gov.ols.router.data.WeeklyTimeRange;
+import ca.bc.gov.ols.router.data.enums.DayCode;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TurnDirection;
+import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
+import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
+import ca.bc.gov.ols.router.data.enums.XingClass;
+import ca.bc.gov.ols.rowreader.CsvRowReader;
+import ca.bc.gov.ols.rowreader.JsonRowReader;
+import ca.bc.gov.ols.rowreader.JsonRowWriter;
+import ca.bc.gov.ols.rowreader.RowReader;
+import ca.bc.gov.ols.rowreader.RowWriter;
+import ca.bc.gov.ols.rowreader.XsvRowWriter;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -11,48 +53,8 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.procedure.TIntObjectProcedure;
 import gnu.trove.procedure.TObjectProcedure;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ca.bc.gov.ols.router.RouterFactory;
-import ca.bc.gov.ols.router.data.TurnCost;
-import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enums.DayCode;
-import ca.bc.gov.ols.router.data.enums.DividerType;
-import ca.bc.gov.ols.router.data.enums.RoadClass;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enums.TravelDirection;
-import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
-import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
-import ca.bc.gov.ols.router.datasources.CsvRowReader;
-import ca.bc.gov.ols.router.datasources.JsonRowReader;
-import ca.bc.gov.ols.router.datasources.JsonRowWriter;
-import ca.bc.gov.ols.router.datasources.RowReader;
-import ca.bc.gov.ols.router.datasources.RowWriter;
-import ca.bc.gov.ols.router.datasources.XsvRowWriter;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-
 public class RouterProcess {
 	private final static Logger logger = LoggerFactory.getLogger(RouterProcess.class.getCanonicalName());
-	private static final byte LEFT_COST = 4; 
-	private static final byte RIGHT_COST = 2; 
-	
-	// BASE_ONLY = true to create turn_costs_base.csv for turn managment UI, ignoring custom file 
-	private static final boolean BASE_ONLY = false;
 	
 	static int droppedTRs = 0;
 	static int droppedSegs = 0;
@@ -73,7 +75,6 @@ public class RouterProcess {
 	
 	private static String dataDir = "C:/apps/router/data/";
 	private RowWriter logWriter;
-	private EnumMap<TrafficImpactor,byte[][]> turnCostMatrix = buildTurnCostMatrix();
 	private EnumMap<RoadClass,Double> trafficMultiplierMap = buildTrafficMultiplierMap();
 	
 	public static void main(String[] args) throws IOException {
@@ -88,18 +89,16 @@ public class RouterProcess {
 			System.exit(-1);
 		}
 		dataDir = dir;
-		logger.info("Reading config properties");
-		Properties props = RouterFactory.loadProps();
-		
-		// RouterProcess must always be run against the deliv data!!
-		// (except in devel)
-		//props.setProperty("environment", "deliv");
-		RouterProcess rp = new RouterProcess(props);
+
+		RouterProcess rp = new RouterProcess();
 		rp.process();
 	}
 
-	public RouterProcess(Properties props) {
-		geometryFactory = RouterFactory.geometryFactoryFromProps(props);
+	public RouterProcess() {
+		Properties bootstrapConfig = RouterFactory.getBootstrapConfigFromEnvironment();
+		ConfigurationStore configStore = RouterConfigurationStoreFactory.getConfigurationStore(bootstrapConfig);
+		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, Integer.parseInt(configStore.getConfigParam("baseSrsCode").get()));
+		configStore.close();
 	}
 
 	public void process() {
@@ -112,6 +111,25 @@ public class RouterProcess {
 		TIntObjectHashMap<String> streetNameById = loadStreetNames();
 		TIntIntHashMap streetNameIdBySegmentId = loadStreetNameOnSegs();
 
+		// load localities into a lookup table
+		logger.info("Loading Localities");
+		TIntObjectHashMap<String> localityIdMap = new TIntObjectHashMap<String>();
+		RowReader rr = new JsonRowReader(dataDir + "street_load_localities.json", geometryFactory);
+		int locCount = 0;
+		while(rr.next()) {
+			locCount++;
+			int locId = rr.getInt("locality_id");
+			String locName = rr.getString("locality_name");
+			localityIdMap.put(locId, locName);
+		}
+		rr.close();		
+
+		logger.info("Localities read: {}", locCount);
+		if(locCount == 0) {
+			logger.error("No localities found - cannot continue!");
+			return;
+		}
+
 		// load street intersections into a lookup table
 		logger.info("Loading Street Intersections");
 		TIntObjectHashMap<RpStreetIntersection> intersectionIdMap = new TIntObjectHashMap<RpStreetIntersection>();
@@ -120,13 +138,15 @@ public class RouterProcess {
 		logger.info("Loading Street Segments");
 		List<RpStreetSegment> segments = new ArrayList<RpStreetSegment>(100000);
 		TIntObjectHashMap<RpStreetSegment> ferrySegments = new TIntObjectHashMap<RpStreetSegment>();
-		RowReader rr = new JsonRowReader(dataDir + "street_load_street_segments.json", geometryFactory);
+		rr = new JsonRowReader(dataDir + "street_load_street_segments.json", geometryFactory);
 		int segCount = 0;
 		while(rr.next()) {
 			segCount++;
 			int segmentId = rr.getInt("street_segment_id");
 			int startIntersectionId = rr.getInt("start_intersection_id");
 			int endIntersectionId = rr.getInt("end_intersection_id");
+			String leftLocality = localityIdMap.get(rr.getInt("left_locality_id"));
+			String rightLocality = localityIdMap.get(rr.getInt("right_locality_id"));
 			RoadClass roadClass = RoadClass.convert(
 					rr.getString("road_class"));
 			boolean isVirtual = "Y".equals(rr.getString("virtual_ind")); 
@@ -169,17 +189,6 @@ public class RouterProcess {
 
 			Integer fromMaxWeight = rr.getInteger("from_vehicle_max_weight");
 			Integer toMaxWeight = rr.getInteger("to_vehicle_max_weight");
-			Integer maxWeight = null;
-			if(fromMaxWeight != null && toMaxWeight != null) {
-				maxWeight = Math.min(fromMaxWeight, toMaxWeight);
-			} else if(fromMaxWeight != null) {
-				maxWeight = fromMaxWeight;
-			} else if(toMaxWeight != null) {
-				maxWeight = toMaxWeight;
-			} else {
-				// fallback for if we are using the _router output as input
-				maxWeight = rr.getInteger("vehicle_max_weight");
-			}
 
 			boolean isTruckRoute = "Y".equals(rr.getString("truck_route_ind"));
 			
@@ -216,11 +225,12 @@ public class RouterProcess {
 			String name = streetNameById.get(streetNameIdBySegmentId.get(segmentId));
 			
 			RpStreetSegment segment = new RpStreetSegment(segmentId, centerLine,
-					startIntersectionId, endIntersectionId, name,
+					startIntersectionId, endIntersectionId, 
+					leftLocality, rightLocality, name,
 					roadClass, travelDir,
 					dividerType, startTrafficImpactor, endTrafficImpactor, 
 					speedLimit,  surfaceType,
-					maxHeight, maxWidth, maxWeight, isTruckRoute,
+					maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
 					false, isVirtual,
 					fromLeftTR, fromCentreTR, fromRightTR, toLeftTR, toCentreTR, toRightTR);
@@ -246,6 +256,7 @@ public class RouterProcess {
 			endInt.addEnd(endEnd);
 
 		}
+		rr.close();
 		
 		logger.info("Street Segments read: {}", segCount);
 		if(segCount == 0) {
@@ -256,7 +267,8 @@ public class RouterProcess {
 		outputTraffic(segments);
 		
 		// loop over each intersection
-		TIntObjectHashMap<List<TurnCost>> turnCosts = new TIntObjectHashMap<List<TurnCost>>();
+		TIntObjectHashMap<List<TurnRestriction>> turnRestrictions = new TIntObjectHashMap<List<TurnRestriction>>();
+		List<TurnClass> turnClasses = new ArrayList<TurnClass>();
 		intersectionIdMap.forEachEntry(new TIntObjectProcedure<RpStreetIntersection>() {
 			@Override
 			public boolean execute(final int id, final RpStreetIntersection intersection) {
@@ -268,7 +280,7 @@ public class RouterProcess {
 				// loop over all the edges adjacent to this intersection
 		        for(int inIdx = 0; inIdx < ends.size(); inIdx++) {
 		        	RpStreetEnd in = ends.get(inIdx);
-		        	// make lists segments with particular characteristics to handle later
+		        	// make lists of segments with particular characteristics to handle later
 					if(RoadClass.FERRY.equals(in.getSegment().getRoadClass())) {
 						ferryEnds.add(in);
 					} else {
@@ -316,58 +328,69 @@ public class RouterProcess {
 		        	}
 		        	
 		        	// handle left TRs
-		        	if(lefts.isEmpty()) {
-		        		if(in.getLeftTR() != null) {
+	        		if(in.getLeftTR() != null) {
+	        			if(lefts.isEmpty()) {
 		        			logRestriction(in, true, "LeftTR with no left segment");
+		        		} else if(lefts.size() > 1) {
+		        			logRestriction(in, false, "LeftTR with multiple left segments");
+		        		} else {
+	        				TurnRestriction tr = buildTurnRestriction(in, intersection, lefts.get(0), in.getLeftTRTimeRange());
+	        				addTurnRestriction(turnRestrictions, tr);
 		        		}
-		        	} else {
-		        		if(lefts.size() > 1) {
-			        		logRestriction(in, false, "LeftTR with multiple left segments");		        			
-			        		for(int i=1; i < lefts.size(); i++) {
-			        			TurnCost tr = buildTurnCost(in, 
-			        					intersection, lefts.get(i), (byte)(getTurnCost(in, lefts.get(i)) + LEFT_COST), null);
-			        			addTurnCost(turnCosts, tr);
-			        		}
-		        		}
-	    				TurnCost tr = buildTurnCost(in, 
-	    						intersection, lefts.get(0), (byte)(getTurnCost(in, lefts.get(0)) + LEFT_COST), in.getLeftTRTimeRange());
-	    				addTurnCost(turnCosts, tr);
 		        	}
+	        		// handle non-restricted lefts
+	        		for(RpStreetEnd left : lefts) {
+	        			handleTurn(in, intersection, left, turnRestrictions, turnClasses, TurnDirection.LEFT);
+	        		}
 		        	
 		        	// handle centre TRs
-					if(centre == null) {
-			        	if(in.getCentreTR() != null) {
+		        	if(in.getCentreTR() != null) {
+		        		if(centre == null) {
 							logRestriction(in, true, "CentreTR with no center segment");
+			        	} else {
+			        		TurnRestriction tr = buildTurnRestriction(in, intersection, centre, in.getCentreTRTimeRange());
+			        		addTurnRestriction(turnRestrictions, tr);
 			        	}
-					} else {
-						RpStreetEnd otherEnd = centre;
-						if(lefts.size() > 0) {
-							otherEnd = lefts.get(0);
-						} else if(rights.size() > 0) {
-							otherEnd = rights.get(0);
-						}
-        				TurnCost tr = buildTurnCost(in, intersection, centre, getTurnCost(in, otherEnd), in.getCentreTRTimeRange());
-        				addTurnCost(turnCosts, tr);
 					}	        		
+	        		// handle non-restricted centre
+	        		if(centre != null) {
+	        			handleTurn(in, intersection, centre, turnRestrictions, turnClasses, TurnDirection.CENTER);
+	        		}
 		        	
 		        	// handle right TRs
-	        		if(rights.isEmpty()) {
-			        	if(in.getRightTR() != null) {
-		        			logRestriction(in, true, "RightTR with no left segment");
-			        	}
-		        	} else {
-		        		if(rights.size() > 1) {
-			        		logRestriction(in, false, "RightTR with multiple left segments");
-			        		for(int i=1; i< rights.size(); i++) {
-			        			TurnCost tr = buildTurnCost(in, 
-			        					intersection, rights.get(i), (byte)(getTurnCost(in, rights.get(i)) + RIGHT_COST), null);
-			        			addTurnCost(turnCosts, tr);
-			        		}
+		        	if(in.getRightTR() != null) {
+		        		if(rights.isEmpty()) {
+		        			logRestriction(in, true, "RightTR with no right segment");
+			        	} else if(rights.size() > 1) {
+			        		logRestriction(in, false, "RightTR with multiple right segments");
+		        		} else {
+		        			TurnRestriction tr = buildTurnRestriction(in, intersection, rights.get(0), in.getRightTRTimeRange());
+		        			addTurnRestriction(turnRestrictions, tr);
 		        		}
-	    				TurnCost tr = buildTurnCost(in, 
-	    						intersection, rights.get(0), (byte)(getTurnCost(in, rights.get(0))+ RIGHT_COST), in.getRightTRTimeRange());
-	    				addTurnCost(turnCosts, tr);
 		        	}
+	        		// handle non-restricted rights
+	        		for(RpStreetEnd right : rights) {
+	        			handleTurn(in, intersection, right, turnRestrictions, turnClasses, TurnDirection.RIGHT);
+	        		}
+		        	
+		        	// assign an intersection-crossing class to each segment based on the impactor and the relative class of a representative turn edge
+		        	// identify the maximum class "group" value of all turns 
+		        	int maxCrossingClass = 0;
+		        	for(RpStreetEnd left : lefts) {
+		        		maxCrossingClass = Math.max(maxCrossingClass, left.getSegment().getRoadClass().getGroup());
+		        	}
+		        	for(RpStreetEnd right : rights) {
+		        		maxCrossingClass = Math.max(maxCrossingClass, right.getSegment().getRoadClass().getGroup());
+		        	}
+		        	RpStreetSegment inSeg = in.getSegment();
+		        	if(in.getSegment().getRoadClass().getGroup() > maxCrossingClass) {
+		        		in.setXingClass(XingClass.LARGER);
+		        	} else if(inSeg.getRoadClass().getGroup() < maxCrossingClass) {
+		        		in.setXingClass(XingClass.SMALLER);
+		        	} else {
+		        		in.setXingClass(XingClass.SAME);
+		        	}
+		        	
 		        } // end loop over segments incident to the intersection
 		        
 		        // deal with ferry terminals
@@ -381,11 +404,13 @@ public class RouterProcess {
 		        		LineString newLine = fr.buildLine();
 		        		RpStreetSegment seg = fr.segs.get(0);
 		        		segments.add(new RpStreetSegment(seg.getSegmentId(), newLine, fr.startEnd.getIntersectionId(),
-		        				fr.endEnd.getIntersectionId(), seg.getName(), seg.getRoadClass(),
+		        				fr.endEnd.getIntersectionId(), "Ferry", "Ferry", seg.getName(), seg.getRoadClass(),
 		        				seg.getTravelDirection(), seg.getDividerType(),
 		        				fr.startEnd.getTrafficImpactor(), fr.endEnd.getTrafficImpactor(),
 		        				seg.getSpeedLimit(), seg.getSurfaceType(), 
-		        				seg.getMaxHeight(), seg.getMaxWidth(), seg.getMaxWeight(), seg.isTruckRoute(),
+		        				seg.getMaxHeight(), seg.getMaxWidth(), 
+		        				seg.getFromMaxWeight(),seg.getToMaxWeight(), 
+		        				seg.isTruckRoute(),
 		        				seg.getHighwayRoute1(), seg.getHighwayRoute2(), seg.getHighwayRoute3(),
 		        				seg.isDeadEnded(), seg.isVirtual(), 
 		        				null, null, null, null, null, null));
@@ -428,9 +453,9 @@ public class RouterProcess {
 					        		// tighter than 90 degrees left or right
 					        		if(relativeAngle < 90 || relativeAngle > 270) {
 					        			turningLaneRestrictionCount++;
-					        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-					        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.Y, "GENERATED: Logically implied ramp-to-ramp restriction", null);
-				        				addTurnCost(turnCosts, tr);
+					        			TurnRestriction tr = new TurnRestriction(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
+					        					WeeklyTimeRange.ALWAYS, TurnRestrictionType.Y, EnumSet.allOf(VehicleType.class), "GENERATED: Logically implied ramp-to-ramp restriction", null);
+				        				addTurnRestriction(turnRestrictions, tr);
 					        			//outputTRRow(tr);
 					        		} else {
 					        			turningLaneNonRestrictionCount++;
@@ -449,9 +474,9 @@ public class RouterProcess {
 					        		// tighter than 45 degrees left or right (from straight)
 					        		if(relativeAngle < 135 || relativeAngle > 225) {
 					        			multiwayTurningLaneRestrictionCount++;
-					        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-					        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.X, "GENERATED: Logically implied ramp-to-ramp restriction (multi-way)", null);
-				        				addTurnCost(turnCosts, tr);
+					        			TurnRestriction tr = new TurnRestriction(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
+					        					WeeklyTimeRange.ALWAYS, TurnRestrictionType.X, EnumSet.allOf(VehicleType.class), "GENERATED: Logically implied ramp-to-ramp restriction (multi-way)", null);
+				        				addTurnRestriction(turnRestrictions, tr);
 					        			//outputTRRow(tr);
 					        		} else {
 					        			multiwayTurningLaneNonRestrictionCount++;
@@ -494,9 +519,9 @@ public class RouterProcess {
 			        			}
 			        			if(validThird) {
 				        			dividedEndRestrictionCount++;
-				        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
-				        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.V, "GENERATED: Logically implied divided-end u/v-turn restriction", null);
-			        				addTurnCost(turnCosts, tr);
+				        			TurnRestriction tr = new TurnRestriction(in.getSegment().getSegmentId(), intersection.getId(), out.getSegment().getSegmentId(), 
+				        					WeeklyTimeRange.ALWAYS, TurnRestrictionType.V, EnumSet.allOf(VehicleType.class), "GENERATED: Logically implied divided-end u/v-turn restriction", null);
+			        				addTurnRestriction(turnRestrictions, tr);
 				        			//outputTRRow(tr);
 			        			}
 			        		} 
@@ -513,7 +538,7 @@ public class RouterProcess {
 		        	// loop over all segments again (to find outgoing segments)
 		        	for(RpStreetEnd between : ends) {
 		        		Double betweenSegLength = between.getSegment().getCenterLine().getLength();
-		        		 RpStreetIntersection secondInt = intersectionIdMap.get(between.getOtherEnd().getIntersectionId());
+		        		RpStreetIntersection secondInt = intersectionIdMap.get(between.getOtherEnd().getIntersectionId());
 		        		// skip incoming 1-way, height-separated, or too long segments,
 		        		// and 2-node intersections
 		        		if(between.getTravelDir().equals(TravelDirection.REVERSE)
@@ -522,7 +547,7 @@ public class RouterProcess {
 		        				|| (in.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)
 		        						!= between.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS))
 		        				|| betweenSegLength > 45
-		        				|| secondInt.getEnds().size() <= 2) continue;
+		        				|| secondInt.getEnds().size() < 2) continue;
         				// inAngle must be a slight to steep left turn but not a hairpin
 		        		int inAngle = (between.getAngle() + 360 - in.getAngle()) % 360;
         				if(inAngle < 210 || inAngle > 330) continue;
@@ -549,29 +574,84 @@ public class RouterProcess {
 	        				int returnAngle = (out.getAngle() + 360 - in.getAngle()) % 360;
 			        		if(returnAngle > 305 || returnAngle < 45) {
 			        			uTurnRestrictionCount++;
-			        			TurnCost tr = new TurnCost(in.getSegment().getSegmentId() + "|" 
+			        			TurnRestriction tr = new TurnRestriction(in.getSegment().getSegmentId() + "|" 
 			        					+ in.getIntersectionId() + "|" 
 			        					+ between.getSegment().getSegmentId() + "|" 
 			        					+ out.getIntersectionId() + "|" 
 			        					+ out.getSegment().getSegmentId(),
-			        					(byte)0, WeeklyTimeRange.ALWAYS, TurnRestrictionType.U, "GENERATED: Logically implied u-turn restriction", null);
-		        				addTurnCost(turnCosts, tr);
+			        					WeeklyTimeRange.ALWAYS, TurnRestrictionType.U, EnumSet.allOf(VehicleType.class), "GENERATED: Logically implied u-turn restriction", null);
+		        				addTurnRestriction(turnRestrictions, tr);
 			        			//outputTRRow(tr);
 		        			} else {
 		        				uTurnNonRestrictionCount++;
 		        			}
 		        		} 
+	        			
+			        	// sometimes there is an extra internal segment
+	        			for(RpStreetEnd between2 : secondInt.getEnds()) {
+	        				Double between2SegLength = between2.getSegment().getCenterLine().getLength();
+			        		RpStreetIntersection thirdInt = intersectionIdMap.get(between2.getOtherEnd().getIntersectionId());
+			        		// skip incoming 1-way, height-separated, or too long segments,
+			        		// and 2-node intersections
+			        		if(between2.getTravelDir().equals(TravelDirection.REVERSE)
+			        				|| (in.getTrafficImpactor().equals(TrafficImpactor.OVERPASS)
+			        						!= between2.getTrafficImpactor().equals(TrafficImpactor.OVERPASS))
+			        				|| (in.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)
+			        						!= between2.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS))
+			        				|| between2SegLength > 45
+			        				|| thirdInt.getEnds().size() <= 2) continue;
+	        				// between angles must be nearly parallel
+			        		int midAngle = Math.abs(between.getAngle() - between2.getAngle());
+	        				if(midAngle > 30 ) continue;
+	        				
+		        			// now look for the final segment, on the other end of the between2 segment
+		        			for(RpStreetEnd out : thirdInt.getEnds()) {
+				        		// skip incoming 1-way, undivided, or height-separated segments,
+		        				// or cases where the in and out segs are not highways and the between seg is too large
+		        				if(out.getTravelDir().equals(TravelDirection.REVERSE)
+		        						|| !out.getSegment().getDividerType().isDivided()
+			        					|| (between2.getOtherEnd().getTrafficImpactor().equals(TrafficImpactor.OVERPASS)
+			        							!= out.getTrafficImpactor().equals(TrafficImpactor.OVERPASS))
+			        					|| (between2.getOtherEnd().getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)
+			        							!= out.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS))
+			        	        		|| ((in.getSegment().getHighwayRoute1() == null
+				        						|| out.getSegment().getHighwayRoute1() == null)
+				        							&& betweenSegLength + between2SegLength > 26)
+		        						) continue;
+		        				// outAngle must be a slight to steep left turn but not a hairpin
+				        		int outAngle = (out.getAngle() + 360 - between2.getOtherEnd().getAngle()) % 360;
+		        				if(outAngle < 210 || outAngle > 330) continue;
+		        				
+				        		// overall u-turn angle must be close to a 180 turn 
+		        				int returnAngle = (out.getAngle() + 360 - in.getAngle()) % 360;
+				        		if(returnAngle > 305 || returnAngle < 45) {
+				        			uTurnRestrictionCount++;
+				        			TurnRestriction tr = new TurnRestriction(in.getSegment().getSegmentId() + "|" 
+				        					+ in.getIntersectionId() + "|" 
+				        					+ between.getSegment().getSegmentId() + "|" 
+				        					+ between2.getIntersectionId() + "|"
+				        					+ between2.getSegment().getSegmentId() + "|" 
+				        					+ out.getIntersectionId() + "|" 
+				        					+ out.getSegment().getSegmentId(),
+				        					WeeklyTimeRange.ALWAYS, TurnRestrictionType.U, EnumSet.allOf(VehicleType.class), "GENERATED: Logically implied u-turn restriction with split internal segment", null);
+			        				addTurnRestriction(turnRestrictions, tr);
+				        			//outputTRRow(tr);
+			        			} else {
+			        				uTurnNonRestrictionCount++;
+			        			}
+			        		} 
+		        		} 
 		        	}
 	        	}
 
-		        handleDeadEnds(intersection, intersectionIdMap, turnCosts);
+		        handleDeadEnds(intersection, intersectionIdMap, turnRestrictions);
 		        		        
 		        return true;
 			}
 
 			private void handleDeadEnds(final RpStreetIntersection intersection, 
 					TIntObjectHashMap<RpStreetIntersection> intersectionIdMap,
-					TIntObjectHashMap<List<TurnCost>> turnCosts) {
+					TIntObjectHashMap<List<TurnRestriction>> turnRestrictions) {
 				// build dead-ended trees by working up from dead-ends
 				List<RpStreetEnd> ends = intersection.getEnds();
 				RpStreetEnd newDeadEnd = null;
@@ -585,7 +665,7 @@ public class RouterProcess {
 		        			if(possibleDeadEnd == in) {
 		        				continue;
 		        			}
-		        			if(!checkTurnRestriction(turnCosts, in.getSegment().getSegmentId(), 
+		        			if(!checkTurnRestriction(turnRestrictions, in.getSegment().getSegmentId(), 
 		        					intersection.getId(), possibleDeadEnd.getSegment().getSegmentId())) {
 		        				newDeadEnd = null;
 			        			break;
@@ -613,11 +693,11 @@ public class RouterProcess {
 	        	}
 			}
 			
-			private boolean checkTurnRestriction(TIntObjectHashMap<List<TurnCost>> turnCosts,
+			private boolean checkTurnRestriction(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions,
 					int inSegId, int intId, int outSegId) {
-				List<TurnCost> tcs = turnCosts.get(inSegId);
+				List<TurnRestriction> tcs = turnRestrictions.get(inSegId);
 				if(tcs == null) return false;
-				for(TurnCost tc : tcs) {
+				for(TurnRestriction tc : tcs) {
 					int[] ids = tc.getIdSeq();
 					if(ids.length == 3 && ids[1] == intId && ids[2] == outSegId
 							&& WeeklyTimeRange.isAlways(tc.getRestriction())) {
@@ -667,9 +747,12 @@ public class RouterProcess {
         		return bestRoute;
 			}
 		});
-		if(!BASE_ONLY) { 
-			readTurnCosts(turnCosts, dataDir + "turn_restrictions_custom.csv");
-		}
+		
+		// Write base only file
+		writeTurnRestrictions(turnRestrictions, "turn_restrictions_base.csv");
+
+		// apply custom restrictions
+		readTurnRestrictions(turnRestrictions, dataDir + "turn_restrictions_custom.csv");
 		
 		logWriter.close();
 		//trWriter.close();
@@ -692,12 +775,9 @@ public class RouterProcess {
 		logger.info("Writing output segments...");
 		writeSegments(segments);
 
-		String fileName = "turn_costs.csv";
-		if(BASE_ONLY) {
-			fileName = "turn_costs_base.csv";
-		}
-		writeTurnCosts(turnCosts, fileName);
-		//dataSource.close();
+		// write complete file
+		writeTurnRestrictions(turnRestrictions, "turn_restrictions.csv");
+		writeTurnClasses(turnClasses, "turn_classes.csv");
 	}
 	
 	protected boolean nameIsTurningLaneOrRamp(String name) {
@@ -711,9 +791,9 @@ public class RouterProcess {
 		return false;
 	}
 
-//	private void outputTRRow(TurnCost turnCost) {
+//	private void outputTRRow(TurnRestriction turnRestriction) {
 //		Map<String,Object> row = new THashMap<String,Object>();
-//		row.put("EDGE_NODE_SET", turnCost.getIdSeqString());
+//		row.put("EDGE_NODE_SET", turnRestriction.getIdSeqString());
 //		trWriter.writeRow(row);
 //	}
 
@@ -802,38 +882,32 @@ public class RouterProcess {
 		return nameIdBySegmentIdMap;
 	}
 	
-	private void addTurnCost(TIntObjectHashMap<List<TurnCost>> turnCosts, TurnCost newTurnCost) {
-		if(newTurnCost == null) return;
-		List<TurnCost> tcl = turnCosts.get(newTurnCost.getIdSeq()[0]);
-		if(tcl == null) {
-			tcl = new ArrayList<TurnCost>(4);
-			turnCosts.put(newTurnCost.getIdSeq()[0], tcl);
+	private void addTurnRestriction(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions, TurnRestriction newTurnRestriction) {
+		if(newTurnRestriction == null) return;
+		// get the list of restrictions that starts from the same segment
+		List<TurnRestriction> trl = turnRestrictions.get(newTurnRestriction.getIdSeq()[0]);
+		if(trl == null) {
+			trl = new ArrayList<TurnRestriction>(1);
+			turnRestrictions.put(newTurnRestriction.getIdSeq()[0], trl);
 		}
-		for(TurnCost oldTurnCost : tcl) {
-			if(oldTurnCost.getIdSeqString().equals(newTurnCost.getIdSeqString())) {
-				// we are overwriting an existing cost 
-				if(newTurnCost.getCost() >= 0) {
-					oldTurnCost.setCost(newTurnCost.getCost());
-				}
-				oldTurnCost.setRestriction(newTurnCost.getRestriction());
-				oldTurnCost.setType(newTurnCost.getType());
-				if(newTurnCost.getSourceDescription() != null && !"".equals(newTurnCost.getSourceDescription())) {
-					if(oldTurnCost.getSourceDescription() == null || "".equals(oldTurnCost.getSourceDescription())) {
-						oldTurnCost.setSourceDescription(newTurnCost.getSourceDescription());
+		// loop over the list to look for duplicates
+		for(int i = 0; i < trl.size(); i++) {
+			TurnRestriction oldTurnRestriction = trl.get(i);
+			if(oldTurnRestriction.getIdSeqString().equals(newTurnRestriction.getIdSeqString()) 
+					&& oldTurnRestriction.getVehicleTypes().equals(newTurnRestriction.getVehicleTypes())) {
+				// we are overwriting an existing restriction 
+				trl.set(i, newTurnRestriction);
+				if(oldTurnRestriction.getSourceDescription() != null && !oldTurnRestriction.getSourceDescription().isBlank()) {
+					if(newTurnRestriction.getSourceDescription() == null || newTurnRestriction.getSourceDescription().isBlank()) {
+						newTurnRestriction.setSourceDescription(oldTurnRestriction.getSourceDescription());
 					} else {
-						oldTurnCost.setSourceDescription(oldTurnCost.getSourceDescription() + " OVERRIDDEN BY " + newTurnCost.getSourceDescription());
+						newTurnRestriction.setSourceDescription(oldTurnRestriction.getSourceDescription() + " OVERRIDDEN BY " + newTurnRestriction.getSourceDescription());
 					}
 				}
-				oldTurnCost.setCustomDescription(newTurnCost.getCustomDescription());
 				return;
 			}
 		}
-		// we didn't find a matching turn cost, so this one is new
-		// if there is no cost and no restriction, we don't need to add it
-		if(newTurnCost.getCost() == 0 && newTurnCost.getRestriction() == null) {
-			return;
-		}
-		tcl.add(newTurnCost);
+		trl.add(newTurnRestriction);
 	}
 	
 	// groups the stubs at each intersection by trafficImpactor and counts them 
@@ -864,22 +938,25 @@ public class RouterProcess {
 		logger.debug(counts.toString());	
 	}
 	
-	private void readTurnCosts(TIntObjectHashMap<List<TurnCost>> turnCosts, String filename) {
-		RowReader turnCostReader = new CsvRowReader(filename, geometryFactory);
-		while(turnCostReader.next()) {
-			String idSeq = turnCostReader.getString("EDGE_NODE_SET");
-			Integer cost = turnCostReader.getInteger("TRAVERSAL_COST");
+	private void readTurnRestrictions(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions, String filename) {
+		RowReader turnRestrictionReader = new CsvRowReader(filename, geometryFactory);
+		while(turnRestrictionReader.next()) {
+			String idSeq = turnRestrictionReader.getString("EDGE_NODE_SET");
+			Integer cost = turnRestrictionReader.getInteger("TRAVERSAL_COST");
 			if(cost == null) {
 				cost = -1;
 			}
-			String dayCodeStr = turnCostReader.getString("DAY_CODE");
-			String timeRangeStr = turnCostReader.getString("TIME_RANGES");
+			String dayCodeStr = turnRestrictionReader.getString("DAY_CODE");
+			String timeRangeStr = turnRestrictionReader.getString("TIME_RANGES");
 			WeeklyTimeRange restriction = WeeklyTimeRange.create(dayCodeStr, timeRangeStr);
-			TurnRestrictionType type = TurnRestrictionType.convert(turnCostReader.getString("TYPE"));
-			String description = turnCostReader.getString("DESCRIPTION");
-			addTurnCost(turnCosts, new TurnCost(idSeq, (byte)(int)cost, restriction, type, "", description));
+			TurnRestrictionType type = TurnRestrictionType.convert(turnRestrictionReader.getString("TYPE"));
+			Set<VehicleType> vehicleTypes = VehicleType.fromList(turnRestrictionReader.getString("VEHICLE_TYPES"));
+			String description = turnRestrictionReader.getString("DESCRIPTION");
+			String source = turnRestrictionReader.getString("SOURCE_CODE");
+			addTurnRestriction(turnRestrictions, new TurnRestriction(idSeq, restriction, type, vehicleTypes, source, description));
 		}
 	}
+	
 	private void writeSegments(List<RpStreetSegment> segments) {
 		File streetsFile = new File(dataDir + "street_load_street_segments_router.json");
 		RowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments");
@@ -889,6 +966,8 @@ public class RouterProcess {
 			row.put("STREET_SEGMENT_ID", seg.getSegmentId());
 			row.put("START_INTERSECTION_ID", seg.getStartIntersectionId());
 			row.put("END_INTERSECTION_ID", seg.getEndIntersectionId());
+			row.put("LEFT_LOCALITY", seg.getLeftLocality());
+			row.put("RIGHT_LOCALITY", seg.getRightLocality());
 			row.put("ROAD_CLASS", seg.getRoadClass());
 			row.put("TRAVEL_DIRECTION", seg.getTravelDirection());
 			row.put("DIVIDER_TYPE", seg.getDividerType().toString());
@@ -898,7 +977,8 @@ public class RouterProcess {
 			row.put("VIRTUAL_IND", seg.isVirtual() ? "Y" : "N");
 			row.put("SURFACE_TYPE", seg.getSurfaceType());
 			row.put("VEHICLE_MAX_HEIGHT", Double.isNaN(seg.getMaxHeight()) ? null : seg.getMaxHeight());
-			row.put("VEHICLE_MAX_WEIGHT", seg.getMaxWeight());
+			row.put("FROM_VEHICLE_MAX_WEIGHT", seg.getFromMaxWeight());
+			row.put("TO_VEHICLE_MAX_WEIGHT", seg.getToMaxWeight());
 			if(seg.getSegmentId() == 460188 || seg.getSegmentId() == 460195) {
 				row.put("VEHICLE_MAX_WIDTH", 10);
 			} else {
@@ -907,6 +987,8 @@ public class RouterProcess {
 			if(seg.isDeadEnded()) {
 				row.put("DEAD_ENDED_IND", "Y");
 			}
+			row.put("START_XING_CLASS", seg.getStartXingClass());
+			row.put("END_XING_CLASS", seg.getEndXingClass());
 			row.put("TRUCK_ROUTE_IND", seg.isTruckRoute() ? "Y" : "N");
 			row.put("geom", seg.getCenterLine());
 			streetWriter.writeRow(row);
@@ -916,23 +998,23 @@ public class RouterProcess {
 		logger.info("Segments written: {}", segCount);
 	}
 	
-	private void writeTurnCosts(TIntObjectHashMap<List<TurnCost>> turnCosts, String fileName) {
+	private void writeTurnRestrictions(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions, String fileName) {
 		File trFile = new File(dataDir + fileName);
-		List<String> trSchema = Arrays.asList("ID","EDGE_NODE_SET","DAY_CODE","TIME_RANGES","TRAVERSAL_COST","TYPE","SOURCE_DESCRIPTION","CUSTOM_DESCRIPTION");
+		List<String> trSchema = Arrays.asList("ID","EDGE_NODE_SET","DAY_CODE","TIME_RANGES","TYPE","VEHICLE_TYPES","SOURCE_DESCRIPTION","CUSTOM_DESCRIPTION");
 		XsvRowWriter trWriter = new XsvRowWriter(trFile, ',', trSchema, false);
 		
-		turnCosts.forEachValue(new TObjectProcedure<List<TurnCost>>() {
+		turnRestrictions.forEachValue(new TObjectProcedure<List<TurnRestriction>>() {
 			@Override
-			public boolean execute(List<TurnCost> tcl) {
-				for(TurnCost tc : tcl) {
+			public boolean execute(List<TurnRestriction> tcl) {
+				for(TurnRestriction tc : tcl) {
 					trCount++;
 					Map<String,Object> row = new THashMap<String,Object>();
 					row.put("ID", trCount);
 					row.put("EDGE_NODE_SET", tc.getIdSeqString());
 					row.put("DAY_CODE", tc.getRestriction() == null ? "" : DayCode.of(tc.getRestriction().getDaySet()));
 					row.put("TIME_RANGES", tc.getRestriction() == null ? "" : tc.getRestriction().getTimeRangeString());
-					row.put("TRAVERSAL_COST", tc.getCost());
 					row.put("TYPE", tc.getType());
+					row.put("VEHICLE_TYPES", VehicleType.setToString(tc.getVehicleTypes()));
 					row.put("SOURCE_DESCRIPTION", tc.getSourceDescription());
 					row.put("CUSTOM_DESCRIPTION", tc.getCustomDescription());
 					trWriter.writeRow(row);
@@ -941,45 +1023,70 @@ public class RouterProcess {
 			}
 		});
 		trWriter.close();
-		logger.info("Turn Costs written: {}", trCount);
+		logger.info("Turn Restrictions written: {}", trCount);
 	}
 
-	private TurnCost buildTurnCost(RpStreetEnd inSegEnd, RpStreetIntersection intersection, 
-			RpStreetEnd outSegEnd, byte cost, WeeklyTimeRange restriction) {
+	private void writeTurnClasses(List<TurnClass> turnClasses, String fileName) {
+		File tcFile = new File(dataDir + fileName);
+		List<String> tcSchema = Arrays.asList("EDGE_NODE_SET","TURN_DIRECTION");
+		XsvRowWriter tcWriter = new XsvRowWriter(tcFile, ',', tcSchema, false);
+		int tcCount = 0;
+		for(TurnClass tc : turnClasses) {
+			tcCount++;
+			Map<String,Object> row = new THashMap<String,Object>();
+			row.put("EDGE_NODE_SET", tc.getIdSeqString());
+			row.put("TURN_DIRECTION", tc.getTurnDirection());
+			tcWriter.writeRow(row);
+		}
+		tcWriter.close();
+		logger.info("Turn Classes written: {}", tcCount);
+	}
+
+	
+	private String validateTurn(RpStreetEnd inSegEnd, RpStreetEnd outSegEnd) {
+		// no turn onto the wrong way of a one-way street
 		if(outSegEnd.getTravelDir() == TravelDirection.REVERSE) {
-			// don't need to add a cost to an impossible turn onto the wrong way of a one-way street
-			if(restriction != null) {
-				logRestriction(inSegEnd, true, "Ignoring TR onto wrong way of one-way street");
-			}
-			return null;
+			return "wrong way of one-way street";
 		}
-		// full-time restriction on barricaded segments
-		if(TrafficImpactor.BARRICADE.equals(inSegEnd.getTrafficImpactor()) 
-				|| TrafficImpactor.BARRICADE.equals(outSegEnd.getTrafficImpactor())) {
-			barricadedTurnCount++;
-			return new TurnCost(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
-					cost, WeeklyTimeRange.ALWAYS, null, "ITN", null);
-		}
-		// no costs on over/underpasses
+		// no turns between over/underpasses
 		if(inSegEnd.getTrafficImpactor().equals(TrafficImpactor.OVERPASS) || inSegEnd.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)
 				||outSegEnd.getTrafficImpactor().equals(TrafficImpactor.OVERPASS) || outSegEnd.getTrafficImpactor().equals(TrafficImpactor.UNDERPASS)) {
-			// don't need to add a cost to an impossible turn off/onto an overpass
-			if(restriction != null) {
-				logRestriction(inSegEnd, true, "Ignoring impossible TR off/onto overpass");
-			}
+			return "off/onto overpass";
+		}
+		// no turns involving ferry segments
+		if(inSegEnd.getSegment().getRoadClass() == RoadClass.FERRY || outSegEnd.getSegment().getRoadClass() == RoadClass.FERRY) {
+			return "involves ferry segments";
+		}
+		return null;
+	}
+	
+	private TurnRestriction buildTurnRestriction(RpStreetEnd inSegEnd, RpStreetIntersection intersection, 
+			RpStreetEnd outSegEnd, WeeklyTimeRange restriction) {
+		String invalidTurnReason = validateTurn(inSegEnd, outSegEnd);
+		if(invalidTurnReason != null) {
+			logRestriction(inSegEnd, true, "Ignoring impossible TR: " + invalidTurnReason);
 			return null;
-			
 		}
-		if(inSegEnd.getSegment().isFerry() || outSegEnd.getSegment().isFerry()) {
-			// don't need to add a cost to ferry turn
-			if(restriction != null) {
-				logRestriction(inSegEnd, true, "Ignoring TR involving ferry segment");
-			}
-			return null;			
-		}
-		return new TurnCost(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
-				cost, restriction, null, restriction == null ? "" : "ITN", null);
+		return new TurnRestriction(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
+				restriction, null, EnumSet.allOf(VehicleType.class), restriction == null ? "" : "ITN", null);
 	}	
+
+	private void handleTurn(RpStreetEnd inSegEnd, RpStreetIntersection intersection, RpStreetEnd outSegEnd,
+			TIntObjectHashMap<List<TurnRestriction>> turnRestrictions, List<TurnClass> turnClasses, TurnDirection td) {
+		// nothing to handle on invalid turns
+		String invalidTurnReason = validateTurn(inSegEnd, outSegEnd);
+		if(invalidTurnReason != null) return;
+		
+		// full-time restriction on barricaded segments
+		if(TrafficImpactor.BARRICADE.equals(inSegEnd.getTrafficImpactor() ) 
+				|| TrafficImpactor.BARRICADE.equals(outSegEnd.getTrafficImpactor())) {
+			barricadedTurnCount++;
+			addTurnRestriction(turnRestrictions, new TurnRestriction(inSegEnd.getSegment().getSegmentId(), 
+					intersection.getId(), outSegEnd.getSegment().getSegmentId(), 
+					WeeklyTimeRange.ALWAYS, null, EnumSet.allOf(VehicleType.class), "ITN", null));
+		}
+		turnClasses.add(new TurnClass(inSegEnd.getSegment().getSegmentId(), intersection.getId(), outSegEnd.getSegment().getSegmentId(), td));
+	}
 
 	private static EnumMap<RoadClass,Double> buildTrafficMultiplierMap() {
 		EnumMap<RoadClass,Double> map = new EnumMap<RoadClass,Double>(RoadClass.class);
@@ -993,27 +1100,17 @@ public class RouterProcess {
 		return map;
 	}
 	
-	private EnumMap<TrafficImpactor,byte[][]> buildTurnCostMatrix() {
-		byte[][] lightMatrix = {{5,5,5},{4,7,5},{10,10,15}};
-		byte[][] stopMatrix = {{5,5,10},{5,7,5},{10,10,15}};
-		byte[][] yieldMatrix = {{5,5,5},{4,7,5},{10,10,15}};
-		EnumMap<TrafficImpactor,byte[][]> matrix = new EnumMap<TrafficImpactor,byte[][]>(TrafficImpactor.class);
-		matrix.put(TrafficImpactor.LIGHT, lightMatrix);
-		matrix.put(TrafficImpactor.STOPSIGN, stopMatrix);
-		matrix.put(TrafficImpactor.YIELD, yieldMatrix);
-		matrix.put(TrafficImpactor.ROUNDABOUT, yieldMatrix);
-		return matrix;
-	}
-	
-	private byte getTurnCost(RpStreetEnd thisEnd, RpStreetEnd otherEnd) {
-		int onGroup = thisEnd.getSegment().getRoadClass().getGroup();
-		int acrossGroup = otherEnd.getSegment().getRoadClass().getGroup();
-		if(onGroup == 0 || acrossGroup == 0) return 0;
-		TrafficImpactor imp = thisEnd.getTrafficImpactor();
-		byte[][] matrix = turnCostMatrix.get(imp);
-		if(matrix == null) return 0;
-		return matrix[onGroup-1][acrossGroup-1];
-	}
+//	private EnumMap<TrafficImpactor,byte[][]> buildTurnCostMatrix() {
+//		byte[][] lightMatrix = {{5,5,5},{4,7,5},{10,10,15}};
+//		byte[][] stopMatrix = {{5,5,10},{5,7,5},{10,10,15}};
+//		byte[][] yieldMatrix = {{5,5,5},{4,7,5},{10,10,15}};
+//		EnumMap<TrafficImpactor,byte[][]> matrix = new EnumMap<TrafficImpactor,byte[][]>(TrafficImpactor.class);
+//		matrix.put(TrafficImpactor.LIGHT, lightMatrix);
+//		matrix.put(TrafficImpactor.STOPSIGN, stopMatrix);
+//		matrix.put(TrafficImpactor.YIELD, yieldMatrix);
+//		matrix.put(TrafficImpactor.ROUNDABOUT, yieldMatrix);
+//		return matrix;
+//	}
 	
 	private void openLogWriter() {
 		File logFile = new File(dataDir + "router_process_log.json");
