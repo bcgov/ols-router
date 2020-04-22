@@ -69,6 +69,7 @@ public class RoutingParameters {
 	private EnumSet<RouteOption> enabledOptions;
 	private boolean setEnableCalled = false;
 	private boolean turnCostsSet = false;
+	private boolean followTruckRouteSet = false;
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -252,6 +253,9 @@ public class RoutingParameters {
 		if(!turnCostsSet) {
 			turnCostMap = defaultTurnCostMap.get(this.vehicleType);
 		}
+		if(!followTruckRouteSet) {
+			followTruckRoute = true;
+		}
 	}
 
 	public Double getHeight() {
@@ -291,6 +295,7 @@ public class RoutingParameters {
 	}
 
 	public void setFollowTruckRoute(boolean followTruckRoute) {
+		followTruckRouteSet = true;
 		this.followTruckRoute = followTruckRoute;
 	}
 
