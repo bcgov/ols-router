@@ -169,13 +169,18 @@ public class DijkstraShortestPath {
 		DijkstraWalker walker;
 		while((walker = queue.poll()) != null) {
 			checkedEdgeCount++;
+			// escape from infinite loop!
+			if(checkedEdgeCount > graph.numEdges() * 2) {
+				logger.error("Infinite routing loop encountered, investigation required!");
+				break;
+			}
 
 			int nodeId = walker.getNodeId();
 			int fromEdgeId = walker.getEdgeId();
 			for(int edgeId = graph.nextEdge(nodeId, BasicGraph.NO_EDGE); edgeId != BasicGraph.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
-				// if we've already been to this non-end, non-internal edge
+				// if we've already been to this non-end, non-internal edge, or it is part of a loop
 				List<Integer> endEdges = endEdgesById.get(edgeId);
-				if(endEdges == null && edgeIdVisisted[edgeId] && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId) || isLoop(edgeId, walker))) {
+				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) || isLoop(edgeId, walker))) {
 					// skip it
 					continue;
 				}
