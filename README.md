@@ -10,7 +10,7 @@ In year two (ending March 2020), we added support for truck routing which takes 
 In year three (ending March 2021), we will add support for real-time road events and ferry schedules. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides.
 
 
-[Route Planner 2.1 in action](https://ols-demo.apps.gov.bc.ca/index.html?rt=dlv&gc=dlv)
+[Route Planner 2.1 in action](https://ols-demo.apps.gov.bc.ca/index.html)
 
 [Route Planner release notes](rpng-release-notes.md)
 
