@@ -5,7 +5,7 @@ The BC Route Planner is being developed by the Province of British Columbia in a
 
 In year one (ending March 2019), we investigated the feasibility of supporting multiple complex routing constraints such as time-dependent routing including historic traffic congestion, scheduled road events and construction, and ferry schedules. The first release includes components for which there is insufficient or no real data so that a stable API is available for developers sooner than later. Such components are turned off by default. Creating and managing data sources is out of scope of this project. Getting data custodians to put usable data APIs in place was not expected and didn't happen. The performance goal of the Route Planner 2.0, the first release of RPNG, is under two seconds execution time for a single, two-point route for an oversized truck.
 
-In year two (ending March 2020), we added support for truck routing which takes vehicle and load dimensions and road restrictions into account.
+In year two (ending March 2020), we added support for truck routing which takes vehicle and load dimensions and road restrictions into account. The BC Route Planner was incorporated into the (TransLink Route Planner)[https://translink.apps.gov.bc.ca/trp/].
 
 In year three (ending March 2021), we will add support for real-time road events and ferry schedules. A road watcher will be implemented to keep the cached road network in-synch with real-time events like construction, traffic congestion, ferry delays, accidents, wildfires, and mudslides.
 
