@@ -5,6 +5,7 @@
 package ca.bc.gov.ols.router.engine.basic;
 
 import java.time.LocalDateTime;
+import java.util.EnumMap;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,10 +20,13 @@ import org.locationtech.jts.index.strtree.ItemBoundable;
 import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
 
+import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
+import gnu.trove.map.TIntObjectMap;
 
 public class BasicGraph {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraph.class.getCanonicalName());
@@ -41,6 +45,7 @@ public class BasicGraph {
 	private EventLookup eventLookup;
 	private TrafficLookup trafficLookup;
 	private ScheduleLookup scheduleLookup;
+	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField;
 	private VisLayers visLayers;
 
 	public BasicGraph(int initialEdgeCapacity) {
@@ -62,10 +67,10 @@ public class BasicGraph {
 	public int[] addEdge(int fromNodeId, int toNodeId, LineString ls, 
 			boolean oneWay, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
-		EdgeData data = new EdgeData(ls, speedLimit, leftLocality, rightLocality, name, fromImp, toImp,
+		EdgeData data = new EdgeData(ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
 				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
@@ -324,6 +329,22 @@ public class BasicGraph {
 		edges.get(edgeId).data.speedLimit = speedLimit;
 	}
 
+	public void setLocalDistortionField(final TIntObjectMap<EnumMap<VehicleType, Double>> localDistortionField) {
+		this.localDistortionField = localDistortionField; 
+	}
+
+	public double getLocalDistortion(int edgeId, VehicleType vehicleType) {
+		EnumMap<VehicleType, Double> frictionFactors = localDistortionField.get(edgeId);
+		if(frictionFactors == null) return 1;
+		Double frictionFactor = frictionFactors.get(vehicleType);
+		if(frictionFactor == null) return 1;
+		return frictionFactor;
+	}
+
+	public RoadClass getRoadClass(int edgeId) {
+		return edges.get(edgeId).data.roadClass;
+	}
+
 }
 
 class Node {
@@ -345,6 +366,7 @@ class EdgeData {
 	final String leftLocality;
 	final String rightLocality;
 	final String name;
+	final RoadClass roadClass;
 	final TrafficImpactor fromImp;
 	final TrafficImpactor toImp;
 	final double maxHeight;
@@ -358,7 +380,7 @@ class EdgeData {
 	
 	public EdgeData(LineString ls, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
 		this.ls = ls;
@@ -370,6 +392,7 @@ class EdgeData {
 		this.leftLocality = leftLocality;
 		this.rightLocality = rightLocality;
 		this.name = name;
+		this.roadClass = roadClass;
 		this.fromImp = fromImp;
 		this.toImp = toImp;
 		this.maxHeight = maxHeight;     

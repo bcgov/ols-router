@@ -27,6 +27,7 @@ import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.util.LineStringSplitter;
 
 public class DijkstraShortestPath {
@@ -44,11 +45,24 @@ public class DijkstraShortestPath {
 		return findShortestPaths(startEdge, new SplitEdge[]{endEdge}, timeOffset)[0];
 	}
 	
+	private double getMultiplier(int edgeId) {
+		double multiplier = 1;
+		if(params.isFollowTruckRoute() && !graph.isTruckRoute(edgeId)) {
+			multiplier *= params.getTruckRouteMultiplier();
+		}
+		if(params.isEnabled(RouteOption.LOCAL_DISTORTION_FIELD)) {
+			multiplier *= graph.getLocalDistortion(edgeId, params.getVehicleType());
+		}
+		if(params.isEnabled(RouteOption.GLOBAL_DISTORTION_FIELD) && params.getVehicleType() == VehicleType.TRUCK) {
+			multiplier *= params.getGlobalDistortionField().lookup(graph.getRoadClass(edgeId), graph.isTruckRoute(edgeId));
+		}
+		return multiplier;
+	}
+	
 	public EdgeList[] findShortestPaths(SplitEdge startEdge, SplitEdge[] toEdges, double timeOffset) {
 		
 		final CostFunction<Integer,Double,Double,Double> costFunction = params.getCriteria() == RoutingCriteria.SHORTEST 
-				? (edgeId, time, dist) -> dist * (params.isFollowTruckRoute() && !graph.isTruckRoute(edgeId) ? params.getTruckRouteMultiplier() : 1) 
-				: (edgeId, time, dist) -> time * (params.isFollowTruckRoute() && !graph.isTruckRoute(edgeId) ? params.getTruckRouteMultiplier() : 1);
+				? (edgeId, time, dist) -> dist * getMultiplier(edgeId) : (edgeId, time, dist) -> time * getMultiplier(edgeId);
 		
 		final BiFunction<Integer,LocalDateTime,Short> speedFunction = params.isEnabled(RouteOption.TRAFFIC) ? graph::getEffectiveSpeed : (edgeId,time) -> graph.getSpeedLimit(edgeId);
 		
@@ -138,7 +152,7 @@ public class DijkstraShortestPath {
 			double length = graph.getReversed(startEdgeId) ? startEdge.getFromSplitLength() : startEdge.getToSplitLength();
 			double time = length * 3.6 / speedFunction.apply(startEdgeId, startTime);
 			double cost = costFunction.apply(startEdgeId, time, length);
-			if(params.isEnabled(RouteOption.XINGCOSTS)) {
+			if(params.isEnabled(RouteOption.XING_COSTS)) {
 				double xingCost = params.getXingCost(graph.getToImpactor(startEdgeId), graph.getXingClass(startEdgeId));
 				time += xingCost;
 				if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
@@ -155,13 +169,18 @@ public class DijkstraShortestPath {
 		DijkstraWalker walker;
 		while((walker = queue.poll()) != null) {
 			checkedEdgeCount++;
+			// escape from infinite loop!
+			if(checkedEdgeCount > graph.numEdges() * 2) {
+				logger.error("Infinite routing loop encountered, investigation required!");
+				break;
+			}
 
 			int nodeId = walker.getNodeId();
 			int fromEdgeId = walker.getEdgeId();
 			for(int edgeId = graph.nextEdge(nodeId, BasicGraph.NO_EDGE); edgeId != BasicGraph.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
-				// if we've already been to this non-end, non-internal edge
+				// if we've already been to this non-end, non-internal edge, or it is part of a loop
 				List<Integer> endEdges = endEdgesById.get(edgeId);
-				if(endEdges == null && edgeIdVisisted[edgeId] && (!params.isEnabled(RouteOption.TURNRESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) {
+				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) || isLoop(edgeId, walker))) {
 					// skip it
 					continue;
 				}
@@ -188,7 +207,7 @@ public class DijkstraShortestPath {
 				LocalDateTime currentDateTime = null;
 				int overrideTravelSeconds = -1;
 				int waitTime = 0;
-				if(params.isEnabled(RouteOption.TIMEDEPENDENCY)) {
+				if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
 					currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.getTime())), RouterConfig.DEFAULT_TIME_ZONE);
 					if(params.isEnabled(RouteOption.EVENTS)) {
 						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime);
@@ -216,7 +235,7 @@ public class DijkstraShortestPath {
 						}
 					}
 				}
-				if(!params.isEnabled(RouteOption.TIMEDEPENDENCY) || !params.isEnabled(RouteOption.SCHEDULING)) {
+				if(!params.isEnabled(RouteOption.TIME_DEPENDENCY) || !params.isEnabled(RouteOption.SCHEDULING)) {
 					FerryInfo info = graph.getScheduleLookup().getFerryInfo(edgeId);
 					if(info != null && info.getMinWaitTime() > 0) {
 						waitTime = info.getMinWaitTime();
@@ -224,10 +243,10 @@ public class DijkstraShortestPath {
 				}
 				
 				TurnDirection turnDir = TurnDirection.CENTER;
-				if(params.isEnabled(RouteOption.TURNRESTRICTIONS) || params.isEnabled(RouteOption.TURNCOSTS)) {
-					turnDir = graph.getTurnLookup().lookupTurn(edgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURNRESTRICTIONS));
+				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
+					turnDir = graph.getTurnLookup().lookupTurn(edgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
 				}
-				if(params.isEnabled(RouteOption.TURNRESTRICTIONS) && turnDir == null) continue;
+				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
 
 				// TODO possibly allow U-turns in some situations/params
 				if(edgeId == graph.getOtherEdgeId(fromEdgeId)) {
@@ -238,7 +257,7 @@ public class DijkstraShortestPath {
 
 				// use the turnDirection to calculate the turn cost, if turncosts are on
 				double turnCost = 0; 
-				if(params.isEnabled(RouteOption.TURNCOSTS)) {
+				if(params.isEnabled(RouteOption.TURN_COSTS)) {
 					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.getEdgeId()));
 				}
 
@@ -286,7 +305,7 @@ public class DijkstraShortestPath {
 				double time = walker.getTime() + edgeTime;
 				double dist = walker.getDist() + length;
 				double cost = walker.getCost() + costFunction.apply(edgeId, edgeTime, length);
-				if(params.isEnabled(RouteOption.XINGCOSTS)) {
+				if(params.isEnabled(RouteOption.XING_COSTS)) {
 					double xingCost = params.getXingCost(graph.getToImpactor(edgeId), graph.getXingClass(edgeId));
 					time += xingCost;
 					if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
@@ -325,6 +344,16 @@ public class DijkstraShortestPath {
 			}
 		}
 		return paths;
+	}
+	
+	private boolean isLoop(int edgeId, DijkstraWalker walker) {
+		for(int count = 1; count < 6 && walker != null; count++) {
+			if(walker.getEdgeId() == edgeId) {
+				return true;
+			}
+			walker = walker.getFrom();
+		}
+		return false;
 	}
 	
 	private double getAngle(int fromEdgeId, int toEdgeId) {

@@ -17,11 +17,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
@@ -58,6 +60,7 @@ import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.TruckNoticeType;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
 import ca.bc.gov.ols.router.data.vis.VisTurnRestriction;
@@ -92,6 +95,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	private List<Integer> ferryEdges;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<RoadTruckNoticeEvent> truckNoticeIdMap = new TIntObjectHashMap<RoadTruckNoticeEvent>();
+	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();
 	
 	
 	public BasicGraphBuilder(RouterConfig config, GeometryReprojector reprojector) {
@@ -115,7 +119,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		boolean oneWay = seg.getTravelDirection() != TravelDirection.BIDIRECTIONAL;
 		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, ls, oneWay, seg.getSpeedLimit(), 
 				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(), 
-				seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
+				seg.getRoadClass(), seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
 				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), seg.isDeadEnded());
 		edgeIdBySegId.put(seg.getSegmentId(), edgeIds);
@@ -170,27 +174,32 @@ public class BasicGraphBuilder implements GraphBuilder {
 				// we save them for now and then compare them against the nodeId to find the right one  
 				edgeIds = edgeIdBySegId.get(oldIds[i]);
 				if(edgeIds == null) {
-					logger.warn("Invalid segmentId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
+					logger.warn("Invalid segmentId in turn restrictions: {} (turn restriction ignored)", oldIds[i]);
 					return null;
 				}
 			} else {
 				// odd indexes are node Ids
 				Integer nodeId = nodeIdByIntId.get(oldIds[i]);
-				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
-					nodeId = nodeIdByIntId.get(-oldIds[i]); // try the negative intId, for an overpass case
-				}
-				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
-					logger.warn("Invalid intersectionId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
+				Integer	nodeIdOverpass = nodeIdByIntId.get(-oldIds[i]); // try the negative intId, for an overpass case
+				if(nodeId == nodeIdByIntId.getNoEntryValue() && nodeIdOverpass == nodeIdByIntId.getNoEntryValue()) {
+					logger.warn("Invalid intersectionId in turn restrictions: {} (turn restriction ignored)", oldIds[i]);
 					return null;
 				}
-				newIds[i] = nodeId;
 				// determine which segmentId to use for the previous segment
 				if(graph.getToNodeId(edgeIds[0]) == nodeId) {
+					newIds[i] = nodeId;
+					newIds[i-1] = edgeIds[0]; 
+				} else if(graph.getToNodeId(edgeIds[0]) == nodeIdOverpass) {
+					newIds[i] = nodeIdOverpass;
 					newIds[i-1] = edgeIds[0]; 
 				} else if(edgeIds.length > 1 && graph.getToNodeId(edgeIds[1]) == nodeId) {
+					newIds[i] = nodeId;
+					newIds[i-1] = edgeIds[1];
+				} else if(edgeIds.length > 1 && graph.getToNodeId(edgeIds[1]) == nodeIdOverpass) {
+					newIds[i] = nodeIdOverpass;
 					newIds[i-1] = edgeIds[1];
 				} else {
-					logger.warn("Invalid segment/intersectionId sequence in turn costs: {}|{} (turn cost/restriction ignored)", oldIds[i-1], oldIds[i]);
+					logger.warn("Invalid segment/intersectionId sequence in turn restrictions: {}|{} (turn restriction ignored)", oldIds[i-1], oldIds[i]);
 					return null;
 				}
 			}
@@ -198,7 +207,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		if(edgeIds == null) {
 			// shouldn't happen unless there was bad input
 			if(logger.isWarnEnabled()) {
-				logger.warn("Invalid Id sequence in turn costs: {} (turn cost/restriction ignored)", Arrays.toString(oldIds));
+				logger.warn("Invalid Id sequence in turn restrictions: {} (turn restriction ignored)", Arrays.toString(oldIds));
 			}
 			return null;			
 		}
@@ -209,7 +218,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		} else if(edgeIds.length > 1 && graph.getFromNodeId(edgeIds[1]) == lastNodeId) {
 			newIds[newIds.length-1] = edgeIds[1];
 		} else {
-			logger.warn("Invalid intersectionId/segment sequence in turn restrictions/classes: {}|{} (turn cost/restriction ignored)", oldIds[oldIds.length-2], oldIds[oldIds.length-1]);
+			logger.warn("Invalid intersectionId/segment sequence in turn restrictions: {}|{} (turn restriction ignored)", oldIds[oldIds.length-2], oldIds[oldIds.length-1]);
 			return null;
 		}
 		return newIds;
@@ -467,6 +476,8 @@ public class BasicGraphBuilder implements GraphBuilder {
 			if(type != null && description != null && !description.isBlank()) {
 				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(TemporalSet.ALWAYS, type, description);
 				truckNoticeIdMap.put(id, event);
+			} else {
+				logger.warn("Invalid Truck Notice ({},{},{})", id, type, description);
 			}
 		}
 
@@ -481,6 +492,31 @@ public class BasicGraphBuilder implements GraphBuilder {
 					eventLookup.addEvent(edgeId, truckNoticeIdMap.get(noticeId));
 				}
 			}
+		}
+	}
+
+	@Override
+	public void addLocalDistortionField(RowReader localDistortionFieldReader) {
+		while(localDistortionFieldReader.next()) {
+			int segId = localDistortionFieldReader.getInt("STREET_SEGMENT_ID");
+			Set<VehicleType> vehicleTypes = VehicleType.fromList(localDistortionFieldReader.getString("VEHICLE_TYPES"));
+			Double frictionFactor = localDistortionFieldReader.getDouble("FRICTION_FACTOR");
+			int[] edgeIds = edgeIdBySegId.get(segId);
+			if(edgeIds == null) {
+				logger.warn("local distortion field references unknown street_segment_id {}", segId);
+			} else {
+				for(int edgeId : edgeIds) {
+					EnumMap<VehicleType, Double> frictionFactors = localDistortionField.get(edgeId);
+					if(frictionFactors == null) {
+						frictionFactors = new EnumMap<VehicleType, Double>(VehicleType.class);
+						localDistortionField.put(edgeId, frictionFactors);
+					}
+					for(VehicleType type : vehicleTypes) {
+						frictionFactors.put(type, frictionFactor);
+					}
+				}
+			}
+			
 		}
 	}
 
@@ -503,6 +539,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
 		graph.setTrafficLookup(trafficLookupBuilder.build());
+		graph.setLocalDistortionField(localDistortionField);
 		buildTurnRestrictionLayer();
 		layers.buildIndexes();
 		graph.setVisLayers(layers);

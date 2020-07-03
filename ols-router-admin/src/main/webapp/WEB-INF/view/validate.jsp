@@ -51,19 +51,19 @@
     <c:forEach var="diff" items="${comparison.configParamDiffs}">
       <tr>
       <c:choose>
-        <c:when test="${diff.db == null}">
+        <c:when test="${diff.current == null}">
       	  <td colspan="3">Not Present</td>
       	</c:when>
       	<c:otherwise>
-          <td>${diff.db.appId}</td><td>${diff.db.configParamName}</td><td>${diff.db.configParamValue}</td>
+          <td>${diff.current.appId}</td><td>${diff.current.configParamName}</td><td>${diff.current.configParamValue}</td>
         </c:otherwise>
       </c:choose>
       <c:choose>
-        <c:when test="${diff.file == null}">
+        <c:when test="${diff.other == null}">
       	  <td colspan="3">Not Present</td>
       	</c:when>
       	<c:otherwise>
-          <td>${diff.file.appId}</td><td>${diff.file.configParamName}</td><td>${diff.file.configParamValue}</td>
+          <td>${diff.other.appId}</td><td>${diff.other.configParamName}</td><td>${diff.other.configParamValue}</td>
         </c:otherwise>
       </c:choose>
       </tr>

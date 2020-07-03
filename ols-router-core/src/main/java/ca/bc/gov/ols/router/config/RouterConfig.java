@@ -17,7 +17,7 @@ import ca.bc.gov.ols.config.ConfigurationParameter;
 import ca.bc.gov.ols.config.ConfigurationStore;
 
 public class RouterConfig {
-	public static final String VERSION = "2.1.0";
+	public static final String VERSION = "2.1.3";
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
@@ -45,6 +45,8 @@ public class RouterConfig {
 	protected String defaultEnableOptions = "tc,xc,tr";
 	protected double[] defaultXingCost = {5,7,10,1.5};
 	protected double[] defaultTurnCost = {3,1,5,2};
+	protected String defaultGlobalDistortionField = "";
+	private double defaultTruckRouteMultiplier = 9;
 		
 	public RouterConfig() {
 		INSTANCE = this;
@@ -104,6 +106,12 @@ public class RouterConfig {
 					break;
 				case "defaultTurnCost":
 					defaultTurnCost = Arrays.asList(value.split(",")).stream().mapToDouble(Double::parseDouble).toArray();
+					break;
+				case "defaultGlobalDistortionField":
+					defaultGlobalDistortionField = value;
+					break;
+				case "defaultTruckRouteMultiplier":
+					defaultTruckRouteMultiplier = Double.parseDouble(value);
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -188,6 +196,14 @@ public class RouterConfig {
 
 	public double[] getDefaultTurnCost() {
 		return defaultTurnCost;
+	}
+
+	public String getDefaultGlobalDistortionField() {
+		return defaultGlobalDistortionField;
+	}
+
+	public double getDefaultTruckRouteMultiplier() {
+		return defaultTruckRouteMultiplier;
 	}
 
 	

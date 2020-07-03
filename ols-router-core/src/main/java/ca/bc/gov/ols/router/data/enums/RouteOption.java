@@ -11,13 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum RouteOption {
-	TIMEDEPENDENCY("td"),
-	TURNCOSTS("tc"),
-	TURNRESTRICTIONS("tr"),
-	XINGCOSTS("xc"),
-	EVENTS("ev"), 
+	EVENTS("ev"),
+	GLOBAL_DISTORTION_FIELD("gdf"),
+	LOCAL_DISTORTION_FIELD("ldf"),
+	SCHEDULING("sc"), 
+	TIME_DEPENDENCY("td"),
 	TRAFFIC("tf"),
-	SCHEDULING("sc"); 
+	TURN_COSTS("tc"),
+	TURN_RESTRICTIONS("tr"),
+	XING_COSTS("xc");
 	
 	private static final Logger logger = LoggerFactory.getLogger(RouteOption.class.getCanonicalName());
 	
