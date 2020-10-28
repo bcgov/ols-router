@@ -1,4 +1,4 @@
-# Location Services Product Vision (draft)
+# Location Services Product Vision
 
 ## Strategic Objectives
 |||
