@@ -8,7 +8,7 @@
 **NEVER FAR**|No public facilities or services that are hard to find or reach by road
 
 ## Slogan
-Find a better way with BC Digital Road Services
+Find a better way with BC Location Services
 
 ## BC Route Planner
 Road and ferry travel are essential to conducting business and serving the citizens of the Province of British Columbia. Route planning can be used to find the best routes, determine proximity of clients to service delivery locations, and optimize goods and service delivery.  Route planning is useful in many government business activities, from field operations to resource and emergency planning, policy-making, and law-making.
