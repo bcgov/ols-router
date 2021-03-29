@@ -11,6 +11,7 @@ import gnu.trove.procedure.TIntObjectProcedure;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -473,8 +474,14 @@ public class BasicGraphBuilder implements GraphBuilder {
 			int id = truckNoticeReader.getInt("TRUCK_NOTICE_ID");
 			TruckNoticeType type = TruckNoticeType.convert(truckNoticeReader.getString("TYPE"));
 			String description = truckNoticeReader.getString("DESCRIPTION");
+			LocalDate startDate = truckNoticeReader.getDate("START_DATE");
+			LocalDate endDate = truckNoticeReader.getDate("END_DATE");
+			TemporalSet dateRange = TemporalSet.ALWAYS;
+			if(startDate != null && endDate != null) {
+				dateRange = new DateInterval(startDate, endDate);
+			}
 			if(type != null && description != null && !description.isBlank()) {
-				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(TemporalSet.ALWAYS, type, description);
+				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(dateRange, type, description);
 				truckNoticeIdMap.put(id, event);
 			} else {
 				logger.warn("Invalid Truck Notice ({},{},{})", id, type, description);
