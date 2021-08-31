@@ -4,8 +4,10 @@ labels:
     template: caddy-minio-pvc
 message: |-
     The following service(s) have been created in your project:
+
       ${MINIO_SERVICE_NAME}
       ${CADDY_SERVICE_NAME}
+
     For more information abotu using this template, including OpenShift considerations, please contact teh rocketchat community.
     This Template will add the following objects:
 
