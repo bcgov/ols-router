@@ -27,13 +27,13 @@ https://delivery.apps.gov.bc.ca/artifactory/
 
 ## Templates
 
-### `caddy-minio-pvc-template.yaml`
+## `caddy-minio-pvc-template.yaml`
 
 This Template provisions a Caddy server and a MinIO sever that share the same PVC.
 * Minio is used to transport/upate the data files.
 * Caddy is used to server the data files to the route planner API - when the pod startes it reads source data files from the caddy server.
 
-#### Example
+### Example
 ```bash
 #!/bin/bash
 
@@ -53,7 +53,7 @@ oc \
       -n ${namespace} -f - # --dry-run=client
 ```
 
-### `router.buildconfigs.template.yaml`
+## `router.buildconfigs.template.yaml`
 
 This contains the build config for:  
 `ols-router-admin-sidecar`  
@@ -66,10 +66,24 @@ The resulting BuildConfig, when run, created an imageStream containing the indic
   * It's purpose is to "copy the ols-router-admin.war to /app/ROOT.war"
   * The long-running container then launches tomcat which subsequently loads the WAR, thus starting the application.
 
-For details on the patter being used see:
+For details on the pattern being used see:
   https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
 
-### `router.template.yaml`
+### Example  
+```bash
+oc process -f router.buildconfigs.template.yaml -o yaml \
+ | oc apply -f - -n 1475a9-tools
+```
+#### Remove
+```bash
+# use get first to check
+oc get all -l template=router-sidecar-buildconfigs -n 1475a9-tools
+...
+# use delete
+oc delete all -l template=router-sidecar-buildconfigs -n 1475a9-tools
+```
+
+## `router.template.yaml`
 
 This provision all the objects relevant to the Route Planner API.  This includes
 
@@ -79,7 +93,7 @@ This provision all the objects relevant to the Route Planner API.  This includes
 * necessary services and routes
 * necessary NetworPolcies.
 
-#### Example
+### Example
 
 ```bash
 #!/bin/bash
@@ -99,4 +113,27 @@ oc process -f router-template.yaml \
     | oc apply -f - -n ${NS} #\
     #--dry-run=client
     #| yq -C - r
+```
+#### Alternatively  
+```bash
+$ cat dev.env
+TOOLS_NAMESPACE=1475a9-tools
+ENV=dev
+# change this to your configured secret
+DEFAULT_DOCKERCFG=default-dockercfg-XXXXX
+ROUTER_IS_TAG=latest
+DATA_ADMIN_IS_TAG=latest
+$
+$
+$ oc process -f router.template.yaml --param-file=dev.env -o yaml
+
+```
+
+#### Remove
+
+```bash
+# use get first to check
+oc get all -n 1475a9-dev -l template=route-planner-template-databc
+# delete
+oc delete all -n 1475a9-dev -l template=route-planner-template-databc
 ```

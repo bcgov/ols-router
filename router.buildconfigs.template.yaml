@@ -63,12 +63,13 @@ parameters:
     displayName: Route Planner API BuildConfig Name
     name: ROUTE_PLANNER_BUILD_CONFIG_NAME
     required: true
-    value: ols-router-sidecar
+    #value: ols-router-sidecar
+    value: sidecar-router
   - description: The name of the Config Admin WebApp Build Config to be created
     displayName: Config Admin WebApp BuildConfig Name
     name: ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME
     required: true
-    value: ols-router-sidecar
+    value: sidecar-router-admin
 
   - description: The Url for the designated Artifactory server.
     displayName: Artifactory URL
