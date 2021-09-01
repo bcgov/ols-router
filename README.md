@@ -115,6 +115,7 @@ oc process -f router-template.yaml \
     #| yq -C - r
 ```
 #### Alternatively  
+Copy or rename `example.env` to `dev.env` for this example to work. _make changes as required
 ```bash
 $ cat dev.env
 TOOLS_NAMESPACE=1475a9-tools
