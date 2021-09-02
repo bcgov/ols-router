@@ -33,6 +33,7 @@ message: |-
 
   StatefulSet
     cassandra-${APP_NAME} - Cassandra cluster
+    ols-router-web        - Route Planne API cluster
 
   Service
     cassandra-${APP_NAME} - Cassandra
@@ -43,7 +44,7 @@ message: |-
     ols-router-admin      - Router - Config Admin WebApp
 
   DeploymentConfig
-    ols-router-web        - Route Planner API WebApp
+    N/A
 
   Deployment
     ols-router-admin      - Config Admin WebApp - Deployment
@@ -239,41 +240,59 @@ objects:
     sessionAffinity: None
     type: ClusterIP
 
-- kind: DeploymentConfig
-  apiVersion: apps.openshift.io/v1
+# This is the new StatefulSet
+- kind: StatefulSet
+  apiVersion: apps/v1
   metadata:
     labels:
       app: ols-router-web
-      name: ols-router-web
-      template: ols-router-web
+      statefulset: ols-router-web
     name: ols-router-web
   spec:
+    podManagementPolicy: OrderedReady
     replicas: 4
     revisionHistoryLimit: 10
     selector:
-      app: ols-router-web
-      deploymentconfig: ols-router-web
-    strategy:
-      activeDeadlineSeconds: 21600
-      resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      matchLabels:
+        statefulset: ols-router-web
+    serviceName: ols-router-web
     template:
       metadata:
-        creationTimestamp: null
         labels:
           app: ols-router-web
-          deploymentconfig: ols-router-web
+          statefulset: ols-router-web
       spec:
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                - key: statefulset
+                  operator: In
+                  values:
+                  - ols-router-web
+              topologyKey: kubernetes.io/hostname
         imagePullSecrets:
         - name: ${DOCKER_SECRET}
         - name: ${DEFAULT_DOCKERCFG}
+
+        initContainers:
+        - command:
+          - cp
+          - /ols-router.war
+          - /app/ROOT.war
+          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
+          imagePullPolicy: Always
+          name: war
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app
+            name: app-volume
+
         containers:
+
         - command:
           - catalina.sh
           - run
@@ -313,7 +332,7 @@ objects:
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /usr/local/tomcat/logs
-            name: tc-work
+            name: router-logs
           - mountPath: /usr/local/tomcat/work
             name: tc-work
           - mountPath: /usr/local/tomcat/temp
@@ -322,21 +341,8 @@ objects:
             name: tc-conf
           - mountPath: /usr/local/tomcat/webapps
             name: app-volume
+
         dnsPolicy: ClusterFirst
-        initContainers:
-        - command:
-          - cp
-          - /ols-router.war
-          - /app/ROOT.war
-          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
-          imagePullPolicy: Always
-          name: war
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /app
-            name: app-volume
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -348,10 +354,134 @@ objects:
           name: tc-conf
         - emptyDir: {}
           name: app-volume
-    test: false
-    triggers:
-    - type: ConfigChange
-  status: {}
+    updateStrategy:
+      rollingUpdate:
+        partition: 0
+      type: RollingUpdate
+    volumeClaimTemplates:
+    - metadata:
+        name: router-logs
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: netapp-block-standard
+
+# - kind: DeploymentConfig
+#   apiVersion: apps.openshift.io/v1
+#   metadata:
+#     labels:
+#       app: ols-router-web
+#       name: ols-router-web
+#       template: ols-router-web
+#     name: ols-router-web
+#   spec:
+#     replicas: 4
+#     revisionHistoryLimit: 10
+#     selector:
+#       app: ols-router-web
+#       deploymentconfig: ols-router-web
+#     strategy:
+#       activeDeadlineSeconds: 21600
+#       resources: {}
+#       rollingParams:
+#         intervalSeconds: 1
+#         maxSurge: 25%
+#         maxUnavailable: 25%
+#         timeoutSeconds: 600
+#         updatePeriodSeconds: 1
+#       type: Rolling
+#     template:
+#       metadata:
+#         creationTimestamp: null
+#         labels:
+#           app: ols-router-web
+#           deploymentconfig: ols-router-web
+#       spec:
+#         imagePullSecrets:
+#         - name: ${DOCKER_SECRET}
+#         - name: ${DEFAULT_DOCKERCFG}
+#         containers:
+#         - command:
+#           - catalina.sh
+#           - run
+#           env:
+#           - name: CATALINA_BASE
+#             value: /usr/local/tomcat
+#           - name: JAVA_OPTS
+#             value: -XX:OnOutOfMemoryError="kill -15 %p" -XX:MaxRAMPercentage=75.0
+#           - name: OLS_CASSANDRA_LOCAL_DATACENTER
+#             value: DC1
+#           - name: OLS_CASSANDRA_CONTACT_POINT
+#             value: cassandra-${APP_NAME}
+#           - name: OLS_CASSANDRA_KEYSPACE
+#             value: bgeo
+#           image: docker-remote.artifacts.developer.gov.bc.ca/tomcat:9-jre11-slim
+#           imagePullPolicy: IfNotPresent
+#           name: tomcat
+#           ports:
+#           - containerPort: 8080
+#             name: catalina-http
+#             protocol: TCP
+#           readinessProbe:
+#             failureThreshold: 3
+#             httpGet:
+#               path: /ping
+#               port: 8080
+#               scheme: HTTP
+#             initialDelaySeconds: 270
+#             periodSeconds: 10
+#             successThreshold: 1
+#             timeoutSeconds: 1
+#           resources:
+#             limits:
+#               cpu: "500m"
+#               memory: 2Gi
+#           terminationMessagePath: /dev/termination-log
+#           terminationMessagePolicy: File
+#           volumeMounts:
+#           - mountPath: /usr/local/tomcat/logs
+#             name: tc-work
+#           - mountPath: /usr/local/tomcat/work
+#             name: tc-work
+#           - mountPath: /usr/local/tomcat/temp
+#             name: tc-work
+#           - mountPath: /usr/local/tomcat/conf/Catalina
+#             name: tc-conf
+#           - mountPath: /usr/local/tomcat/webapps
+#             name: app-volume
+#         dnsPolicy: ClusterFirst
+#         initContainers:
+#         - command:
+#           - cp
+#           - /ols-router.war
+#           - /app/ROOT.war
+#           image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
+#           imagePullPolicy: Always
+#           name: war
+#           resources: {}
+#           terminationMessagePath: /dev/termination-log
+#           terminationMessagePolicy: File
+#           volumeMounts:
+#           - mountPath: /app
+#             name: app-volume
+#         restartPolicy: Always
+#         schedulerName: default-scheduler
+#         securityContext: {}
+#         terminationGracePeriodSeconds: 30
+#         volumes:
+#         - emptyDir: {}
+#           name: tc-work
+#         - emptyDir: {}
+#           name: tc-conf
+#         - emptyDir: {}
+#           name: app-volume
+#     test: false
+#     triggers:
+#     - type: ConfigChange
+#   status: {}
 
 - kind: Deployment
   apiVersion: apps/v1
