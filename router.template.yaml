@@ -8,14 +8,12 @@ metadata:
   annotations:
     openshift.io/display-name: "DataBC Route Planner API"
     description: >-
-      An example Route Planner APU application with a Cassandra cluster,
+      An example Route Planner API application with a Cassandra cluster,
       a Data Admin WebApp and a Router Planer API. For more information
       about using this template, including OpenShift considerations, see
-      https://github.com/sclorg/cakephp-ex/blob/master/README.md.
+      https://docs.openshift.com/container-platform/4.6/openshift_images/using-templates.html.
 
-
-      WARNING: Any data stored will be lost upon pod destruction. Only use this
-      template for testing."
+      Note: Logs for router nodes are persisted in PCVs.
     openshift.io/long-description: >-
       This template defines resources needed to develop a Route Planner API
       application, including a build configuration, application DeploymentConfig, and
