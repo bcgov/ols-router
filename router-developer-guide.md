@@ -63,7 +63,7 @@ https://router.api.gov.bc.ca/truck/distance.json?routeDescription=fastest%20dist
 
 and here is the json response:
 
-```
+```json
 {
   "routeDescription": "fastest distance in km and json",
   "searchTimestamp": "2020-03-29 23:27:48",
@@ -152,7 +152,7 @@ https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2
 
 and here's the json response:
 
-```
+```json
 {
   "routeDescription": null,
   "searchTimestamp": "2020-03-29 23:38:35",
@@ -313,7 +313,7 @@ https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611
 
 and here's the json response:
 
-```
+```json
 {
   "routeDescription": null,
   "searchTimestamp": "2020-03-29 22:52:31",
@@ -478,7 +478,7 @@ https://router.api.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.2849
 
 and here's the json response:
 
-```
+```json
 {
   "routeDescription": null,
   "searchTimestamp": "2020-03-29 20:54:12",
@@ -1117,6 +1117,7 @@ Attribute Name |	Type
 
 Here is a sample json response:
 
+```json
     {
 	"routeDescription": "",
 	"searchTimestamp": "2018-02-20 16:36:39.254",
@@ -1170,6 +1171,7 @@ Here is a sample json response:
 		[-123.36002, 48.42919]
 	]
     }
+```
 
 The visitOrder values need a bit more explanation. The points in the request in example 2 above are given in the following order:
 
@@ -1237,7 +1239,7 @@ Attribute Name |	Type
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List
 
 Here is a sample json response:
-
+```json
     {
 	"routeDescription": "",
 	"searchTimestamp": "2018-02-20 16:09:36.298",
@@ -1349,3 +1351,4 @@ Here is a sample json response:
 		"point": [-123.36002, 48.42919]
 	}]
     }
+    ```
