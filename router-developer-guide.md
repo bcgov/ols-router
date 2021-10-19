@@ -1239,7 +1239,8 @@ Attribute Name |	Type
 [directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List
 
 Here is a sample json response:
-```json
+```
+json
     {
 	"routeDescription": "",
 	"searchTimestamp": "2018-02-20 16:09:36.298",
