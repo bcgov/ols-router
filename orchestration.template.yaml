@@ -1,10 +1,9 @@
 apiVersion: template.openshift.io/v1
 kind: Template
 labels:
-  template: route-planner-template-databc
+  template: cassandra-test-template
 metadata:
-  name: route-planner-template-databc
-
+  name: cassandra-test-template
   annotations:
     openshift.io/display-name: "DataBC Route Planner API"
     description: >-
@@ -12,8 +11,8 @@ metadata:
       a Data Admin WebApp and a Router Planer API. For more information
       about using this template, including OpenShift considerations, see
       https://docs.openshift.com/container-platform/4.6/openshift_images/using-templates.html.
-
       Note: Logs for router nodes are persisted in PCVs.
+
     openshift.io/long-description: >-
       This template defines resources needed to develop a Route Planner API
       application, including a build configuration, application DeploymentConfig, and
@@ -25,6 +24,7 @@ metadata:
     openshift.io/provider-display-name: "Data Systems and Services, DataBC"
     openshift.io/documentation-url: "https://github.com/bcgov/ols-router"
     openshift.io/support-url: "https://access.redhat.com"
+
 message: |-
   Your admin credentials are ${ADMIN_USERNAME}:${ADMIN_PASSWORD}
   The following objects have been created in you project:
@@ -89,7 +89,6 @@ parameters:
     required: true
     # e.g.
     # value: default-dockercfg-jgsbn
-
   - description: docker-secret for the 'default' Service account for Artifactory
     displayName: Default service account Artifactory docker Secret
     name: DOCKER_SECRET
@@ -103,7 +102,66 @@ parameters:
     description: "The image stream tag to use for the ols-admin-sidecar"
     required: true
 
+  - name: DATASTORE_URL
+    description: "the URL for the datastore"
+    required: true
+    value: https://router-datastore-prod.apps.silver.devops.gov.bc.ca/router/
+
 objects:
+
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    name: bgeo-configuration-parameters
+  data:
+    bgeo_configuration_parameters.csv: |-
+      app_id^config_param_name^config_param_value
+      ROUTER^baseSrsCode^3005
+      ROUTER^copyrightLicenseURI^https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61
+      ROUTER^copyrightNotice^Copyright 2020 Province of British Columbia - Open Government License
+      ROUTER^dataSource.baseFileUrl^${DATASTORE_URL}
+      ROUTER^dataSource.baseFileUrl.devel^http://ols-router-data:8080
+      ROUTER^dataSource.className^ca.bc.gov.ols.router.datasource.FileRouterDataSource
+      ROUTER^defaultDisableOptions^TD,EV,SC,TF
+      ROUTER^defaultEnableOptions^GDF,LDF,TR,XC,TC
+      ROUTER^defaultGlobalDistortionField^alleyway:1.2,alleyway.truck:1.1,arterial_major:1.01,arterial_major.truck:1.01,arterial_minor:1.01,arterial_minor.truck:1.01,collector_major:1.01,collector_major.truck:1.01,collector_minor:1.01,collector_minor.truck:1.01,driveway:1.2,driveway.truck:1.1,ferry:1,ferry.truck:1,freeway:1,freeway.truck:1,highway_major:1,highway_major.truck:1,highway_minor:1,highway_minor.truck:1,lane:1.01,lane.truck:1.01,local:1.1,local.truck:1.05,ramp:1,ramp.truck:1,recreation:1.2,recreation.truck:1.1,resource:1.2,resource.truck:1.1,restricted:1.2,restricted.truck:1.1,service:1.2,service.truck:1.1,strata:1.2,strata.truck:1.1,yield_lane:1.01,yield_lane.truck:1.01
+      ROUTER^defaultTruckRouteMultiplier^9
+      ROUTER^defaultTurnCost^3,1,10,5
+      ROUTER^defaultXingCost^3,10,7,1.2
+      ROUTER^disclaimer^https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535
+      ROUTER^glossaryBaseUrl^https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
+      ROUTER^kmlStylesUrl^http://openmaps.gov.bc.ca/kml/router_results_styles.kml
+      ROUTER^maxOptimalRoutePoints^100
+      ROUTER^maxPairs^1000
+      ROUTER^maxRoutePoints^100
+      ROUTER^moreInfoUrl^https://www2.gov.bc.ca/gov/content?id=9D99E684CCD042CD88FADC51E079B4B5
+      ROUTER^privacyStatement^https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932
+
+    bgeo_keyspace_config.cql: |-
+      CREATE KEYSPACE bgeo WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '2'}  AND durable_writes = true;
+
+      CREATE TABLE bgeo.bgeo_configuration_parameters (
+          app_id text,
+          config_param_name text,
+          config_param_value text,
+          PRIMARY KEY (app_id, config_param_name)
+      ) WITH CLUSTERING ORDER BY (config_param_name ASC)
+          AND bloom_filter_fp_chance = 0.01
+          AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
+          AND comment = ''
+          AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+          AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+          AND crc_check_chance = 1.0
+          AND dclocal_read_repair_chance = 0.1
+          AND default_time_to_live = 0
+          AND gc_grace_seconds = 864000
+          AND max_index_interval = 2048
+          AND memtable_flush_period_in_ms = 0
+          AND min_index_interval = 128
+          AND read_repair_chance = 0.0
+          AND speculative_retry = '99PERCENTILE';
+
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -141,6 +199,7 @@ objects:
           - -R
           env:
           - name: MAX_HEAP_SIZE
+            #value: 1500M
             value: 2500M
           - name: HEAP_NEWSIZE
             value: 100M
@@ -160,6 +219,11 @@ objects:
           - name: CASSANDRA_ENDPOINT_SNITCH
             value: GossipingPropertyFileSnitch
           image: docker-remote.artifacts.developer.gov.bc.ca/cassandra:3.11.2
+          #image: tools/cassandra:3.11.2
+          #image: image-registry.openshift-image-registry.svc:5000/tools/cassandra:3.11.2
+          #image: image-registry.openshift-image-registry.svc:5000/tools/cassandra:3.11
+          #image: image-registry.openshift-image-registry.svc:5000/dev/cassandra:3.11
+          #image: registry.hub.docker.com/library/cassandra:3.11
           imagePullPolicy: Always
           lifecycle:
             preStop:
@@ -185,6 +249,7 @@ objects:
           resources:
             limits:
               cpu: 500m
+              #memory: 2Gi
               memory: 4Gi
             requests:
               cpu: 250m
@@ -219,7 +284,7 @@ objects:
         resources:
           requests:
             storage: 1Gi
-        storageClassName: netapp-block-standard
+        #storageClassName: netapp-block-standard
 
 - kind: Service
   apiVersion: v1
@@ -238,7 +303,6 @@ objects:
     sessionAffinity: None
     type: ClusterIP
 
-# This is the new StatefulSet
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -248,7 +312,7 @@ objects:
     name: ols-router-web
   spec:
     podManagementPolicy: OrderedReady
-    replicas: 4
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       matchLabels:
@@ -275,13 +339,14 @@ objects:
         - name: ${DEFAULT_DOCKERCFG}
 
         initContainers:
-        - command:
+        - name: war
+          # Copy the ols-router.war to the PVC
+          command:
           - cp
           - /ols-router.war
           - /app/ROOT.war
           image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
           imagePullPolicy: Always
-          name: war
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
@@ -290,18 +355,59 @@ objects:
             name: app-volume
 
         - name: init-wait-for-cassandra
-          image: image-registry.openshift-image-registry.svc:5000/988040-tools/busybox:1.33.1
-          command: ['sh', '-c']
-          args:
-            # wait for cassandra service to be ready
-            - while (:); do
-              nc -w 1 cassandra-${APP_NAME} 9042
-              if [ $? == 0 ]; then
-                break;
-              fi
+          image: docker-remote.artifacts.developer.gov.bc.ca/busybox:1.33.1
+          # Wait for cassandra service cassandra-${APP_NAME} to be ready.
+          # In other words, wait for cassandra to 'boot'
+          command:
+            - 'sh'
+            - '-c'
+            - while (:);
+               do
+                 nc -w 1 cassandra-${APP_NAME} 9042;
+                 if [ $? == 0 ];
+                 then break;
+                 fi;
+                 printf .;
+                 sleep 1;
+               done;
           volumeMounts:
           - name: router-logs
             mountPath: /app
+
+        - name: init-bgeo-keyspace
+          image: docker-remote.artifacts.developer.gov.bc.ca/cassandra:3.11.2
+          # Create the bgeo keyspace and the bgeo_configuration_parameters table.
+          command:
+            - 'cqlsh'
+            - cassandra-${APP_NAME}
+            - '-f'
+            - '/apps/bgeo/bgeo_keyspace_config.cql'
+          volumeMounts:
+          - name: bgeo-configuration-parameters
+            mountPath: /apps/bgeo
+
+        - name: load-bgeo-keyspace
+          # Load the bgeo.bgeo_configuration_parameters table with data from
+          # the config map.
+          image: docker-remote.artifacts.developer.gov.bc.ca/cassandra:3.11.2
+          # command:
+          #   - 'cqlsh'
+          #   - cassandra-${APP_NAME}
+          #   - '-e'
+          #   - DESCRIBE KEYSPACES
+          command:
+            - 'cqlsh'
+            - cassandra-${APP_NAME}
+            - '-k'
+            - bgeo
+            - '-e'
+            - COPY bgeo.bgeo_configuration_parameters
+              FROM '/apps/bgeo/bgeo_configuration_parameters.csv'
+              WITH DELIMITER='^'
+              AND HEADER=TRUE
+          volumeMounts:
+          - name: bgeo-configuration-parameters
+            mountPath: /apps/bgeo
 
 
         containers:
@@ -367,6 +473,10 @@ objects:
           name: tc-conf
         - emptyDir: {}
           name: app-volume
+        - name: bgeo-configuration-parameters
+          configMap:
+            name: bgeo-configuration-parameters
+
     updateStrategy:
       rollingUpdate:
         partition: 0
@@ -380,349 +490,3 @@ objects:
         resources:
           requests:
             storage: 1Gi
-        storageClassName: netapp-block-standard
-
-# - kind: DeploymentConfig
-#   apiVersion: apps.openshift.io/v1
-#   metadata:
-#     labels:
-#       app: ols-router-web
-#       name: ols-router-web
-#       template: ols-router-web
-#     name: ols-router-web
-#   spec:
-#     replicas: 4
-#     revisionHistoryLimit: 10
-#     selector:
-#       app: ols-router-web
-#       deploymentconfig: ols-router-web
-#     strategy:
-#       activeDeadlineSeconds: 21600
-#       resources: {}
-#       rollingParams:
-#         intervalSeconds: 1
-#         maxSurge: 25%
-#         maxUnavailable: 25%
-#         timeoutSeconds: 600
-#         updatePeriodSeconds: 1
-#       type: Rolling
-#     template:
-#       metadata:
-#         creationTimestamp: null
-#         labels:
-#           app: ols-router-web
-#           deploymentconfig: ols-router-web
-#       spec:
-#         imagePullSecrets:
-#         - name: ${DOCKER_SECRET}
-#         - name: ${DEFAULT_DOCKERCFG}
-#         containers:
-#         - command:
-#           - catalina.sh
-#           - run
-#           env:
-#           - name: CATALINA_BASE
-#             value: /usr/local/tomcat
-#           - name: JAVA_OPTS
-#             value: -XX:OnOutOfMemoryError="kill -15 %p" -XX:MaxRAMPercentage=75.0
-#           - name: OLS_CASSANDRA_LOCAL_DATACENTER
-#             value: DC1
-#           - name: OLS_CASSANDRA_CONTACT_POINT
-#             value: cassandra-${APP_NAME}
-#           - name: OLS_CASSANDRA_KEYSPACE
-#             value: bgeo
-#           image: docker-remote.artifacts.developer.gov.bc.ca/tomcat:9-jre11-slim
-#           imagePullPolicy: IfNotPresent
-#           name: tomcat
-#           ports:
-#           - containerPort: 8080
-#             name: catalina-http
-#             protocol: TCP
-#           readinessProbe:
-#             failureThreshold: 3
-#             httpGet:
-#               path: /ping
-#               port: 8080
-#               scheme: HTTP
-#             initialDelaySeconds: 270
-#             periodSeconds: 10
-#             successThreshold: 1
-#             timeoutSeconds: 1
-#           resources:
-#             limits:
-#               cpu: "500m"
-#               memory: 2Gi
-#           terminationMessagePath: /dev/termination-log
-#           terminationMessagePolicy: File
-#           volumeMounts:
-#           - mountPath: /usr/local/tomcat/logs
-#             name: tc-work
-#           - mountPath: /usr/local/tomcat/work
-#             name: tc-work
-#           - mountPath: /usr/local/tomcat/temp
-#             name: tc-work
-#           - mountPath: /usr/local/tomcat/conf/Catalina
-#             name: tc-conf
-#           - mountPath: /usr/local/tomcat/webapps
-#             name: app-volume
-#         dnsPolicy: ClusterFirst
-#         initContainers:
-#         - command:
-#           - cp
-#           - /ols-router.war
-#           - /app/ROOT.war
-#           image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
-#           imagePullPolicy: Always
-#           name: war
-#           resources: {}
-#           terminationMessagePath: /dev/termination-log
-#           terminationMessagePolicy: File
-#           volumeMounts:
-#           - mountPath: /app
-#             name: app-volume
-#         restartPolicy: Always
-#         schedulerName: default-scheduler
-#         securityContext: {}
-#         terminationGracePeriodSeconds: 30
-#         volumes:
-#         - emptyDir: {}
-#           name: tc-work
-#         - emptyDir: {}
-#           name: tc-conf
-#         - emptyDir: {}
-#           name: app-volume
-#     test: false
-#     triggers:
-#     - type: ConfigChange
-#   status: {}
-
-- kind: Deployment
-  apiVersion: apps/v1
-  metadata:
-    generation: 1
-    labels:
-      app: ols-router-admin
-      name: ols-router-admin
-      template: ols-router-admin
-    name: ols-router-admin
-  spec:
-    progressDeadlineSeconds: 600
-    replicas: 1
-    revisionHistoryLimit: 10
-    selector:
-      matchLabels:
-        app: ols-router-admin
-        name: ols-router-admin
-    strategy:
-      type: Recreate
-    template:
-      metadata:
-        creationTimestamp: null
-        labels:
-          app: ols-router-admin
-          name: ols-router-admin
-      spec:
-        imagePullSecrets:
-          - name: ${DOCKER_SECRET}
-          - name: ${DEFAULT_DOCKERCFG}
-          # e.g.
-          #- name: default-dockercfg-hb696
-        containers:
-        - command:
-          - catalina.sh
-          - run
-          env:
-          - name: CATALINA_BASE
-            value: /usr/local/tomcat
-          - name: OLS_CASSANDRA_LOCAL_DATACENTER
-            value: DC1
-          - name: OLS_CASSANDRA_CONTACT_POINT
-            value: cassandra-${APP_NAME}
-          - name: OLS_CASSANDRA_KEYSPACE
-            value: bgeo
-          image: docker-remote.artifacts.developer.gov.bc.ca/tomcat:9-jre11-slim
-          imagePullPolicy: IfNotPresent
-          name: tomcat
-          ports:
-          - containerPort: 8080
-            name: catalina-http
-            protocol: TCP
-          resources:
-            limits:
-              cpu: "500m"
-              memory: 2Gi
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /usr/local/tomcat/logs
-            name: tc-work
-          - mountPath: /usr/local/tomcat/work
-            name: tc-work
-          - mountPath: /usr/local/tomcat/temp
-            name: tc-work
-          - mountPath: /usr/local/tomcat/conf/Catalina
-            name: tc-conf
-          - mountPath: /usr/local/tomcat/webapps
-            name: app-volume
-        dnsPolicy: ClusterFirst
-        initContainers:
-        - command:
-          - cp
-          - /ols-router-admin.war
-          - /app/int.war
-          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-admin-sidecar:${DATA_ADMIN_IS_TAG}
-          imagePullPolicy: Always
-          name: war
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /app
-            name: app-volume
-        restartPolicy: Always
-        schedulerName: default-scheduler
-        securityContext: {}
-        terminationGracePeriodSeconds: 30
-        volumes:
-        - emptyDir: {}
-          name: tc-work
-        - emptyDir: {}
-          name: tc-conf
-        - emptyDir: {}
-          name: app-volume
-  status: {}
-
-- kind: Service
-  apiVersion: v1
-  metadata:
-    creationTimestamp: null
-    name: ols-router-admin
-  spec:
-    ports:
-    - name: ols-router-admin
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-    selector:
-      app: ols-router-admin
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-
-- kind: Route
-  apiVersion: route.openshift.io/v1
-  metadata:
-    creationTimestamp: null
-    name: ols-router-admin
-  spec:
-    host: ${ROUTER_ADMIN_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
-    path: /int/
-    port:
-      targetPort: ols-router-admin
-    tls:
-      termination: edge
-    to:
-      kind: Service
-      name: ols-router-admin
-      weight: 100
-    wildcardPolicy: None
-  status:
-    ingress: null
-
-- kind: Service
-  apiVersion: v1
-  metadata:
-    creationTimestamp: null
-    name: ols-router-web
-  spec:
-    ports:
-    - name: ols-router-web
-      port: 8080
-      protocol: TCP
-      targetPort: 8080
-    selector:
-      app: ols-router-web
-    sessionAffinity: None
-    type: ClusterIP
-  status:
-    loadBalancer: {}
-
-# For initial deployment you may want to create a route.
-# Routes should be managed through the Kong API Gateway.
-# see ... for instructions on how to configure Kong gateway
-# routes.
-#
-# - kind: Route
-#   apiVersion: route.openshift.io/v1
-#   metadata:
-#     creationTimestamp: null
-#     name: ols-router-api
-#   spec:
-#     host: ${ROUTER_API_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
-#     port:
-#       targetPort: ols-router-web
-#     tls:
-#       termination: edge
-#     to:
-#       kind: Service
-#       name: ols-router-web
-#       weight: 100
-#     wildcardPolicy: None
-#   status:
-#     ingress: null
-
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: allow-from-openshift-ingress
-  spec:
-    ingress:
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            network.openshift.io/policy-group: ingress
-    podSelector: {}
-    policyTypes:
-    - Ingress
-
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: allow-same-namespace
-  spec:
-    ingress:
-    - from:
-      - podSelector: {}
-    podSelector: {}
-    policyTypes:
-    - Ingress
-
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: deny-by-default
-  spec:
-    podSelector: {}
-    policyTypes:
-    - Ingress
-
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: allow-traffic-from-gateway-to-${APP_NAME}-${ENV}
-  spec:
-    podSelector:
-      matchLabels:
-        app: ols-router-web
-    ingress:
-      - from:
-          - namespaceSelector:
-              matchLabels:
-                environment: test
-                name: 264e6f
-      - from:
-          - namespaceSelector:
-              matchLabels:
-                environment: prod
-                name: 264e6f
