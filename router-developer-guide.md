@@ -8,6 +8,14 @@ The BC Route Planner REST API lets you integrate basic routing between BC locati
 
 Your application can store router results or display them on any web map. The BC Route Planner API supports GET and POST requests. POST should be used when you have many waypoints to visit.
 
+## Technical Overview
+
+Access to the BC Route Planner API  is mediated by the Data Systems and Services branch API Services Gateway.
+
+Source data for the BC Route Planner comes from the BC Digital Road Atlas which is updated on a monthly basis by GeoBC in the BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development. The BC Route Planner loads this data from files into in-memory data structures at startup. A small configuration file of global parameters is also loaded at startup from a redundant Apache Cassandra key-value Datastore.  
+
+The BC Route Planner is written in Java 11.0 and uses the jSprit open source libraries. The [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html) web application, which demonstrates the features of the BC Route Planner, is written in JavaScript and uses jQuery and Leaflet libraries and plugins.
+
 ## Limitations of Route Planner API v2.1
 Route Planner API v2.1 is backward-compatible with v2.0. There are still severe limitations on the new features and data in Route Planner v2.1 . For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
 
