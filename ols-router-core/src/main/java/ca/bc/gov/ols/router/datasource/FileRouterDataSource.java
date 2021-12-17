@@ -250,8 +250,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			String nameBody = reader.getString("name_body");
 			String streetType = reader.getString("street_type");
 			String streetTypeIsPrefix = reader.getString("street_type_is_prefix_ind");
-			String streetDir = reader.getString("street_dir");
-			String streetDirIsPrefix = reader.getString("street_dir_is_prefix_ind");
+			String streetDir = reader.getString("street_direction");
+			String streetDirIsPrefix = reader.getString("street_direction_is_prefix_ind");
 			String streetQualifier = reader.getString("street_qualifier");
 			
 			String fullName = null;
