@@ -894,7 +894,8 @@ public class RouterProcess {
 		for(int i = 0; i < trl.size(); i++) {
 			TurnRestriction oldTurnRestriction = trl.get(i);
 			if(oldTurnRestriction.getIdSeqString().equals(newTurnRestriction.getIdSeqString()) 
-					&& oldTurnRestriction.getVehicleTypes().equals(newTurnRestriction.getVehicleTypes())) {
+					&& (oldTurnRestriction.getVehicleTypes().equals(EnumSet.allOf(VehicleType.class)) 
+							|| oldTurnRestriction.getVehicleTypes().equals(newTurnRestriction.getVehicleTypes()))) {
 				// we are overwriting an existing restriction 
 				trl.set(i, newTurnRestriction);
 				if(oldTurnRestriction.getSourceDescription() != null && !oldTurnRestriction.getSourceDescription().isBlank()) {

@@ -11,6 +11,7 @@ import gnu.trove.procedure.TIntObjectProcedure;
 
 import java.io.IOException;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -174,27 +175,32 @@ public class BasicGraphBuilder implements GraphBuilder {
 				// we save them for now and then compare them against the nodeId to find the right one  
 				edgeIds = edgeIdBySegId.get(oldIds[i]);
 				if(edgeIds == null) {
-					logger.warn("Invalid segmentId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
+					logger.warn("Invalid segmentId in turn restrictions: {} (turn restriction ignored)", oldIds[i]);
 					return null;
 				}
 			} else {
 				// odd indexes are node Ids
 				Integer nodeId = nodeIdByIntId.get(oldIds[i]);
-				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
-					nodeId = nodeIdByIntId.get(-oldIds[i]); // try the negative intId, for an overpass case
-				}
-				if(nodeId == nodeIdByIntId.getNoEntryKey()) {
-					logger.warn("Invalid intersectionId in turn costs: {} (turn cost/restriction ignored)", oldIds[i]);
+				Integer	nodeIdOverpass = nodeIdByIntId.get(-oldIds[i]); // try the negative intId, for an overpass case
+				if(nodeId == nodeIdByIntId.getNoEntryValue() && nodeIdOverpass == nodeIdByIntId.getNoEntryValue()) {
+					logger.warn("Invalid intersectionId in turn restrictions: {} (turn restriction ignored)", oldIds[i]);
 					return null;
 				}
-				newIds[i] = nodeId;
 				// determine which segmentId to use for the previous segment
 				if(graph.getToNodeId(edgeIds[0]) == nodeId) {
+					newIds[i] = nodeId;
+					newIds[i-1] = edgeIds[0]; 
+				} else if(graph.getToNodeId(edgeIds[0]) == nodeIdOverpass) {
+					newIds[i] = nodeIdOverpass;
 					newIds[i-1] = edgeIds[0]; 
 				} else if(edgeIds.length > 1 && graph.getToNodeId(edgeIds[1]) == nodeId) {
+					newIds[i] = nodeId;
+					newIds[i-1] = edgeIds[1];
+				} else if(edgeIds.length > 1 && graph.getToNodeId(edgeIds[1]) == nodeIdOverpass) {
+					newIds[i] = nodeIdOverpass;
 					newIds[i-1] = edgeIds[1];
 				} else {
-					logger.warn("Invalid segment/intersectionId sequence in turn costs: {}|{} (turn cost/restriction ignored)", oldIds[i-1], oldIds[i]);
+					logger.warn("Invalid segment/intersectionId sequence in turn restrictions: {}|{} (turn restriction ignored)", oldIds[i-1], oldIds[i]);
 					return null;
 				}
 			}
@@ -202,7 +208,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		if(edgeIds == null) {
 			// shouldn't happen unless there was bad input
 			if(logger.isWarnEnabled()) {
-				logger.warn("Invalid Id sequence in turn costs: {} (turn cost/restriction ignored)", Arrays.toString(oldIds));
+				logger.warn("Invalid Id sequence in turn restrictions: {} (turn restriction ignored)", Arrays.toString(oldIds));
 			}
 			return null;			
 		}
@@ -213,7 +219,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		} else if(edgeIds.length > 1 && graph.getFromNodeId(edgeIds[1]) == lastNodeId) {
 			newIds[newIds.length-1] = edgeIds[1];
 		} else {
-			logger.warn("Invalid intersectionId/segment sequence in turn restrictions/classes: {}|{} (turn cost/restriction ignored)", oldIds[oldIds.length-2], oldIds[oldIds.length-1]);
+			logger.warn("Invalid intersectionId/segment sequence in turn restrictions: {}|{} (turn restriction ignored)", oldIds[oldIds.length-2], oldIds[oldIds.length-1]);
 			return null;
 		}
 		return newIds;
@@ -468,8 +474,14 @@ public class BasicGraphBuilder implements GraphBuilder {
 			int id = truckNoticeReader.getInt("TRUCK_NOTICE_ID");
 			TruckNoticeType type = TruckNoticeType.convert(truckNoticeReader.getString("TYPE"));
 			String description = truckNoticeReader.getString("DESCRIPTION");
+			LocalDate startDate = truckNoticeReader.getDate("START_DATE");
+			LocalDate endDate = truckNoticeReader.getDate("END_DATE");
+			TemporalSet dateRange = TemporalSet.ALWAYS;
+			if(startDate != null && endDate != null) {
+				dateRange = new DateInterval(startDate, endDate);
+			}
 			if(type != null && description != null && !description.isBlank()) {
-				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(TemporalSet.ALWAYS, type, description);
+				RoadTruckNoticeEvent event = new RoadTruckNoticeEvent(dateRange, type, description);
 				truckNoticeIdMap.put(id, event);
 			} else {
 				logger.warn("Invalid Truck Notice ({},{},{})", id, type, description);
