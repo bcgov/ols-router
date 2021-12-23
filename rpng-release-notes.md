@@ -14,7 +14,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 ### Route Planner 2.1.4
 1. Route Planner 2.1.4 is backward compatible with Route Planner 2.x.
 2. Support for vehicle-type specific turn restrictions. For example, a road that only commercial vehicles are permitted to use.
-3. Support for timed notifications. A timed notification is a notice that has an effective time period. During this period, the notice should be displayed on the appropriate leg of the best route in turn-by-turn directions. A notification doesn't affect the computation of best route.
+3. Support for timed notifications. A timed notification is a notice that has an effective time period. During this period, the notice is displayed on the appropriate leg of the best route in turn-by-turn directions. A notification doesn't affect the computation of best route.
 
 ### Route Planner 2.1.3
 1. Route Planner 2.1.3 is backward compatible with Route Planner 2.x.
