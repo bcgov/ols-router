@@ -11,8 +11,17 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
+### Route Planner 2.1.4
+1. Route Planner 2.1.4 is backward compatible with Route Planner 2.x.
+2. Support for vehicle-type specific turn restrictions. For example, a road that only commercial vehicles are permitted to use.
+3. Support for timed notifications. A timed notification is a notice that has an effective time period. During this period, the notice should be displayed on the appropriate leg of the best route in turn-by-turn directions. A notification doesn't affect the computation of best route.
+
+### Route Planner 2.1.3
+1. Route Planner 2.1.3 is backward compatible with Route Planner 2.x.
+2. Truck resources now have default for followTruckRoute set to true.
+
 ### Route Planner 2.1
-1. Route Planner 2.1 is backward compatible with Route Planner 2.0.
+1. Route Planner 2.1 is backward compatible with Route Planner 2.x.
 
 2. Enable intersection crossing costs to more accurately model all combinations of major and minor road crossings.
 
