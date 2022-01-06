@@ -162,6 +162,7 @@ objects:
           AND read_repair_chance = 0.0
           AND speculative_retry = '99PERCENTILE';
 
+# Cassandra StatefulSet
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -286,6 +287,7 @@ objects:
             storage: 1Gi
         #storageClassName: netapp-block-standard
 
+# Cassandra Service
 - kind: Service
   apiVersion: v1
   metadata:
@@ -303,6 +305,7 @@ objects:
     sessionAffinity: None
     type: ClusterIP
 
+# ols-router-web StatefulSet
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -490,3 +493,138 @@ objects:
         resources:
           requests:
             storage: 1Gi
+
+# ols-router-admin Deployment
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    generation: 1
+    labels:
+      app: ols-router-admin
+      name: ols-router-admin
+      template: ols-router-admin
+    name: ols-router-admin
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: ols-router-admin
+        name: ols-router-admin
+    strategy:
+      type: Recreate
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ols-router-admin
+          name: ols-router-admin
+      spec:
+        imagePullSecrets:
+          - name: ${DOCKER_SECRET}
+          - name: ${DEFAULT_DOCKERCFG}
+          # e.g.
+          #- name: default-dockercfg-hb696
+        containers:
+        - command:
+          - catalina.sh
+          - run
+          env:
+          - name: CATALINA_BASE
+            value: /usr/local/tomcat
+          - name: OLS_CASSANDRA_LOCAL_DATACENTER
+            value: DC1
+          - name: OLS_CASSANDRA_CONTACT_POINT
+            value: cassandra-${APP_NAME}
+          - name: OLS_CASSANDRA_KEYSPACE
+            value: bgeo
+          image: docker-remote.artifacts.developer.gov.bc.ca/tomcat:9-jre11-slim
+          imagePullPolicy: IfNotPresent
+          name: tomcat
+          ports:
+          - containerPort: 8080
+            name: catalina-http
+            protocol: TCP
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 2Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /usr/local/tomcat/logs
+            name: tc-work
+          - mountPath: /usr/local/tomcat/work
+            name: tc-work
+          - mountPath: /usr/local/tomcat/temp
+            name: tc-work
+          - mountPath: /usr/local/tomcat/conf/Catalina
+            name: tc-conf
+          - mountPath: /usr/local/tomcat/webapps
+            name: app-volume
+        dnsPolicy: ClusterFirst
+        initContainers:
+        - command:
+          - cp
+          - /ols-router-admin.war
+          - /app/int.war
+          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-admin-sidecar:${DATA_ADMIN_IS_TAG}
+          imagePullPolicy: Always
+          name: war
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app
+            name: app-volume
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: tc-work
+        - emptyDir: {}
+          name: tc-conf
+        - emptyDir: {}
+          name: app-volume
+  status: {}
+
+- kind: Service
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    name: ols-router-admin
+  spec:
+    ports:
+    - name: ols-router-admin
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: ols-router-admin
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+
+- kind: Route
+  apiVersion: route.openshift.io/v1
+  metadata:
+    creationTimestamp: null
+    name: ols-router-admin
+  spec:
+    host: ${ROUTER_ADMIN_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
+    path: /int/
+    port:
+      targetPort: ols-router-admin
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: ols-router-admin
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress: null
