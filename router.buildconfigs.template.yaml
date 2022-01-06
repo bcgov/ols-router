@@ -75,7 +75,21 @@ parameters:
     displayName: Artifactory URL
     name: ARTIFACTORY_URL
     required: true
-    value: delivery.apps.bcgov/artifactory/libs-snapshot-local/ca/bc/gov/ols
+    value: delivery.apps.gov.bc.ca/artifactory
+
+  - description: The SNAPSHOT repo for the designated Artifactory server.
+    displayName: Artifactory SNAPSHOT repo
+    name: ARTIFACTORY_SNAPSHOT_REPO
+    required: true
+    value: libs-snapshot-local
+    #/ca/bc/gov/ols
+  - description: The RELEASE repo for the designated Artifactory server.
+    displayName: Artifactory RELEASE repo
+    name: ARTIFACTORY_RELEASE_REPO
+    required: true
+    value: libs-release-local
+    #/ca/bc/gov/ols
+
   - description: The pull secrete configured to pull images from the DevOps provided Artifactory server.
     displayName: Artifactory Pull Secrete
     name: ARTIFACTORY_PULL_SECRET
@@ -83,15 +97,20 @@ parameters:
     value: docker-secret
 
   - description: The App version. e.g 2.1.3-SNAPSHOT or 2.1.3-RC
-    displayName: App Version
-    name: APP_VERSION
+    displayName: App Snapshot Version
+    name: APP_VERSION_SNAPSHOT
     required: true
-    value: 2.1.3-SNAPSHOT
+    value: 2.1.4-SNAPSHOT
+  - description: The App version. e.g 2.1.3-SNAPSHOT or 2.1.3-RC
+    displayName: App Release Version
+    name: APP_VERSION_RELEASE
+    required: true
+    value: 2.1.4
   - description: The Snapshot version. e.g 2.1.3-20200430.000404-2
     displayName: Snapshot Version
     name: SNAPSHOT_VERSION
     required: true
-    value: 2.1.3-20200430.000404-2
+    value: 2.1.4-20211217.221512-1
 
 objects:
 
@@ -111,7 +130,7 @@ objects:
     creationTimestamp: null
     labels:
       app: ${ROUTE_PLANNER_BUILD_CONFIG_NAME}
-    name: ${ROUTE_PLANNER_BUILD_CONFIG_NAME}
+    name: ${ROUTE_PLANNER_BUILD_CONFIG_NAME}-release
   spec:
     failedBuildsHistoryLimit: 5
     nodeSelector: null
@@ -126,9 +145,7 @@ objects:
       dockerfile: |
         FROM docker-remote.artifacts.developer.gov.bc.ca/busybox:latest
 
-        #RUN wget -O ols-router.war https://$ARTIFACTORY_URL/ols-router-web/$APP_VERSION/ols-router-web-$APP_VERSION.war
-
-        RUN wget -O ols-router.war http://$ARTIFACTORY_URL/ols-router-web/$APP_VERSION/ols-router-web-$SNAPSHOT_VERSION.war
+        RUN wget -O ols-router.war https://$ARTIFACTORY_URL/$ARTIFACTORY_RELEASE_REPO/ca/bc/gov/ols/ols-router-web/$APP_VERSION/ols-router-web-$APP_VERSION.war
 
         CMD ["tail", "-f", "/dev/null"]
       type: Dockerfile
@@ -139,8 +156,51 @@ objects:
         env:
         - name: ARTIFACTORY_URL
           value: ${ARTIFACTORY_URL}
+        - name: ARTIFACTORY_RELEASE_REPO
+          value: ${ARTIFACTORY_RELEASE_REPO}
         - name: APP_VERSION
-          value: ${APP_VERSION}
+          value: ${APP_VERSION_RELEASE}
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers: []
+  status: {}
+
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${ROUTE_PLANNER_BUILD_CONFIG_NAME}
+    name: ${ROUTE_PLANNER_BUILD_CONFIG_NAME}-snapshot
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${ROUTE_PLANNER_IMAGESTREAM_NAME}:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |
+        FROM docker-remote.artifacts.developer.gov.bc.ca/busybox:latest
+
+        RUN wget -O ols-router.war https://$ARTIFACTORY_URL/$ARTIFACTORY_SNAPSHOT_REPO/ca/bc/gov/ols/ols-router-web/$APP_VERSION/ols-router-web-$SNAPSHOT_VERSION.war
+
+        CMD ["tail", "-f", "/dev/null"]
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        pullSecret:
+          name: ${ARTIFACTORY_PULL_SECRET}
+        env:
+        - name: ARTIFACTORY_URL
+          value: ${ARTIFACTORY_URL}
+        - name: ARTIFACTORY_SNAPSHOT_REPO
+          value: ${ARTIFACTORY_SNAPSHOT_REPO}
+        - name: APP_VERSION
+          value: ${APP_VERSION_SNAPSHOT}
         - name: SNAPSHOT_VERSION
           value: ${SNAPSHOT_VERSION}
       type: Docker
@@ -155,7 +215,7 @@ objects:
     creationTimestamp: null
     labels:
       app: ${ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME}
-    name: ${ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME}
+    name: ${ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME}-release
   spec:
     failedBuildsHistoryLimit: 5
     nodeSelector: null
@@ -170,19 +230,64 @@ objects:
       dockerfile: |
         FROM docker-remote.artifacts.developer.gov.bc.ca/busybox:latest
 
-        #RUN  wget -O ols-router-admin.war https://$ARTIFACTORY_URL/ols-router-admin/$APP_VERSION/ols-router-admin-$APP_VERSION.war
-
-        RUN  wget -O ols-router-admin.war https://$ARTIFACTORY_URL/ols-router-admin/$APP_VERSION/ols-router-admin-$SNAPSHOT_VERSION.war
+        RUN  wget -O ols-router-admin.war https://$ARTIFACTORY_URL/$ARTIFACTORY_RELEASE_REPO/ca/bc/gov/ols/ols-router-admin/$APP_VERSION/ols-router-admin-$APP_VERSION.war
 
         CMD ["tail", "-f", "/dev/null"]
       type: Dockerfile
     strategy:
       dockerStrategy:
+        pullSecret:
+          name: ${ARTIFACTORY_PULL_SECRET}
         env:
         - name: ARTIFACTORY_URL
           value: ${ARTIFACTORY_URL}
+        - name: ARTIFACTORY_RELEASE_REPO
+          value: ${ARTIFACTORY_RELEASE_REPO}
         - name: APP_VERSION
-          value: ${APP_VERSION}
+          value: ${APP_VERSION_RELEASE}
+        - name: SNAPSHOT_VERSION
+          value: ${SNAPSHOT_VERSION}
+      type: Docker
+    successfulBuildsHistoryLimit: 5
+    triggers: []
+  status: {}
+
+- kind: BuildConfig
+  apiVersion: build.openshift.io/v1
+  metadata:
+    creationTimestamp: null
+    labels:
+      app: ${ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME}
+    name: ${ROUTE_CONFIG_ADMIN_BUILD_CONFIG_NAME}-snapshot
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${ROUTE_CONFIG_ADMIN_IMAGESTREAM_NAME}:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      dockerfile: |
+        FROM docker-remote.artifacts.developer.gov.bc.ca/busybox:latest
+
+        RUN  wget -O ols-router-admin.war https://$ARTIFACTORY_URL/$ARTIFACTORY_SNAPSHOT_REPO/ca/bc/gov/ols/ols-router-admin/$APP_VERSION/ols-router-admin-$SNAPSHOT_VERSION.war
+
+        CMD ["tail", "-f", "/dev/null"]
+      type: Dockerfile
+    strategy:
+      dockerStrategy:
+        pullSecret:
+          name: ${ARTIFACTORY_PULL_SECRET}
+        env:
+        - name: ARTIFACTORY_URL
+          value: ${ARTIFACTORY_URL}
+        - name: ARTIFACTORY_SNAPSHOT_REPO
+          value: ${ARTIFACTORY_SNAPSHOT_REPO}
+        - name: APP_VERSION
+          value: ${APP_VERSION_SNAPSHOT}
         - name: SNAPSHOT_VERSION
           value: ${SNAPSHOT_VERSION}
       type: Docker
