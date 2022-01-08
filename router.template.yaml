@@ -104,6 +104,7 @@ parameters:
     required: true
 
 objects:
+# StatefulSet for Cassandra
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -221,6 +222,7 @@ objects:
             storage: 1Gi
         storageClassName: netapp-block-standard
 
+# Service for Cassandra
 - kind: Service
   apiVersion: v1
   metadata:
@@ -238,7 +240,7 @@ objects:
     sessionAffinity: None
     type: ClusterIP
 
-# This is the new StatefulSet
+# StatefulSet for ols-router-web
 - kind: StatefulSet
   apiVersion: apps/v1
   metadata:
@@ -496,6 +498,7 @@ objects:
 #     - type: ConfigChange
 #   status: {}
 
+# Deployment for ols-router-admin
 - kind: Deployment
   apiVersion: apps/v1
   metadata:
@@ -592,6 +595,7 @@ objects:
           name: app-volume
   status: {}
 
+# Serice for ols-router-admin
 - kind: Service
   apiVersion: v1
   metadata:
@@ -610,6 +614,7 @@ objects:
   status:
     loadBalancer: {}
 
+# Route for ols-router-admin
 - kind: Route
   apiVersion: route.openshift.io/v1
   metadata:
@@ -630,6 +635,7 @@ objects:
   status:
     ingress: null
 
+# Service for ols-router-web
 - kind: Service
   apiVersion: v1
   metadata:

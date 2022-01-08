@@ -57,44 +57,55 @@ parameters:
   - name: TOOLS_NAMESPACE
     description: The tools namspace where image streams will be pulled from.
     required: true
-  - description: A common label that will be applied to all objects
+  - name: APP_NAME
+    description: A common label that will be applied to all objects
     displayName: App Label
-    name: APP_NAME
     required: true
     value: router
-  - description: The environment i.e. on of -dev, -test, -prod.  This will be appended to hostnames so routes don't collide across namespaces.
+  - name: ENV
+    description: The environment i.e. on of -dev, -test, -prod.  This will be appended to hostnames so routes don't collide across namespaces.
     displayName: App Environment
-    name: ENV
     required: true
 
-  - description: The hostname for the Admin App.
+  - name: ROUTER_ADMIN_HOSTNAME
+    description: The hostname for the Admin App.
     displayName: Admin configurtion app hostname
-    name: ROUTER_ADMIN_HOSTNAME
     required: true
     value: router-admin
-  - description: The hostname for the Router API App.
+  - name: ROUTER_API_HOSTNAME
+    description: The hostname for the Router API App.
     displayName: Router API endpoint hostname.
-    name: ROUTER_API_HOSTNAME
     required: true
     value: router-api
-  - description: Default route subdomain - use apps.silver.devops.gov.bc.ca
+  - name: ROUTE_SUBDOMAIN
+    description: Default route subdomain - use apps.silver.devops.gov.bc.ca
     displayName: Route subdomain
-    name: ROUTE_SUBDOMAIN
     required: true
     value:  apps.silver.devops.gov.bc.ca
 
-  - description: default-dockercfg secret for the 'default' Service account
+  - name: DEFAULT_DOCKERCFG
+    description: default-dockercfg secret for the 'default' Service account
     displayName: Default service account docker Secret
-    name: DEFAULT_DOCKERCFG
     required: true
     # e.g.
     # value: default-dockercfg-jgsbn
-  - description: docker-secret for the 'default' Service account for Artifactory
+  - name: DOCKER_SECRET
+    description: docker-secret for the 'default' Service account for Artifactory
     displayName: Default service account Artifactory docker Secret
-    name: DOCKER_SECRET
     required: true
     value:  docker-secret
 
+  - name: CASSANDRA_REPLICA_COUNT
+    description: "The number of Cassandra replicas to deploy"
+    displayName: Cassandra Replica Count
+    required: true
+    value: "3"
+
+  - name: ROUTER_REPLICA_COUNT
+    description: "The number of Router Web replicas to deploy"
+    displayName: Router Replica Count
+    required: true
+    value: "4"
   - name: "ROUTER_IS_TAG"
     description: "The image stream tag to use for the ols-router-sidecar"
     required: true
@@ -109,6 +120,7 @@ parameters:
 
 objects:
 
+# Config maps necessary to load data into cassandra bgeo keyspace
 - kind: ConfigMap
   apiVersion: v1
   metadata:
@@ -162,6 +174,25 @@ objects:
           AND read_repair_chance = 0.0
           AND speculative_retry = '99PERCENTILE';
 
+# PVC for state-ledger
+- kind: PersistentVolumeClaim
+  # This is used to track the initializattion of cassandra and the BGEO Keyspace.
+  # It is mounted in each init containers in turn, for the router, the Admin App
+  # and router container (though it's not really necessary)
+  apiVersion: v1
+  metadata:
+    name: state-ledger
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 20Mi
+    storageClassName: netapp-file-standard
+    volumeMode: Filesystem
+  status: {}
+
+
 # Cassandra StatefulSet
 - kind: StatefulSet
   apiVersion: apps/v1
@@ -172,7 +203,7 @@ objects:
     name: cassandra-${APP_NAME}
   spec:
     podManagementPolicy: OrderedReady
-    replicas: 3
+    replicas: ${{CASSANDRA_REPLICA_COUNT}}
     revisionHistoryLimit: 10
     selector:
       matchLabels:
@@ -315,7 +346,7 @@ objects:
     name: ols-router-web
   spec:
     podManagementPolicy: OrderedReady
-    replicas: 1
+    replicas: ${{ROUTER_REPLICA_COUNT}}
     revisionHistoryLimit: 10
     selector:
       matchLabels:
@@ -342,7 +373,7 @@ objects:
         - name: ${DEFAULT_DOCKERCFG}
 
         initContainers:
-        - name: war
+        - name: init-copy-war
           # Copy the ols-router.war to the PVC
           command:
           - cp
@@ -361,56 +392,84 @@ objects:
           image: docker-remote.artifacts.developer.gov.bc.ca/busybox:1.33.1
           # Wait for cassandra service cassandra-${APP_NAME} to be ready.
           # In other words, wait for cassandra to 'boot'
+          #
+          # /state-ledger/cassandra-up is created after the services comes up.
+          # this will be used by subsequent pods - if the file exists, that stage of
+          # the init has completed.
           command:
             - 'sh'
             - '-c'
-            - while (:);
-               do
-                 nc -w 1 cassandra-${APP_NAME} 9042;
-                 if [ $? == 0 ];
-                 then break;
-                 fi;
-                 printf .;
-                 sleep 1;
-               done;
+            - if [[ -f /state-ledger/cassandra-up ]] ;
+              then
+                exit 0;
+              else
+                while (:);
+                do
+                  nc -w 1 cassandra-${APP_NAME} 9042;
+                  if [ $? == 0 ];
+                    then break;
+                  fi;
+                  printf .;
+                  sleep 1;
+                done;
+                touch /state-ledger/cassandra-up;
+              fi;
           volumeMounts:
           - name: router-logs
             mountPath: /app
+          - name: state-ledger-vol
+            mountPath: /state-ledger
 
         - name: init-bgeo-keyspace
           image: docker-remote.artifacts.developer.gov.bc.ca/cassandra:3.11.2
           # Create the bgeo keyspace and the bgeo_configuration_parameters table.
+          #
+          # The /state-ledger/keyspace-bgeo-creaed is checked by subseqent pods -
+          # if the init container finds this file, there's no need to init the bgeo
+          # keyspace.
           command:
-            - 'cqlsh'
-            - cassandra-${APP_NAME}
-            - '-f'
-            - '/apps/bgeo/bgeo_keyspace_config.cql'
+            - 'sh'
+            - '-c'
+            - if [ -f /state-ledger/keyspace-bgeo-created ] ;
+              then
+                exit 0;
+              else
+                cqlsh cassandra-${APP_NAME} -f /apps/bgeo/bgeo_keyspace_config.cql;
+                touch /state-ledger/keyspace-bgeo-created;
+              fi;
           volumeMounts:
           - name: bgeo-configuration-parameters
             mountPath: /apps/bgeo
+          - name: state-ledger-vol
+            mountPath: /state-ledger
 
         - name: load-bgeo-keyspace
           # Load the bgeo.bgeo_configuration_parameters table with data from
           # the config map.
+          #
+          # the /state-ledger/keyspace-bgeo-loaded is created after the bego
+          # keyspace has been loaded.   All subsequent router Pods are configured
+          # with init containers that check for this file.  If it exists,
+          # the bgeo keyspace is loaded with required data.
           image: docker-remote.artifacts.developer.gov.bc.ca/cassandra:3.11.2
-          # command:
-          #   - 'cqlsh'
-          #   - cassandra-${APP_NAME}
-          #   - '-e'
-          #   - DESCRIBE KEYSPACES
           command:
-            - 'cqlsh'
-            - cassandra-${APP_NAME}
-            - '-k'
-            - bgeo
-            - '-e'
-            - COPY bgeo.bgeo_configuration_parameters
-              FROM '/apps/bgeo/bgeo_configuration_parameters.csv'
-              WITH DELIMITER='^'
-              AND HEADER=TRUE
+            - 'sh'
+            - '-c'
+            - if [ -f /state-ledger/keyspace-bgeo-loaded ] ;
+              then
+                exit 0;
+              else
+                cqlsh cassandra-${APP_NAME} -k bgeo -e "COPY bgeo.bgeo_configuration_parameters FROM '/apps/bgeo/bgeo_configuration_parameters.csv' WITH DELIMITER='^' AND HEADER=TRUE";
+                touch /state-ledger/keyspace-bgeo-loaded;
+              fi;
+              echo
+              echo Sleeping for 5 more seonds.
+              sleep 5;
           volumeMounts:
           - name: bgeo-configuration-parameters
             mountPath: /apps/bgeo
+          - name: state-ledger-vol
+            mountPath: /state-ledger
 
 
         containers:
@@ -442,7 +501,7 @@ objects:
               path: /ping
               port: 8080
               scheme: HTTP
-            initialDelaySeconds: 270
+            initialDelaySeconds: 120
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
@@ -463,6 +522,9 @@ objects:
             name: tc-conf
           - mountPath: /usr/local/tomcat/webapps
             name: app-volume
+          - name: state-ledger-vol
+            mountPath: /state-ledger
+
 
         dnsPolicy: ClusterFirst
         restartPolicy: Always
@@ -479,6 +541,9 @@ objects:
         - name: bgeo-configuration-parameters
           configMap:
             name: bgeo-configuration-parameters
+        - name: state-ledger-vol
+          persistentVolumeClaim:
+            claimName: state-ledger
 
     updateStrategy:
       rollingUpdate:
@@ -493,6 +558,25 @@ objects:
         resources:
           requests:
             storage: 1Gi
+
+# Service for ols-router-web
+- kind: Service
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    name: ols-router-web
+  spec:
+    ports:
+    - name: ols-router-web
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: ols-router-web
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
 
 # ols-router-admin Deployment
 - kind: Deployment
@@ -565,19 +649,50 @@ objects:
             name: app-volume
         dnsPolicy: ClusterFirst
         initContainers:
-        - command:
+        - name: init-copy-war
+          command:
           - cp
           - /ols-router-admin.war
           - /app/int.war
           image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-admin-sidecar:${DATA_ADMIN_IS_TAG}
           imagePullPolicy: Always
-          name: war
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
           - mountPath: /app
             name: app-volume
+
+        - name: init-wait-for-cassandra
+          image: docker-remote.artifacts.developer.gov.bc.ca/busybox:1.33.1
+          # Wait for cassandra service cassandra-${APP_NAME} to be ready.
+          # In other words, wait for cassandra to 'boot'
+          #
+          # /state-ledger/keyspace-bgeo-loaded is created by the first router
+          # pod that runs; The first router pod has a series of init containers
+          # which wait for cassandra to start, create the bgeo keyspace, and
+          # finlally, load the bgeo keyspace with the required data.
+          # /state-ledger/keyspace-bgeo-loaded indicates all init stages have
+          # been completed
+          command:
+            - 'sh'
+            - '-c'
+            - while (:);
+              do
+                if test -f /state-ledger/keyspace-bgeo-loaded;
+                then
+                  break;
+                fi;
+                printf .;
+                sleep 1;
+              done;
+              echo
+              echo sleeping for 5 more seconds.
+              sleep 5;
+          volumeMounts:
+          - name: state-ledger-vol
+            mountPath: /state-ledger
+
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -589,8 +704,13 @@ objects:
           name: tc-conf
         - emptyDir: {}
           name: app-volume
+        - name: state-ledger-vol
+          persistentVolumeClaim:
+            claimName: state-ledger
+
   status: {}
 
+# Service for the Data Admin App
 - kind: Service
   apiVersion: v1
   metadata:
@@ -609,6 +729,7 @@ objects:
   status:
     loadBalancer: {}
 
+# Route for the Data Admin App
 - kind: Route
   apiVersion: route.openshift.io/v1
   metadata:
@@ -628,3 +749,60 @@ objects:
     wildcardPolicy: None
   status:
     ingress: null
+
+
+# Network Policies
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: allow-from-openshift-ingress
+  spec:
+    ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            network.openshift.io/policy-group: ingress
+    podSelector: {}
+    policyTypes:
+    - Ingress
+
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: allow-same-namespace
+  spec:
+    ingress:
+    - from:
+      - podSelector: {}
+    podSelector: {}
+    policyTypes:
+    - Ingress
+
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: deny-by-default
+  spec:
+    podSelector: {}
+    policyTypes:
+    - Ingress
+
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: allow-traffic-from-gateway-to-${APP_NAME}-${ENV}
+  spec:
+    podSelector:
+      matchLabels:
+        app: ols-router-web
+    ingress:
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                environment: test
+                name: 264e6f
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                environment: prod
+                name: 264e6f
