@@ -730,25 +730,26 @@ objects:
     loadBalancer: {}
 
 # Route for the Data Admin App
-- kind: Route
-  apiVersion: route.openshift.io/v1
-  metadata:
-    creationTimestamp: null
-    name: ols-router-admin
-  spec:
-    host: ${ROUTER_ADMIN_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
-    path: /int/
-    port:
-      targetPort: ols-router-admin
-    tls:
-      termination: edge
-    to:
-      kind: Service
-      name: ols-router-admin
-      weight: 100
-    wildcardPolicy: None
-  status:
-    ingress: null
+# The route is now configured through the Kong Gateway
+# - kind: Route
+#   apiVersion: route.openshift.io/v1
+#   metadata:
+#     creationTimestamp: null
+#     name: ols-router-admin
+#   spec:
+#     host: ${ROUTER_ADMIN_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
+#     path: /int/
+#     port:
+#       targetPort: ols-router-admin
+#     tls:
+#       termination: edge
+#     to:
+#       kind: Service
+#       name: ols-router-admin
+#       weight: 100
+#     wildcardPolicy: None
+#   status:
+#     ingress: null
 
 
 # Network Policies
@@ -790,11 +791,31 @@ objects:
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
-    name: allow-traffic-from-gateway-to-${APP_NAME}-${ENV}
+    name: allow-traffic-from-gateway-to-${APP_NAME}-web-${ENV}
   spec:
     podSelector:
       matchLabels:
         app: ols-router-web
+    ingress:
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                environment: test
+                name: 264e6f
+      - from:
+          - namespaceSelector:
+              matchLabels:
+                environment: prod
+                name: 264e6f
+
+- kind: NetworkPolicy
+  apiVersion: networking.k8s.io/v1
+  metadata:
+    name: allow-traffic-from-gateway-to-${APP_NAME}-admin-${ENV}
+  spec:
+    podSelector:
+      matchLabels:
+        app: ols-router-admin
     ingress:
       - from:
           - namespaceSelector:
