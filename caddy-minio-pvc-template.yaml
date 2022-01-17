@@ -82,11 +82,11 @@ parameters:
     required: true
     value:  pathfinder.bcgov
 objects:
-- apiVersion: apps.openshift.io/v1
-  kind: DeploymentConfig
-  #
-  # Caddy DeploymentConfig
-  #
+#
+# Caddy DeploymentConfig
+#
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -152,11 +152,12 @@ objects:
     test: false
     triggers:
     - type: ConfigChange
-- apiVersion: apps.openshift.io/v1
-  #
-  # Minio DeploymentConfig
-  #
-  kind: DeploymentConfig
+
+#
+# Minio DeploymentConfig
+#
+- kind: DeploymentConfig
+  apiVersion: apps.openshift.io/v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -227,8 +228,10 @@ objects:
     test: false
     triggers:
     - type: ConfigChange
-- apiVersion: v1
-  kind: Service
+
+# Minion Service
+- kind: Service
+  apiVersion: v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -244,8 +247,10 @@ objects:
       deploymentconfig: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
     sessionAffinity: None
     type: ClusterIP
-- apiVersion: v1
-  kind: Service
+
+# Caddy Service
+- kind: Service
+  apiVersion: v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -262,8 +267,10 @@ objects:
       deploymentconfig: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}
     sessionAffinity: None
     type: ClusterIP
-- apiVersion: route.openshift.io/v1
-  kind: Route
+
+# Minio Route
+- kind: Route
+  apiVersion: route.openshift.io/v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -286,8 +293,10 @@ objects:
       #name: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
       weight: 100
     wildcardPolicy: None
-- apiVersion: route.openshift.io/v1
-  kind: Route
+
+# Caddy Route
+- kind: Route
+  apiVersion: route.openshift.io/v1
   metadata:
     labels:
       app: ${APPLICATION_NAME}
@@ -311,37 +320,13 @@ objects:
       #name: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
       weight: 100
     wildcardPolicy: None
-- apiVersion: route.openshift.io/v1
-  kind: Route
-  metadata:
-    labels:
-      app: ${APPLICATION_NAME}
-      env: internal
-      route: within-cluster
-    name: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}-int
-    #name: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
-    # TODO
-    # Questions:
-    #    1. why is the route not listed in the overview page?  trivial but it bugs me. it WAS showing up before!
-    #    2. Should routes be internal only? e.g. route-to-this-app.pathfinder.bcgov
-    #
-  spec:
-    host: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}.${INTERNAL_ROUTE_SUBDOMAIN}
-    port:
-      # targetPort: 8080-tcp
-      targetPort: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}
-    to:
-      kind: Service
-      name: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}
-      #name: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
-      weight: 100
-    wildcardPolicy: None
+
+# PersistentVolumeClaim shared
 # TODO
 # What to name This
 # What size works?
-#
-- apiVersion: v1
-  kind: PersistentVolumeClaim
+- kind: PersistentVolumeClaim
+  apiVersion: v1
   metadata:
     annotations:
       volume.beta.kubernetes.io/storage-class: gluster-file
@@ -357,7 +342,9 @@ objects:
       requests:
         storage: 5Gi
 
-- apiVersion: v1
+# Caddy Config ConfigMap
+- kind: ConfigMap
+  apiVersion: v1
   data:
     caddifile: |-
       0.0.0.0:8080
@@ -374,16 +361,17 @@ objects:
     #  log stdout
     #  errors stdout
     #  ext .png .kml .html .htm
-  kind: ConfigMap
   metadata:
     labels:
       app: ${APPLICATION_NAME}
     name: caddy-conf-${APPLICATION_NAME}
-- apiVersion: v1
+
+# Minio Secret
+- kind: Secret
+  apiVersion: v1
   data:
     minioAccessKey: ${MINIO_ACCESS_KEY}
     minioSecretKey: ${MINIO_SECRET_KEY}
-  kind: Secret
   metadata:
     labels:
       app: ${APPLICATION_NAME}
