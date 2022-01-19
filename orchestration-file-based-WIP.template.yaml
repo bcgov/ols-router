@@ -137,27 +137,27 @@ objects:
     name: input-bgeo-configuration-parameters
   data:
     bgeo_configuration_parameters.csv: |-
-      app_id^config_param_name^config_param_value
-      ROUTER^baseSrsCode^3005
-      ROUTER^copyrightLicenseURI^https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61
-      ROUTER^copyrightNotice^Copyright 2020 Province of British Columbia - Open Government License
-      ROUTER^dataSource.baseFileUrl^${DATASTORE_URL}
-      ROUTER^dataSource.baseFileUrl.devel^http://ols-router-data:8080
-      ROUTER^dataSource.className^ca.bc.gov.ols.router.datasource.FileRouterDataSource
-      ROUTER^defaultDisableOptions^TD,EV,SC,TF
-      ROUTER^defaultEnableOptions^GDF,LDF,TR,XC,TC
-      ROUTER^defaultGlobalDistortionField^alleyway:1.2,alleyway.truck:1.1,arterial_major:1.01,arterial_major.truck:1.01,arterial_minor:1.01,arterial_minor.truck:1.01,collector_major:1.01,collector_major.truck:1.01,collector_minor:1.01,collector_minor.truck:1.01,driveway:1.2,driveway.truck:1.1,ferry:1,ferry.truck:1,freeway:1,freeway.truck:1,highway_major:1,highway_major.truck:1,highway_minor:1,highway_minor.truck:1,lane:1.01,lane.truck:1.01,local:1.1,local.truck:1.05,ramp:1,ramp.truck:1,recreation:1.2,recreation.truck:1.1,resource:1.2,resource.truck:1.1,restricted:1.2,restricted.truck:1.1,service:1.2,service.truck:1.1,strata:1.2,strata.truck:1.1,yield_lane:1.01,yield_lane.truck:1.01
-      ROUTER^defaultTruckRouteMultiplier^9
-      ROUTER^defaultTurnCost^3,1,10,5
-      ROUTER^defaultXingCost^3,10,7,1.2
-      ROUTER^disclaimer^https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535
-      ROUTER^glossaryBaseUrl^https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
-      ROUTER^kmlStylesUrl^http://openmaps.gov.bc.ca/kml/router_results_styles.kml
-      ROUTER^maxOptimalRoutePoints^100
-      ROUTER^maxPairs^1000
-      ROUTER^maxRoutePoints^100
-      ROUTER^moreInfoUrl^https://www2.gov.bc.ca/gov/content?id=9D99E684CCD042CD88FADC51E079B4B5
-      ROUTER^privacyStatement^https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932
+      app_id,config_param_name,config_param_value
+      ROUTER,baseSrsCode,3005
+      ROUTER,copyrightLicenseURI,https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61
+      ROUTER,copyrightNotice,Copyright 2020 Province of British Columbia - Open Government License
+      ROUTER,dataSource.baseFileUrl,${DATASTORE_URL}
+      ROUTER,dataSource.baseFileUrl.devel,http://ols-router-data:8080
+      ROUTER,dataSource.className,ca.bc.gov.ols.router.datasource.FileRouterDataSource
+      ROUTER,defaultDisableOptions,"TD,EV,SC,TF"
+      ROUTER,defaultEnableOptions,"GDF,LDF,TR,XC,TC"
+      ROUTER,defaultGlobalDistortionField,"alleyway:1.2,alleyway.truck:1.1,arterial_major:1.01,arterial_major.truck:1.01,arterial_minor:1.01,arterial_minor.truck:1.01,collector_major:1.01,collector_major.truck:1.01,collector_minor:1.01,collector_minor.truck:1.01,driveway:1.2,driveway.truck:1.1,ferry:1,ferry.truck:1,freeway:1,freeway.truck:1,highway_major:1,highway_major.truck:1,highway_minor:1,highway_minor.truck:1,lane:1.01,lane.truck:1.01,local:1.1,local.truck:1.05,ramp:1,ramp.truck:1,recreation:1.2,recreation.truck:1.1,resource:1.2,resource.truck:1.1,restricted:1.2,restricted.truck:1.1,service:1.2,service.truck:1.1,strata:1.2,strata.truck:1.1,yield_lane:1.01,yield_lane.truck:1.01"
+      ROUTER,defaultTruckRouteMultiplier,9
+      ROUTER,defaultTurnCost,"3,1,10,5"
+      ROUTER,defaultXingCost,"3,10,7,1.2"
+      ROUTER,disclaimer,https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535
+      ROUTER,glossaryBaseUrl,https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
+      ROUTER,kmlStylesUrl,http://openmaps.gov.bc.ca/kml/router_results_styles.kml
+      ROUTER,maxOptimalRoutePoints,100
+      ROUTER,maxPairs,1000
+      ROUTER,maxRoutePoints,100
+      ROUTER,moreInfoUrl,https://www2.gov.bc.ca/gov/content?id=9D99E684CCD042CD88FADC51E079B4B5
+      ROUTER,privacyStatement,https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932
 
 #
 # Caddy DeploymentConfig
@@ -190,17 +190,18 @@ objects:
         labels:
           app: ${APPLICATION_NAME}
           deploymentconfig: ${CADDY_SERVICE_NAME}
+          #app: ${CADDY_SERVICE_NAME}-${APPLICATION_NAME}
       spec:
         containers:
         - name: www
-          image: abiosoft/caddy:no-stats
+          image: image-registry.apps.silver.devops.gov.bc.ca/1475a9-tools/caddy:2.4.1-alpine
           imagePullPolicy: IfNotPresent
-          args:
-          - /conf/Caddyfile
           command:
           - caddy
-          - -quic
-          - -conf
+          args:
+          - run
+          - --config
+          - /conf/Caddyfile
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
@@ -258,12 +259,14 @@ objects:
       metadata:
         creationTimestamp: null
         labels:
+          #app: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
           app: ${APPLICATION_NAME}
           deploymentconfig: ${MINIO_SERVICE_NAME}
       spec:
         containers:
         - name: minio
-          image: docker-registry.default.svc:5000/openshift/minio
+          image: image-registry.apps.silver.devops.gov.bc.ca/1475a9-tools/minio:RELEASE.20201-05-27T22-06-31Z
+          #image: docker-registry.default.svc:5000/openshift/minio
           imagePullPolicy: Always
           env:
           - name: MINIO_ACCESS_KEY
@@ -280,6 +283,9 @@ objects:
             value: /tmp
           - name: MINIO_DATA_DIR
             value: /data
+          args:
+          - server
+          - /data
           ports:
           - containerPort: 9000
             protocol: TCP
@@ -319,16 +325,18 @@ objects:
     revisionHistoryLimit: 10
     selector:
       matchLabels:
-        app: ols-router-admin
-        name: ols-router-admin
+        app: ${APPLICATION_NAME}-web
+        #app: ols-router-admin
+        #name: ols-router-admin
     strategy:
       type: Recreate
     template:
       metadata:
         creationTimestamp: null
         labels:
-          app: ols-router-admin
-          name: ols-router-admin
+          app: ${APPLICATION_NAME}-web
+          #app: ols-router-admin
+          #name: ols-router-admin
       spec:
         imagePullSecrets:
           - name: ${DOCKER_SECRET}
@@ -346,10 +354,7 @@ objects:
           - name: CATALINA_BASE
             value: /usr/local/tomcat
           - name: OLS_ROUTER_CONFIGURATION_STORE
-            value: ca.bc.gov.ols.router.datasource.FileRouterDataSource
-            #value: ca.bc.gov.ols.config.FileConfigurationStore
-            #value: ca.bc.gov.ols.router.config.FileRouterConfigurationStore
-            #value: ca.bc.gov.ols.geocoder.config.FileGeocoderConfigurationStore
+            value: ca.bc.gov.ols.config.FileConfigurationStore
           - name: OLS_FILE_CONFIGURATION_URL
             value: file://apps/conf/router
           ports:
@@ -363,7 +368,7 @@ objects:
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
-          - mountPath: /apps/conf/router
+          - mountPath: /apps/conf
             name: config-data-volume
           - mountPath: /usr/local/tomcat/logs
             name: tc-work
@@ -396,13 +401,20 @@ objects:
         - name: init-copy-config
           image: docker-remote.artifacts.developer.gov.bc.ca/busybox:1.33.1
           command:
-          - cp
-          - /apps/config/bgeo_configuration_parameters.csv
-          - /apps/conf/router
+          - sh
+          - "-c"
+          - |
+            /bin/sh <<EOF
+
+            mkdir /apps/conf/router
+            cp \
+              /apps/config/bgeo_configuration_parameters.csv \
+              /apps/conf/router
+            EOF
           volumeMounts:
           - mountPath: /apps/config
             name: bgeo-configuration-parameters
-          - mountPath: /apps/conf/router
+          - mountPath: /apps/conf
             name: config-data-volume
 
         restartPolicy: Always
@@ -463,6 +475,7 @@ objects:
       targetPort: 9000
     selector:
       deploymentconfig: ${MINIO_SERVICE_NAME}-${APPLICATION_NAME}
+
     sessionAffinity: None
     type: ClusterIP
 
@@ -480,7 +493,8 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      deploymentconfig: ${ADMIN_APP_SERVICE_NAME}-${APPLICATION_NAME}
+      app: ${APPLICATION_NAME}-web
+      #deploymentconfig: ${ADMIN_APP_SERVICE_NAME}-${APPLICATION_NAME}
     sessionAffinity: None
     type: ClusterIP
   status:
@@ -592,6 +606,9 @@ objects:
       :8080
       root * /data
       file_server
+    #  :8080
+    #  root * /data
+    #  file_server
     # 0.0.0.0:8080
     # root /data
     # log stdout
