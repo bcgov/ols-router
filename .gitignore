@@ -43,3 +43,5 @@ local.properties
 # IntelliJ
 
 .idea/
+
+node_modules/
