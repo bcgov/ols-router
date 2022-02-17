@@ -691,6 +691,25 @@ objects:
   status:
     loadBalancer: {}
 
+# Service for ols-router-web
+- kind: Service
+  apiVersion: v1
+  metadata:
+    creationTimestamp: null
+    name: ols-router-web
+  spec:
+    ports:
+    - name: ols-router-web
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: ols-router-web
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+
 # Caddy Route
 - kind: Route
   apiVersion: route.openshift.io/v1
