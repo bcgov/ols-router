@@ -159,7 +159,7 @@ objects:
           - name: JAVA_OPTS
             value: -XX:OnOutOfMemoryError="kill -15 %p" -XX:MaxRAMPercentage=75.0
           - name: OLS_FILE_CONFIGURATION_URL
-            value: file://apps/config/geocoder/
+            value: file://apps/config/router/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
           image: tomcat:9-jre11-slim
@@ -196,8 +196,8 @@ objects:
             name: tc-conf
           - mountPath: /usr/local/tomcat/webapps
             name: app-volume
-          - name: geocoder-config
-            mountPath: /apps/config/geocoder
+          - name: router-config
+            mountPath: /apps/config/router
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -210,7 +210,7 @@ objects:
           name: tc-conf
         - emptyDir: {}
           name: app-volume
-        - name: geocoder-config
+        - name: router-config
           configMap:
             name: router-file-based-config
     updateStrategy:
@@ -263,7 +263,7 @@ objects:
           - name: CATALINA_BASE
             value: /usr/local/tomcat
           - name: OLS_FILE_CONFIGURATION_URL
-            value: file://apps/config/geocoder/
+            value: file://apps/config/router/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
           image: tomcat:9-jre11-slim
@@ -290,8 +290,8 @@ objects:
             name: tc-conf
           - mountPath: /usr/local/tomcat/webapps
             name: app-volume
-          - name: geocoder-config
-            mountPath: /apps/config/geocoder
+          - name: router-config
+            mountPath: /apps/config/router
         dnsPolicy: ClusterFirst
         initContainers:
         - command:
@@ -318,7 +318,7 @@ objects:
           name: tc-conf
         - emptyDir: {}
           name: app-volume
-        - name: geocoder-config
+        - name: router-config
           configMap:
             name: router-file-based-config
   status: {}
