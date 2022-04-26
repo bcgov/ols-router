@@ -1,0 +1,35 @@
+apiVersion: v1
+objects:
+- kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: router-file-based-config
+  data:
+    bgeo_configuration_parameters.csv: |-
+      app_id,config_param_name,config_param_value
+      ROUTER,baseSrsCode,3005
+      ROUTER,copyrightLicenseURI,https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61
+      ROUTER,copyrightNotice,Copyright 2020 Province of British Columbia - Open Government License
+      ROUTER,dataSource.baseFileUrl,${DATASTORE_URL}
+      ROUTER,dataSource.baseFileUrl.devel,http://ols-router-data:8080
+      ROUTER,dataSource.className,ca.bc.gov.ols.router.datasource.FileRouterDataSource
+      ROUTER,defaultDisableOptions,"TD,EV,SC,TF"
+      ROUTER,defaultEnableOptions,"GDF,LDF,TR,XC,TC"
+      ROUTER,defaultGlobalDistortionField,"alleyway:1.2,alleyway.truck:1.1,arterial_major:1.01,arterial_major.truck:1.01,arterial_minor:1.01,arterial_minor.truck:1.01,collector_major:1.01,collector_major.truck:1.01,collector_minor:1.01,collector_minor.truck:1.01,driveway:1.2,driveway.truck:1.1,ferry:1,ferry.truck:1,freeway:1,freeway.truck:1,highway_major:1,highway_major.truck:1,highway_minor:1,highway_minor.truck:1,lane:1.01,lane.truck:1.01,local:1.1,local.truck:1.05,ramp:1,ramp.truck:1,recreation:1.2,recreation.truck:1.1,resource:1.2,resource.truck:1.1,restricted:1.2,restricted.truck:1.1,service:1.2,service.truck:1.1,strata:1.2,strata.truck:1.1,yield_lane:1.01,yield_lane.truck:1.01"
+      ROUTER,defaultTruckRouteMultiplier,9
+      ROUTER,defaultTurnCost,"3,1,10,5"
+      ROUTER,defaultXingCost,"3,10,7,1.2"
+      ROUTER,disclaimer,https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535
+      ROUTER,glossaryBaseUrl,https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md
+      ROUTER,kmlStylesUrl,http://openmaps.gov.bc.ca/kml/router_results_styles.kml
+      ROUTER,maxOptimalRoutePoints,100
+      ROUTER,maxPairs,1000
+      ROUTER,maxRoutePoints,100
+      ROUTER,moreInfoUrl,https://www2.gov.bc.ca/gov/content?id=9D99E684CCD042CD88FADC51E079B4B5
+      ROUTER,privacyStatement,https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932
+  apiVersion: v1
+kind: Template
+parameters:
+- name: DATASTORE_URL
+  description: "minio/caddy data provider url"
+  value: https://data-integration-datastore.apps.silver.devops.gov.bc.ca/geocoder/
