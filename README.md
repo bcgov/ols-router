@@ -82,6 +82,13 @@ oc get all -l template=router-sidecar-buildconfigs -n 1475a9-tools
 # use delete
 oc delete all -l template=router-sidecar-buildconfigs -n 1475a9-tools
 ```
+## `cfg-maps.yaml`
+
+Provision config files:
+
+```
+oc process -f cfg-maps.yaml | oc apply -f -
+```
 
 ## `router.template.yaml`
 
