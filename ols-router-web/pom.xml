@@ -21,7 +21,7 @@
   <properties>
     <m2eclipse.wtp.contextRoot>/pub/router</m2eclipse.wtp.contextRoot>
     <geotools.version>22.5</geotools.version>
-    <springframework.version>5.3.18</springframework.version>
+    <springframework.version>5.2.21.RELEASE</springframework.version>
     <springframework.security.version>5.2.10.RELEASE</springframework.security.version>
   </properties>
 
