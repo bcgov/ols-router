@@ -64,7 +64,6 @@ parameters:
     displayName: App Environment
     name: ENV
     required: true
-
   - description: The hostname for the Admin App.
     displayName: Admin configurtion app hostname
     name: ROUTER_ADMIN_HOSTNAME
@@ -80,26 +79,24 @@ parameters:
     name: ROUTE_SUBDOMAIN
     required: true
     value:  apps.silver.devops.gov.bc.ca
-
-  - description: default-dockercfg secret for the 'default' Service account
-    displayName: Default service account docker Secret
-    name: DEFAULT_DOCKERCFG
+  - description: minio secret for the data provider access to pull router configs
+    displayName: MinIO secret
+    name: MINIO_SECRET
     required: true
-    # e.g.
-    # value: default-dockercfg-jgsbn
-
-  - description: docker-secret for the 'default' Service account for Artifactory
-    displayName: Default service account Artifactory docker Secret
-    name: DOCKER_SECRET
-    required: true
-    value:  docker-secret
-
+    value:  minio-router-datastore-dlv
   - name: "ROUTER_IS_TAG"
     description: "The image stream tag to use for the ols-router-sidecar"
     required: true
   - name: "DATA_ADMIN_IS_TAG"
     description: "The image stream tag to use for the ols-admin-sidecar"
     required: true
+  - name: "MINIO_BUCKET"
+    description: "minio bucket containing config files"
+    value: router-configs-dev
+  - name: "DATA_PROVIDER_URL"
+    description: "URL for data provider bucket containing router config files"
+    value: https://minio-router-datastore-prod.apps.silver.devops.gov.bc.ca/
+    requited: true
 
 objects:
 
@@ -159,7 +156,7 @@ objects:
           - name: JAVA_OPTS
             value: -XX:OnOutOfMemoryError="kill -15 %p" -XX:MaxRAMPercentage=75.0
           - name: OLS_FILE_CONFIGURATION_URL
-            value: file://apps/config/router/
+            value: file://apps/config/router/${MINIO_BUCKET}/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
           image: tomcat:9-jre11-slim
@@ -211,8 +208,8 @@ objects:
         - emptyDir: {}
           name: app-volume
         - name: router-config
-          configMap:
-            name: router-file-based-config
+          persistentVolumeClaim:
+            claimName: router-configs
     updateStrategy:
       rollingUpdate:
         partition: 0
@@ -227,7 +224,6 @@ objects:
           requests:
             storage: 1Gi
         storageClassName: netapp-block-standard
-
 # Deployment for ols-router-admin
 - kind: Deployment
   apiVersion: apps/v1
@@ -263,7 +259,7 @@ objects:
           - name: CATALINA_BASE
             value: /usr/local/tomcat
           - name: OLS_FILE_CONFIGURATION_URL
-            value: file://apps/config/router/
+            value: file://apps/config/router/${MINIO_BUCKET}/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
           image: tomcat:9-jre11-slim
@@ -319,10 +315,113 @@ objects:
         - emptyDir: {}
           name: app-volume
         - name: router-config
-          configMap:
-            name: router-file-based-config
+          persistentVolumeClaim:
+            claimName: router-configs
   status: {}
+# minio client to sync content for admin app
+- kind: Deployment
+  apiVersion: apps/v1
+  metadata:
+    name: ${APP_NAME}-${ENV}-data-provider-monitor
+    generation: 1
+    labels:
+      app: ${APP_NAME}-${ENV}-data-provider-monitor
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: ${APP_NAME}-${ENV}-data-provider-monitor
+        name: ${APP_NAME}-${ENV}-data-provider-monitor
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          app: ${APP_NAME}-${ENV}-data-provider-monitor
+          name: ${APP_NAME}-${ENV}-data-provider-monitor
+      spec:
+        volumes:
+          - name: router-configs
+            persistentVolumeClaim:
+              claimName: router-configs
+          - name: router-mc
+            persistentVolumeClaim:
+              claimName: router-mc
+          - name: router-configs
+            persistentVolumeClaim:
+              claimName: router-configs
+        containers:
+          - resources:
+              limits:
+                cpu: 250m
+                memory: 1Gi
+              requests:
+                cpu: 50m
+                memory: 256Mi
+            terminationMessagePath: /dev/termination-log
+            name: ${APP_NAME}-data-provider-monitor
+            env:
+              - name: MINIO_ROOT_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: ${MINIO_SECRET}
+                    key: minioAccessKey
+              - name: MINIO_ROOT_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: ${MINIO_SECRET}
+                    key: minioSecretKey
+              - name: DATA_PROVIDER_URL
+                value: ${DATA_PROVIDER_URL}
+              - name: MINIO_BUCKET
+                value: ${MINIO_BUCKET}
+            ports:
+              - containerPort: 9000
+                protocol: TCP
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+              - name: router-configs
+                mountPath: /data
+              - name: router-mc
+                mountPath: /.mc
+            terminationMessagePolicy: File
+            image: >-
+              image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/minio-client:latest
+            args:
+              - -C
+              - /data
+              - server
+              - /data
+            readinessProbe:
+              httpGet:
+                path: /minio/health/ready
+                port: 9000
+                scheme: HTTP
+              initialDelaySeconds: 120
+              periodSeconds: 15
+              timeoutSeconds: 10
+              successThreshold: 1
+              failureThreshold: 3
+            lifecycle:
+              postStart:
+                exec:
+                  command:
+                    - "sh"
+                    - "-c"
+                    - >
+                      mc alias set router-prod $DATA_PROVIDER_URL $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD;
 
+                      mc cp --recursive router-prod/$MINIO_BUCKET/ /data/$MINIO_BUCKET/;
+
+                      nohup mc mirror --watch /data/$MINIO_BUCKET/ router-prod/$MINIO_BUCKET/ >/dev/null 2>&1 &
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+    strategy:
+      type: Recreate
+    revisionHistoryLimit: 10
+    progressDeadlineSeconds: 600
 # Serice for ols-router-admin
 - kind: Service
   apiVersion: v1
@@ -341,7 +440,6 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
-
 # Route for ols-router-admin
 - kind: Route
   apiVersion: route.openshift.io/v1
@@ -362,7 +460,6 @@ objects:
     wildcardPolicy: None
   status:
     ingress: null
-
 # Service for ols-router-web
 - kind: Service
   apiVersion: v1
@@ -381,12 +478,10 @@ objects:
     type: ClusterIP
   status:
     loadBalancer: {}
-
 # For initial deployment you may want to create a route.
 # Routes should be managed through the Kong API Gateway.
 # see ... for instructions on how to configure Kong gateway
 # routes.
-
 - kind: Route
   apiVersion: route.openshift.io/v1
   metadata:
@@ -405,7 +500,6 @@ objects:
     wildcardPolicy: None
   status:
     ingress: null
-
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
@@ -419,7 +513,6 @@ objects:
     podSelector: {}
     policyTypes:
     - Ingress
-
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
@@ -431,7 +524,6 @@ objects:
     podSelector: {}
     policyTypes:
     - Ingress
-
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
@@ -440,7 +532,6 @@ objects:
     podSelector: {}
     policyTypes:
     - Ingress
-
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
@@ -460,3 +551,43 @@ objects:
               matchLabels:
                 environment: prod
                 name: 264e6f
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: router-configs
+    finalizers:
+      - kubernetes.io/pvc-protection
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: netapp-file-standard
+    volumeMode: Filesystem
+  status:
+    phase: Bound
+    accessModes:
+      - ReadWriteMany
+    capacity:
+      storage: 100Mi
+- kind: PersistentVolumeClaim
+  apiVersion: v1
+  metadata:
+    name: router-mc
+    finalizers:
+      - kubernetes.io/pvc-protection
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 100Mi
+    storageClassName: netapp-file-standard
+    volumeMode: Filesystem
+  status:
+    phase: Bound
+    accessModes:
+      - ReadWriteOnce
+    capacity:
+      storage: 100Mi
