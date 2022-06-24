@@ -107,6 +107,8 @@ objects:
       app: ols-router-web
       statefulset: ols-router-web
     name: ols-router-web
+    image.openshift.io/triggers: >-
+      [{"from":{"kind":"ImageStreamTag","name":"ols-router-admin-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"api\")].image"}]
   spec:
     podManagementPolicy: OrderedReady
     replicas: 4
@@ -131,20 +133,6 @@ objects:
                   values:
                   - ols-router-web
               topologyKey: kubernetes.io/hostname
-        initContainers:
-        - command:
-          - cp
-          - /ols-router.war
-          - /app/ROOT.war
-          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
-          imagePullPolicy: Always
-          name: war
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /app
-            name: app-volume
         containers:
         - command:
           - catalina.sh
@@ -158,7 +146,8 @@ objects:
             value: file://apps/config/router/${MINIO_BUCKET}/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
-          image: tomcat:9-jre11-slim
+          image: >-
+              image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-sidecar:${ROUTER_IS_TAG}
           imagePullPolicy: IfNotPresent
           name: tomcat
           ports:
@@ -190,8 +179,6 @@ objects:
             name: tc-work
           - mountPath: /usr/local/tomcat/conf/Catalina
             name: tc-conf
-          - mountPath: /usr/local/tomcat/webapps
-            name: app-volume
           - name: router-config
             mountPath: /apps/config/router
         dnsPolicy: ClusterFirst
@@ -204,8 +191,6 @@ objects:
           name: tc-work
         - emptyDir: {}
           name: tc-conf
-        - emptyDir: {}
-          name: app-volume
         - name: router-config
           persistentVolumeClaim:
             claimName: ${DATA_PROVIDER_PVC}
@@ -261,9 +246,10 @@ objects:
             value: file://apps/config/router/${MINIO_BUCKET}/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
-          image: tomcat:9-jre11-slim
           imagePullPolicy: IfNotPresent
           name: tomcat
+          image: >-
+            image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-admin-sidecar:${DATA_ADMIN_IS_TAG}
           ports:
           - containerPort: 8080
             name: catalina-http
@@ -283,25 +269,9 @@ objects:
             name: tc-work
           - mountPath: /usr/local/tomcat/conf/Catalina
             name: tc-conf
-          - mountPath: /usr/local/tomcat/webapps
-            name: app-volume
           - name: router-config
             mountPath: /apps/config/router
         dnsPolicy: ClusterFirst
-        initContainers:
-        - command:
-          - cp
-          - /ols-router-admin.war
-          - /app/int.war
-          image: image-registry.openshift-image-registry.svc:5000/${TOOLS_NAMESPACE}/ols-router-admin-sidecar:${DATA_ADMIN_IS_TAG}
-          imagePullPolicy: Always
-          name: war
-          resources: {}
-          terminationMessagePath: /dev/termination-log
-          terminationMessagePolicy: File
-          volumeMounts:
-          - mountPath: /app
-            name: app-volume
         restartPolicy: Always
         schedulerName: default-scheduler
         securityContext: {}
@@ -311,8 +281,6 @@ objects:
           name: tc-work
         - emptyDir: {}
           name: tc-conf
-        - emptyDir: {}
-          name: app-volume
         - name: router-config
           persistentVolumeClaim:
             claimName: ${DATA_PROVIDER_PVC}

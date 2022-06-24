@@ -1,17 +1,5 @@
 # Route Planner API - Build and OpenShift Deployment
 
-## Build Instructions
-
-The Following Jenkins Job is used to Build the artifacts:
-
- [OLS Router Build](https://cis.apps.gov.bc.ca/int/view/LOC/job/ols/job/OLS%20OSS%20Jobs/job/OLS%20Router%20Build/)
-
-Artifacts are managed in Artifactory:
-
-https://delivery.apps.gov.bc.ca/artifactory/
-
-`lib-snapshot-repo` and   `lib-release-repo` folders.
-
 
 ## OpenShift Deployment Instructions
 
@@ -59,15 +47,8 @@ This contains the build config for:
 `ols-router-admin-sidecar`  
 `ols-router-sidecar`
 
-This template provides a parameterized BuildConfig for both sidedar containers.
+This template provides a parameterized BuildConfig for both images.
 The resulting BuildConfig, when run, created an imageStream containing the indicated version of the ols-router-admin WAR file.
-
-  * When the associated Deployment runs, this imageStream is used as an initContainer in a pod.
-  * It's purpose is to "copy the ols-router-admin.war to /app/ROOT.war"
-  * The long-running container then launches tomcat which subsequently loads the WAR, thus starting the application.
-
-For details on the pattern being used see:
-  https://github.com/kubernetes/examples/tree/master/staging/javaweb-tomcat-sidecar
 
 ### Example  
 ```bash
@@ -96,44 +77,12 @@ This provision all the objects relevant to the Route Planner API.  This includes
 
 * Route Planner API web app
 * Data (or) Config Admin Web App
-* Cassandra Cluster
 * necessary services and routes
 * necessary NetworPolcies.
 
-### Example
+#### Using env. files
 
-```bash
-#!/bin/bash
-
-NS=1475a9-dev
-TOOLS=1475a9-tools
-DOCKER_CFG_SECRET=default-dockercfg-XXXXX
-
-# oc get all -l app=ols-router-web -n ${NS}
-# oc delete  all -l app=ols-router-web -n ${NS}
-
-oc process -f router-template.yaml \
-    -p TOOLS_NAMESPACE=${TOOLS} \
-    -p ENV=dev \
-    -p DEFAULT_DOCKERCFG=${DOCKER_CFG_SECRET} \
-    -o yaml \
-    | oc apply -f - -n ${NS} #\
-    #--dry-run=client
-    #| yq -C - r
-```
-#### Alternatively  
-Copy or rename `example.env` to `dev.env` for this example to work. _make changes as required
-```bash
-$ cat dev.env
-TOOLS_NAMESPACE=1475a9-tools
-ENV=dev
-# change this to your configured secret
-DEFAULT_DOCKERCFG=default-dockercfg-XXXXX
-ROUTER_IS_TAG=latest
-DATA_ADMIN_IS_TAG=latest
-$
-$
-$ oc process -f router.template.yaml --param-file=dev.env -o yaml
+$ oc process -f router.template.yaml --param-file=env.dev -o yaml | oc apply -f - -n 1475a9-dev
 
 ```
 
