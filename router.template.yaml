@@ -107,8 +107,9 @@ objects:
       app: ols-router-web
       statefulset: ols-router-web
     name: ols-router-web
-    image.openshift.io/triggers: >-
-      [{"from":{"kind":"ImageStreamTag","name":"ols-router-admin-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"api\")].image"}]
+    annotations:
+      image.openshift.io/triggers: >-
+        [{"from":{"kind":"ImageStreamTag","name":"ols-router-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tomcat\")].image"}]
   spec:
     podManagementPolicy: OrderedReady
     replicas: 4
@@ -218,6 +219,9 @@ objects:
       name: ols-router-admin
       template: ols-router-admin
     name: ols-router-admin
+    annotations:
+      image.openshift.io/triggers: >-
+        [{"from":{"kind":"ImageStreamTag","name":"ols-router-admin-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tomcat\")].image"}]
   spec:
     progressDeadlineSeconds: 600
     replicas: 1
