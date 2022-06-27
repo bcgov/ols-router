@@ -343,5 +343,14 @@
 			</properties>
 		</profile>
 	</profiles>
+	<repositories>
+           <repository>
+              <id>ps-libs</id>
+              <name>artifactory</name>                        
+              <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs/</url>
+        </repository>
+      </repositories>
 	
+
+
 </project>
