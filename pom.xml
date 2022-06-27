@@ -342,15 +342,19 @@
 				<environment>k8s</environment>
 			</properties>
 		</profile>
+              <profiles>
+                <profile>
+                  <id>router</id>
+                  <repositories>
+                      <repository>
+                        <id>ps-repo</id>
+                        <name>artifactory</name>
+                        <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs/</url>
+                      </repository>
+                  </repositories>
+                </profile>
+              </profiles>
 	</profiles>
-	<repositories>
-           <repository>
-              <id>ps-libs</id>
-              <name>artifactory</name>                        
-              <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs/</url>
-        </repository>
-      </repositories>
-	
 
 
 </project>
