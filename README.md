@@ -52,8 +52,7 @@ The resulting BuildConfig, when run, created an imageStream containing the indic
 
 ### Example  
 ```bash
-oc process -f router.buildconfigs.template.yaml -o yaml \
- | oc apply -f - -n 1475a9-tools
+oc process -f router.buildconfigs.template.yaml --param-file=env.build -o yaml | oc apply -f - -n 1475a9-tools
 ```
 #### Remove
 ```bash
@@ -82,8 +81,8 @@ This provision all the objects relevant to the Route Planner API.  This includes
 
 #### Using env. files
 
+```bash
 $ oc process -f router.template.yaml --param-file=env.dev -o yaml | oc apply -f - -n 1475a9-dev
-
 ```
 
 #### Remove
