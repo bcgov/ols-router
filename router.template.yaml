@@ -104,9 +104,9 @@ objects:
   apiVersion: apps/v1
   metadata:
     labels:
-      app: ols-router-web
-      statefulset: ols-router-web
-    name: ols-router-web
+      app: ols-${APP_NAME}-web
+      statefulset: ols-${APP_NAME}-web
+    name: ols-${APP_NAME}-web
     annotations:
       image.openshift.io/triggers: >-
         [{"from":{"kind":"ImageStreamTag","name":"ols-router-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tomcat\")].image"}]
@@ -116,13 +116,13 @@ objects:
     revisionHistoryLimit: 10
     selector:
       matchLabels:
-        statefulset: ols-router-web
-    serviceName: ols-router-web
+        statefulset: ols-${APP_NAME}-web
+    serviceName: ols-${APP_NAME}-web
     template:
       metadata:
         labels:
-          app: ols-router-web
-          statefulset: ols-router-web
+          app: ols-${APP_NAME}-web
+          statefulset: ols-${APP_NAME}-web
       spec:
         affinity:
           podAntiAffinity:
@@ -132,7 +132,7 @@ objects:
                 - key: statefulset
                   operator: In
                   values:
-                  - ols-router-web
+                  - ols-${APP_NAME}-web
               topologyKey: kubernetes.io/hostname
         containers:
         - command:
@@ -215,10 +215,10 @@ objects:
   metadata:
     generation: 1
     labels:
-      app: ols-router-admin
-      name: ols-router-admin
-      template: ols-router-admin
-    name: ols-router-admin
+      app: ols-${APP_NAME}-admin
+      name: ols-${APP_NAME}-admin
+      template: ols-${APP_NAME}-admin
+    name: ols-${APP_NAME}-admin
     annotations:
       image.openshift.io/triggers: >-
         [{"from":{"kind":"ImageStreamTag","name":"ols-router-admin-sidecar:${ENV}","namespace":"1475a9-tools"},"fieldPath":"spec.template.spec.containers[?(@.name==\"tomcat\")].image"}]
@@ -228,16 +228,16 @@ objects:
     revisionHistoryLimit: 10
     selector:
       matchLabels:
-        app: ols-router-admin
-        name: ols-router-admin
+        app: ols-${APP_NAME}-admin
+        name: ols-${APP_NAME}-admin
     strategy:
       type: Recreate
     template:
       metadata:
         creationTimestamp: null
         labels:
-          app: ols-router-admin
-          name: ols-router-admin
+          app: ols-${APP_NAME}-admin
+          name: ols-${APP_NAME}-admin
       spec:
         containers:
         - command:
@@ -294,15 +294,15 @@ objects:
   apiVersion: v1
   metadata:
     creationTimestamp: null
-    name: ols-router-admin
+    name: ols-${APP_NAME}-admin
   spec:
     ports:
-    - name: ols-router-admin
+    - name: ols-${APP_NAME}-admin
       port: 8080
       protocol: TCP
       targetPort: 8080
     selector:
-      app: ols-router-admin
+      app: ols-${APP_NAME}-admin
     sessionAffinity: None
     type: ClusterIP
   status:
@@ -312,17 +312,17 @@ objects:
   apiVersion: route.openshift.io/v1
   metadata:
     creationTimestamp: null
-    name: ols-router-admin
+    name: ols-${APP_NAME}-admin
   spec:
     host: ${ROUTER_ADMIN_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
     path: /int/
     port:
-      targetPort: ols-router-admin
+      targetPort: ols-${APP_NAME}-admin
     tls:
       termination: edge
     to:
       kind: Service
-      name: ols-router-admin
+      name: ols-${APP_NAME}-admin
       weight: 100
     wildcardPolicy: None
   status:
@@ -332,15 +332,15 @@ objects:
   apiVersion: v1
   metadata:
     creationTimestamp: null
-    name: ols-router-web
+    name: ols-${APP_NAME}-web
   spec:
     ports:
-    - name: ols-router-web
+    - name: ols-${APP_NAME}-web
       port: 8080
       protocol: TCP
       targetPort: 8080
     selector:
-      app: ols-router-web
+      app: ols-${APP_NAME}-web
     sessionAffinity: None
     type: ClusterIP
   status:
@@ -353,16 +353,16 @@ objects:
   apiVersion: route.openshift.io/v1
   metadata:
     creationTimestamp: null
-    name: ols-router-api
+    name: ols-${APP_NAME}-api
   spec:
-    host: ${ROUTER_API_HOSTNAME}-${ENV}.${ROUTE_SUBDOMAIN}
+    host: ${ROUTER_API_HOSTNAME}-api-${ENV}.${ROUTE_SUBDOMAIN}
     port:
-      targetPort: ols-router-web
+      targetPort: ols-${APP_NAME}-web
     tls:
       termination: edge
     to:
       kind: Service
-      name: ols-router-web
+      name: ols-${APP_NAME}-web
       weight: 100
     wildcardPolicy: None
   status:
@@ -406,7 +406,7 @@ objects:
   spec:
     podSelector:
       matchLabels:
-        app: ols-router-web
+        app: ols-${APP_NAME}-web
     ingress:
       - from:
           - namespaceSelector:
