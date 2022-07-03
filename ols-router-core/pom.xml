@@ -13,7 +13,7 @@
 	<artifactId>ols-router-core</artifactId>
 	<packaging>jar</packaging>
 	<properties>
-		<ols-util.version>2.1.6-RELEASE</ols-util.version>
+		<ols-util.version>1.2.0-RELEASE</ols-util.version>
 	</properties>
 	<dependencies>
 		<dependency>
