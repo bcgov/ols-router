@@ -168,10 +168,10 @@ objects:
           resources:
             requests:
               cpu: "50m"
-              memory: 1Gi
+              memory: 2Gi
             limits:
               cpu: "500m"
-              memory: 2Gi
+              memory: 3Gi
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
