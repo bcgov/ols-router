@@ -166,6 +166,9 @@ objects:
             successThreshold: 1
             timeoutSeconds: 1
           resources:
+            requests:
+              cpu: "50m"
+              memory: 1Gi
             limits:
               cpu: "500m"
               memory: 2Gi
@@ -367,38 +370,38 @@ objects:
     wildcardPolicy: None
   status:
     ingress: null
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: allow-from-openshift-ingress
-  spec:
-    ingress:
-    - from:
-      - namespaceSelector:
-          matchLabels:
-            network.openshift.io/policy-group: ingress
-    podSelector: {}
-    policyTypes:
-    - Ingress
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: allow-same-namespace
-  spec:
-    ingress:
-    - from:
-      - podSelector: {}
-    podSelector: {}
-    policyTypes:
-    - Ingress
-- kind: NetworkPolicy
-  apiVersion: networking.k8s.io/v1
-  metadata:
-    name: deny-by-default
-  spec:
-    podSelector: {}
-    policyTypes:
-    - Ingress
+# - kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: allow-from-openshift-ingress
+#   spec:
+#     ingress:
+#     - from:
+#       - namespaceSelector:
+#           matchLabels:
+#             network.openshift.io/policy-group: ingress
+#     podSelector: {}
+#     policyTypes:
+#     - Ingress
+# - kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: allow-same-namespace
+#   spec:
+#     ingress:
+#     - from:
+#       - podSelector: {}
+#     podSelector: {}
+#     policyTypes:
+#     - Ingress
+# - kind: NetworkPolicy
+#   apiVersion: networking.k8s.io/v1
+#   metadata:
+#     name: deny-by-default
+#   spec:
+#     podSelector: {}
+#     policyTypes:
+#     - Ingress
 - kind: NetworkPolicy
   apiVersion: networking.k8s.io/v1
   metadata:
