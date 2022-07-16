@@ -144,7 +144,7 @@ objects:
           - name: JAVA_OPTS
             value: -XX:OnOutOfMemoryError="kill -15 %p" -XX:MaxRAMPercentage=75.0
           - name: OLS_FILE_CONFIGURATION_URL
-            value: file://apps/config/router/${MINIO_BUCKET}/
+            value:  https://router-datastore-prod.apps.silver.devops.gov.bc.ca/${MINIO_BUCKET}/
           - name: OLS_ROUTER_CONFIGURATION_STORE
             value: ca.bc.gov.ols.config.FileConfigurationStore
           image: >-
