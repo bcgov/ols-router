@@ -193,7 +193,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private EdgeMerger doRoute(RoutingParameters params) {
 		List<Point> points = params.getFullPoints();
-		SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide());
+		SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide(), false);
 		return doCoreRoute(params, edgeSplits);
 	}
 
@@ -224,14 +224,14 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
-			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.isCorrectSide());
-			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.isCorrectSide());
+			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.isCorrectSide(), true);
+			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
 				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
 				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
 				for(EdgeList edgeList : edgeLists) {
 					if(edgeList == null) {
-						response.addResult("");
+						response.addResult("No Route Found.");
 					} else {
 						EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeList}, graph, params);
 						em.calcDistance();
@@ -264,7 +264,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide());
+		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
@@ -332,39 +332,43 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return optimizedEdgeSplits;
 	}
 	
-	private SplitEdge[] getEdges(List<Point> points, boolean correctSide) {
+	private SplitEdge[] getEdges(List<Point> points, boolean correctSide, boolean allowNullEdges) {
 		SplitEdge[] edgeSplits = new SplitEdge[points.size()];
 		int i = 0;
 		for(Point p : points) {
 			int edgeId = graph.findClosestEdge(p);
+			int[] edgeIds = null;
 			if(edgeId == BasicGraph.NO_EDGE) {
 				//throw new RuntimeException("ERROR: point not near any edge");
-				throw new IllegalArgumentException("Point (" + p.getX() + "," + p.getY() + ") is too far from any edge.");
-			}
-			LineString[] splitString = LineStringSplitter.split(graph.getLineString(edgeId), p);
-			int[] edgeIds;
-			int otherEdgeId = graph.getOtherEdgeId(edgeId);
-			if(otherEdgeId == BasicGraph.NO_EDGE) {
-				// this is a 1-way segment, doesn't matter which side
-				edgeIds = new int[] {edgeId};
-			} else {
-				// this is a 2-way segment 
-				if(correctSide && !graph.isDeadEnded(edgeId)) {
-					// need to check which one is the right side
-					int orientation = computeSide(graph.getLineString(edgeId), p);
-					if(orientation == -1 ^ graph.getReversed(edgeId)) {
-						// the point is on the right of the forward linestring, or the left of the reversed seg
-						edgeIds = new int[] {edgeId};
-					} else {
-						// the point is on the left of the forward seg, or the right of reversed seg
-						edgeIds = new int[] {otherEdgeId};
-					}
-				} else {
-					// we're not correct-side routing, so include both direction edges
-					edgeIds = new int[] {edgeId, otherEdgeId};
+				if(!allowNullEdges) {
+					throw new IllegalArgumentException("Point (" + p.getX() + "," + p.getY() + ") is too far from any edge.");
 				}
+				edgeSplits[i++] = null;
+			} else {
+				LineString[] splitString = LineStringSplitter.split(graph.getLineString(edgeId), p);
+				int otherEdgeId = graph.getOtherEdgeId(edgeId);
+				if(otherEdgeId == BasicGraph.NO_EDGE) {
+					// this is a 1-way segment, doesn't matter which side
+					edgeIds = new int[] {edgeId};
+				} else {
+					// this is a 2-way segment 
+					if(correctSide && !graph.isDeadEnded(edgeId)) {
+						// need to check which one is the right side
+						int orientation = computeSide(graph.getLineString(edgeId), p);
+						if(orientation == -1 ^ graph.getReversed(edgeId)) {
+							// the point is on the right of the forward linestring, or the left of the reversed seg
+							edgeIds = new int[] {edgeId};
+						} else {
+							// the point is on the left of the forward seg, or the right of reversed seg
+							edgeIds = new int[] {otherEdgeId};
+						}
+					} else {
+						// we're not correct-side routing, so include both direction edges
+						edgeIds = new int[] {edgeId, otherEdgeId};
+					}
+				}
+				edgeSplits[i++] = new SplitEdge(edgeIds, p, splitString);
 			}
-			edgeSplits[i++] = new SplitEdge(edgeIds, p, splitString); 
 		}
 		return edgeSplits;
 	}
