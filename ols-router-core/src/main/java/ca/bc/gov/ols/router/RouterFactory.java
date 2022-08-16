@@ -20,8 +20,15 @@ public class RouterFactory {
 	private Properties bootstrapConfig = getBootstrapConfigFromEnvironment();
 	private GeometryFactory geometryFactory;
 	private GeometryReprojector geometryReprojector;
+	private boolean unitTest = false;
 	
 	public RouterFactory() {
+	}
+
+	public void setUnitTestMode(String unitTest) {
+		if("TRUE".equalsIgnoreCase(unitTest)) {
+			this.unitTest = true;
+		}
 	}
 	
 	public void setCassandraContactPoint(String contactPoint) {
@@ -57,6 +64,11 @@ public class RouterFactory {
 	}
 
 	public Router getRouter() {
+		if (unitTest) {
+			logger.info("GeocoderFactory: Creating unit test geocoder instance");
+			bootstrapConfig = getBootstrapUnitTestConfig();
+			return new Router(bootstrapConfig, geometryFactory, geometryReprojector);
+		}
 		logger.info("{}: Creating new router instance", getClass().getName());
 		return new Router(bootstrapConfig, geometryFactory, geometryReprojector);
 	}
@@ -92,6 +104,12 @@ public class RouterFactory {
 		bootstrapConfig.setProperty("OLS_CASSANDRA_REPL_FACTOR", Optional.ofNullable(System.getenv("OLS_CASSANDRA_REPL_FACTOR")).orElse("2"));
 		bootstrapConfig.setProperty("OLS_ROUTER_CONFIGURATION_STORE", Optional.ofNullable(System.getenv("OLS_ROUTER_CONFIGURATION_STORE"))
 				.orElse("ca.bc.gov.ols.config.CassandraConfigurationStore"));
+		return bootstrapConfig;
+	}
+
+	public static Properties getBootstrapUnitTestConfig() {
+		Properties bootstrapConfig = new Properties();
+		bootstrapConfig.setProperty("OLS_ROUTER_CONFIGURATION_STORE", "ca.bc.gov.ols.router.config.InMemoryRouterConfigurationStore");
 		return bootstrapConfig;
 	}
 	
