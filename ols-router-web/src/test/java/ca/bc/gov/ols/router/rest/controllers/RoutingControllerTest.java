@@ -7,6 +7,7 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+
 import java.lang.reflect.Field;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,12 +38,14 @@ class RoutingControllerTest {
         setPrivateField(ctrlr, "router", router);
     }
 
+    @Tag("Prod")
     @Test
     void pingTest() {
         ResponseEntity<String> resp = ctrlr.ping();
         assertEquals(resp.getStatusCode(), HttpStatus.OK);
     }
 
+    @Tag("Prod")
     @Test
     void betweenPairsTest() {
         RoutingParameters params = new RoutingParameters();
