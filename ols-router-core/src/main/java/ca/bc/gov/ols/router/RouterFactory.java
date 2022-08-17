@@ -65,7 +65,7 @@ public class RouterFactory {
 
 	public Router getRouter() {
 		if (unitTest) {
-			logger.info("GeocoderFactory: Creating unit test geocoder instance");
+			logger.info("RouterFactory: Creating unit test router instance");
 			bootstrapConfig = getBootstrapUnitTestConfig();
 			return new Router(bootstrapConfig, geometryFactory, geometryReprojector);
 		}
