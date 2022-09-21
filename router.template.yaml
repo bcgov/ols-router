@@ -183,8 +183,6 @@ objects:
             name: tc-work
           - mountPath: /usr/local/tomcat/conf/Catalina
             name: tc-conf
-          - name: router-config
-            mountPath: /apps/config/router
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -195,9 +193,6 @@ objects:
           name: tc-work
         - emptyDir: {}
           name: tc-conf
-        - name: router-config
-          persistentVolumeClaim:
-            claimName: ${DATA_PROVIDER_PVC}
     updateStrategy:
       rollingUpdate:
         partition: 0
