@@ -45,17 +45,19 @@ import ca.bc.gov.ols.rowreader.TsvRowReader;
 
 public class FileRouterDataSource implements RouterDataSource {
 	private final static Logger logger = LoggerFactory.getLogger(FileRouterDataSource.class.getCanonicalName());
-	
-	private RouterConfig config;
-	private GeometryFactory geometryFactory;
-	private TIntObjectHashMap<String> streetNameById;
-	private TIntIntHashMap streetNameIdBySegmentId;
-	private RowReader segmentReader;
+
+	protected RouterConfig config;
+	protected GeometryFactory geometryFactory;
+	protected TIntObjectHashMap<String> streetNameById;
+	protected TIntIntHashMap streetNameIdBySegmentId;
+	protected RowReader segmentReader;
 	private int segmentCount = 0;
-	private RowReader turnRestrictionReader;
+	protected RowReader turnRestrictionReader;
 	//private List<StreetSegment> ferrySegs;
 	//private int nextFerrySeg = -1;
 	//private TIntObjectHashMap<List<StreetSegment>> ferrySegsByIntId;
+
+	public FileRouterDataSource(){}
 
 	public FileRouterDataSource(RouterConfig config, GeometryFactory geometryFactory) {
 		logger.trace("{}() constructor called", getClass().getName());
@@ -95,7 +97,7 @@ public class FileRouterDataSource implements RouterDataSource {
 			String leftLocality = segmentReader.getString("left_locality");
 			String rightLocality = segmentReader.getString("right_locality");
 			RoadClass roadClass = RoadClass.convert(segmentReader.getString("road_class"));
-			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind")); 
+			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind"));
 			TravelDirection travelDir = TravelDirection.convert(segmentReader.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(segmentReader.getString("divider_type"));
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("start_traffic_impactor"));
@@ -239,7 +241,7 @@ public class FileRouterDataSource implements RouterDataSource {
 		return getXsvRowReader("turn_classes");
 	}
 
-	private TIntObjectHashMap<String> loadStreetNames() {
+	protected TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = getStreetNames();
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
@@ -274,7 +276,7 @@ public class FileRouterDataSource implements RouterDataSource {
 		return nameIdMap;
 	}
 
-	private TIntIntHashMap loadStreetNameOnSegs() {
+	protected TIntIntHashMap loadStreetNameOnSegs() {
 		// build a map from the StreetSegmentId to primary StreetNameId
 		RowReader reader = getStreetNameOnSegments();
 		TIntIntHashMap nameIdBySegmentIdMap = new TIntIntHashMap(300000);
@@ -322,15 +324,15 @@ public class FileRouterDataSource implements RouterDataSource {
 		}
 	}
 
-	private RowReader getStreetSegments() {
+	protected RowReader getStreetSegments() {
 		return getJsonRowReader("street_load_street_segments_router");
 	}
 
-	private RowReader getStreetNames() {
+	protected RowReader getStreetNames() {
 		return getJsonRowReader("street_load_street_names");
 	}
 	
-	private RowReader getStreetNameOnSegments() {
+	protected RowReader getStreetNameOnSegments() {
 		return getJsonRowReader("street_load_street_name_on_seg_xref");
 	}
 	
