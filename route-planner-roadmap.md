@@ -2,6 +2,6 @@
 Version | Release Date | Features
 -------: | --------------- | -------------
 2.2|March 2022| Route List Editor
-|||Batch Route Planner
-2.3|March 2023|Nearest Service Centre script (Python)
-|||Batch Route Optimizer for multiple trucks on routes with many waypoints 
+|||Snap tolerance override parameter
+|||Enable Transport Line IDs in response
+|||Add data reference dates to response
