@@ -21,9 +21,3 @@ Term | Definition
 <a name="Time dependent routing (Dynamic)">Time dependent routing (Dynamic)</a> | Takes into account both predicted congestions using historic data as well as realtime congestions.
 <a name="Time-dependent scalars">Time-dependent scalars</a> | .
 <a name="Time-independent scalars">Time-independent scalars</a> | .
-<a name=""></a> | .
-<a name=""></a> | .
-<a name=""></a> | .
-<a name=""></a> | .
-<a name=""></a> | .
-
