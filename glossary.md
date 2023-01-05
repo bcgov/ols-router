@@ -6,6 +6,7 @@ Term | Definition
 <a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner API
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is fastest
+<a name="departure">departure</a> | The departure date and time in internet timestamp notation as defined in RFC 3339, section 5.6 (e.g., 2019-02-28T11:36:00-08:00). This parameter will be ignored if time-dependency is disabled.
 <a name="directions">directions</a> | A structured sequence of turn-by-turn directions including notifications
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
 <a name="distance">distance</a> | Length of the best route found (in distanceUnit units)
