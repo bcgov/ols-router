@@ -3,30 +3,30 @@
 This guide is aimed at developers and web masters who would like to incorporate the BC Route Planner into their applications and websites.
 <br>
 ## Introduction
-The BC Route Planner REST API lets you integrate basic routing between BC locations into your own applications. This document defines aspects of the REST API that are not covered in the [Swagger definition](https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). You can explore the API in the [API Console](https://catalogue.data.gov.bc.ca/dataset/bc-route-planner/resource/82cd3194-0955-4d7e-b35a-78a98fda153a/view/80721e92-1a39-4300-ac76-6cfb09493d81). For a list of the latest changes to the Route Planner API, see [Route Planner Release Notes](https://bcgov.github.io/ols-router/rpng-release-notes.html)
+The BC Route Planner REST API lets you integrate basic routing between BC locations into your own applications. This document defines aspects of the REST API that are not covered in the [Swagger definition](https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). You can explore the API in the [API Console](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). For a list of the latest changes to the Route Planner API, see [Route Planner Release Notes](https://bcgov.github.io/ols-router/rpng-release-notes.html)
 <br>
 
 Your application can store router results or display them on any web map. The BC Route Planner API supports GET and POST requests. POST should be used when you have many waypoints to visit.
 
 ## Technical Overview
 
-Access to the BC Route Planner API  is mediated by the Data Systems and Services branch API Services Gateway.
+Access to the BC Route Planner API is mediated by the Data Systems and Services branch [API Services Gateway](https://api.gov.bc.ca/).
 
-Source data for the BC Route Planner comes from the BC Digital Road Atlas which is updated on a monthly basis by GeoBC in the BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development. The BC Route Planner loads this data from files into in-memory data structures at startup. A small configuration file of global parameters is also loaded at startup from a redundant Apache Cassandra key-value Datastore.  
+Source data for the BC Route Planner comes from the BC Digital Road Atlas which is updated on a monthly basis by GeoBC in the BC Ministry of Forests, Lands, Natural Resource Operations and Rural Development. The BC Route Planner loads this data from files into in-memory data structures at startup. A small configuration file of global parameters is also loaded at startup from a key-value Datastore.  
 
 The BC Route Planner is written in Java 11.0 and uses the jSprit open source libraries. The [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html) web application, which demonstrates the features of the BC Route Planner, is written in JavaScript and uses jQuery and Leaflet libraries and plugins.
 
 ## Limitations of Route Planner API v2.1
-Route Planner API v2.1 is backward-compatible with v2.0. There are still severe limitations on the new features and data in Route Planner v2.1 . For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
+Route Planner API v2.1 is backward-compatible with v2.0. There are still some limitations on the new features and data in Route Planner v2.1 . For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
 
 ## API Key
-Use of the BC Route Planner REST API is currently restricted to use by government applications. A cost model may become available soon to enable use beyond government applications. If you are working on a government application that needs routing, please submit a request for access via the [API Services Portal](https://api.gov.bc.ca/)
+Use of the BC Route Planner REST API is currently restricted to use by BC government applications. A cost model may become available soon to enable use beyond government applications. If you are working on a government application that needs routing, please submit a request for access via the [API Services Portal](https://api.gov.bc.ca/)
 
-Every route planner request needs an apiKey header that contains your api key as follows:
+Every route planner request needs an apikey header that contains your api key as follows:
 ```
-apiKey: <myapikey>
+apikey: <myapikey>
 ```	
-Do not put the apiKey in the request URL because it will expose your api key.
+Do not put the apikey in the request URL because it will expose your api key.
 
 
 ## Distance Resource
@@ -1244,7 +1244,8 @@ Attribute Name |	Type
 [timeText](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#timeText) | String
 [visitOrder](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#visitOrder) | List of Integer
 [route](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List of Point
-[directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#route) | List
+[notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) | String
+[directions](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#directions) | String
 
 Here is a sample json response:
 
@@ -1301,6 +1302,7 @@ Here is a sample json response:
 		[-123.35928, 48.42914],
 		[-123.36002, 48.42919]
 	],
+	"notifications": [],
 	"directions": [{
 		"text": "Continue onto View St for 7 m (0 seconds)",
 		"point": [-123.36517, 48.42545]
