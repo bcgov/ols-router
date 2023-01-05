@@ -18,6 +18,8 @@
 |14| Only one height restriction represented|Height restrictions vary by lane and travel direction.|Leave single height value to represent minimum max height across all lanes and both directions. Detailed height restrictions will come from a separate, MOTI restriction data service that ties road-restricting features to ITN road segments.
 |15|No time-dependent max speed property|Can't represent school zone speed limits which are only in force during school hours| ?
 |16|NO implicit flag in turn restrictions|Can't tell if a given turn-restriction should have a sign on the ground for QA|Add implicit flag to turn restrictions| 
-|17|Access restriction codes need review|||
+|17|Some access restrictions are represented as road names instead of access restriction codes|Best routes will include road that a given vehicle type is not allowed on|Add appropriate access restrictions|
 |18|Turn-restrictions need a vehicle type property|Can't specify a truck-only turn restriction|add vehicle-type:String property with possible values of truck and any
 |19|Many yield lanes are missing|Best route duration will be a bit higher because yield lanes have lower turn cost than stop lanes|Add yield lanes
+|20|All 22,000 intersections on the backbone and ribs of the highway and Greater Vancouver road networks need their turn-restrictions validated and corrected if necessary|Best routes will contain illegal turns|Validate and fix turn-restrictions
+|21|Many divided road intersections are missing connector segments|Missing segments will prevent the router from including valid turns that could make the best route faster|Add missing connector segments
