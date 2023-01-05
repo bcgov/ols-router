@@ -5,9 +5,11 @@ Term | Definition
 <a name=best route>best route</a> | The route found by the route planner that best meets the constraints specified by the input parameters of a given routing request
 <a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner API
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API
+<a name="correctSide">correctSide</a> | If true, the route starts and ends on same side of road as start and end points. Default is false.
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is fastest
 <a name="departure">departure</a> | The departure date and time in internet timestamp notation as defined in RFC 3339, section 5.6 (e.g., 2019-02-28T11:36:00-08:00). This parameter will be ignored if time-dependency is disabled.
 <a name="directions">directions</a> | A structured sequence of turn-by-turn directions including notifications
+<a name="disable">disable</a> | A comma-separated list of time-related modules to disable (e.g., sc,tf,ev,td).
 <a name="disclaimer">disclaimer</a> | Legal disclaimer of the BC Route Planner API
 <a name="distance">distance</a> | Length of the best route found (in distanceUnit units)
 <a name="distanceUnit">distanceUnit</a> | Unit of measure used by distance property. Allowed values are km (kilometres) and mi (miles). Default is km.
@@ -32,5 +34,6 @@ Term | Definition
 <a name="time">time</a> | Duration of the best route found (in seconds)
 <a name="timeText">timeText</a> | Duration of the best route found in structured English (e.g., 1 hour and 15 minutes)
 <a name="toPoints">toPoints</a> | A list of destination points in geographic coordinates (lon/lat). Commas are used to separate coordinates and points as in the following list of two points: -124.972951,49.715181,-123.139464,49.704015
+<a name="truckRouteMultiplier">truckRouteMultiplier</a> | The truck route multiplier value is used to multiply the cost of using roads that are not truck routes.
 <a name="version">version</a> | Software version of the BC Route Planner API
 <a name="visitOrder">visitOrder</a> | Represents the position in the optimal order each input point should appear in. For example, a visitOrder of [0,3,2,4,1] means input point 0 is output point 0, input point 1 is output point 3, input point 2 is output point 2, input point 3 is output point 4, and input point 4 is output point 1
