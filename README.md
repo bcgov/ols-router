@@ -9,7 +9,7 @@ In year two (ending March 2020), we added support for truck routing which takes 
 
 In year three (ending March 2021), we added support for vehicle-type specific turn restrictions and timed notifications. A timed notification is a notice that has an effective time period. During this period, the notice is displayed on the appropriate leg of the best route in turn-by-turn directions. A notification doesn't affect the computation of best route.
 
-Details on further releases can be found on the [BC Route Planner What's New page](https://www2.gov.bc.ca/gov/content?id=51364680561947AA9372AF1817EC2ACD), the [BC Route Planner release notes](rpng-release-notes.md) or the [BC Route Planner Roadmap](https://github.com/BK01/ols-router/blob/gh-pages/route-planner-roadmap.md).
+Details on recent and future releases can be found on the [BC Route Planner What's New page](https://www2.gov.bc.ca/gov/content?id=51364680561947AA9372AF1817EC2ACD), the [BC Route Planner release notes](rpng-release-notes.md) or the [BC Route Planner Roadmap](https://github.com/BK01/ols-router/blob/gh-pages/route-planner-roadmap.md).
 
 
 [Route Planner 2.1.7 in action](https://ols-demo.apps.gov.bc.ca/index.html)
