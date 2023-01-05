@@ -8,7 +8,7 @@ Term | Definition
 <a name="Dijkstra's Algorithm">Dijkstra's Algorithm</a> | A shortest path algorithm to find the shortest route between nodes in a graph. Quick to implement and relatively quick to solve, no pre-processing. Uses a priority queue typically sorted by edge weight / cost.
 <a name="Edge">Edge</a> | A terms used for a routing arc that connects nodes. In reality this could be a road, pathway, bike lane etc.
 <a name="Edge weight">Edge weight</a> | Travel time a vehicle needs to traverse the edge (road).
-<a name="Heuristic Algorithm">Heuristic Algorithm</a> | The algorithm will attempt to make the best choice at each step as it continues with the goal of finding the overall near-optimal route.
+<a name="Heuristic Algorithm">Heuristic Algorithm</a> | A fast and efficient algorithm which will attempt to make the best choice at each step as it continues with the goal of finding the optimal route.
 <a name="Heuristic - Freeflow">Heuristic - Freeflow</a> | .
 <a name="Heuristic - Predicted path">Heuristic - Predicted path</a> | .
 <a name="Predicted congestions">Predicted congestions</a> | Use functions as edge weights.
