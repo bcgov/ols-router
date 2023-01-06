@@ -18,15 +18,12 @@ Details on recent and future releases can be found on the [BC Route Planner What
 
 [Route Planner NG Acceptance Test Plan](rpng-atp.md)
 
-[Draft Integrated Transportation Network Data Model Gaps](ITN-Data-Mode-Gaps.md)
-
 [Draft Integrated Transportation Network Data Issues](itn-data-issues.md)
 
 [Current milestones for this year](https://github.com/bcgov/ols-router/milestones)
 
 [Promising routing algorithms](https://github.com/bcgov/ols-router/issues/25)
 
-[Comparison between ITN and OSM](osm-itn-stats.md)
 
 ## Phase 1 System Architecture
 The BC Route Planner is a web service (aka API) running behind Kong, our API Gateway. Kong is an NGINX plugin that provides security and access control, metering, and load balancing. Multiple route planner nodes are deployed across multiple data centres to ensure service is not interrupted during scheduled maintenance or data centre failure.
