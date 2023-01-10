@@ -24,15 +24,15 @@ GitHub and ZenHub are to be used for issue logging and tracking
 
 ### Defining, storing, and executing test cases and analysing results
 
-- The *Route Planner Test Framework* (RPTF) can store and execute a suite of routing test cases and compare results to a reference dataset. 
+- The *Route Planner Benchmark Route List* contains a collection of routing test cases. 
 
-- The *Brython Router Probe* will be used for additional testing as needed.
+- The *Router Test Script* (python) will be used to process the *Route Planner Benchmark Route List*.
 
-- The Location Services in Action application will be used for interactive router validation and bash testing.
+- The [Location Services in Action application](https://bcgov.github.io/ols-devkit/ols-demo/index.html?) will be used for interactive router validation.
 
 ## Test Planning Process
 
-Route planning test cases will be stored in both the RPTF and BRP.
+Route planning test cases will be stored in the *Route Planner Benchmark Route List*.
 
 Define test cases for each feature of the router including:
  - correct-side routing
@@ -48,7 +48,6 @@ Define test cases for each feature of the router including:
  - ferry schedules
  - multiple waypoints
  - route optimization
- 
 
 Define route planning test cases for various geographic scenarios including:
  - urban areas (high road density)
@@ -66,23 +65,23 @@ Define Route Planner Administration Application tests including:
 
 ### Preconditions
 
-  * Route Planner deployed on delivery and test platforms
+  * Route Planner code has been deployed
 
-  * Test tools deployed and configured to access route planner on delivery and test platforms
+  * Test tools are configured and ready to access route planner on delivery and test platforms
 
-  * Route planner test suite run on developer and delivery platforms with no major issues (system test)
+  * Route planner tests run with no major issues (system test)
   
-  * Route Planner Admin Application test suite executed manually on developer and delivery platform with no major issues (system test)
+  * Route Planner Admin Application tests executed manually with no major issues (system test)
 
 ### Steps
 
 1. On Test platform, use Routable BC Maker to prepare a routable road network using the latest ITN and turn-restrictions.
 
-2. Run route planner test suite on test platform and compare to delivery platform
+2. Run route planner tests in the test environment
 
-3. Bash test the route planner using the Location Services in Action application
+3. Manually test the route planner using the Location Services in Action application
 
-4. Execute Route Planner Administration test suite manually on Test Platform
+4. Manually test the Route Planner Administration application in the test environment
 
 
 ### Acceptance
