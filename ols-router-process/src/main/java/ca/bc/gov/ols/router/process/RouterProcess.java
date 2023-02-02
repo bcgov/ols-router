@@ -76,6 +76,7 @@ public class RouterProcess {
 	private static String dataDir = "C:/apps/router/data/";
 	private RowWriter logWriter;
 	private EnumMap<RoadClass,Double> trafficMultiplierMap = buildTrafficMultiplierMap();
+	private Map<String, String> dates;
 	
 	public static void main(String[] args) throws IOException {
 		if(args.length != 1) {
@@ -828,7 +829,8 @@ public class RouterProcess {
 
 	private TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
-		RowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
+		JsonRowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
+		dates = reader.getDates();
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
 		int count = 0;
 		while(reader.next()) {
@@ -960,7 +962,7 @@ public class RouterProcess {
 	
 	private void writeSegments(List<RpStreetSegment> segments) {
 		File streetsFile = new File(dataDir + "street_load_street_segments_router.json");
-		RowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments");
+		JsonRowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments", dates);
 		int segCount = 0;
 		for(RpStreetSegment seg : segments) {
 			Map<String,Object> row = new THashMap<String,Object>();

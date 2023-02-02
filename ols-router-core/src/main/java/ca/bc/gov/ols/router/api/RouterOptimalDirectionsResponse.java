@@ -26,8 +26,8 @@ public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse im
 	}
 	
 	public RouterOptimalDirectionsResponse(RoutingParameters params, double distance, double time, LineString path, 
-			List<Partition> partitions, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
-		super(params, distance, time, path, partitions, directions, notifications);
+			List<Partition> partitions, List<Integer> tlids, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
+		super(params, distance, time, path, partitions, tlids, directions, notifications);
 		this.visitOrder = visitOrder;
 	}
 

@@ -15,7 +15,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
@@ -39,6 +45,7 @@ import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.util.UrlCsvInputSource;
 import ca.bc.gov.ols.rowreader.CsvRowReader;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.rowreader.TsvRowReader;
@@ -53,6 +60,8 @@ public class FileRouterDataSource implements RouterDataSource {
 	protected RowReader segmentReader;
 	private int segmentCount = 0;
 	protected RowReader turnRestrictionReader;
+	private Map<String,Map<String,String>> allDates = new HashMap<String,Map<String,String>>();
+
 	//private List<StreetSegment> ferrySegs;
 	//private int nextFerrySeg = -1;
 	//private TIntObjectHashMap<List<StreetSegment>> ferrySegsByIntId;
@@ -384,7 +393,9 @@ public class FileRouterDataSource implements RouterDataSource {
 	private RowReader getJsonRowReader(String name) {
 		try {
 			InputStream is = getInputStream(name + ".json");
-			return new JsonRowReader(is, geometryFactory);
+			JsonRowReader jrr = new JsonRowReader(is, geometryFactory);
+			allDates.put(name, jrr.getDates());
+			return jrr;
 		} catch(IOException ioe) {
 			logger.error("Error opening stream for {} file.", name, ioe);
 			throw new RuntimeException(ioe);
@@ -415,6 +426,46 @@ public class FileRouterDataSource implements RouterDataSource {
 		}
 		URL fileUrl = new URL(fileUrlString);
 		return fileUrl.openStream();		
+	}
+
+	@Override
+	public Map<DateType, ZonedDateTime> getDates() {
+		Map<DateType, ZonedDateTime> dates = new EnumMap<DateType, ZonedDateTime>(DateType.class);
+		boolean ok = true;
+		for(Entry<String, Map<String, String>> dateSet : allDates.entrySet()) {
+			String file = dateSet.getKey();
+			Set<Entry<String, String>> dateEntries = dateSet.getValue().entrySet();
+			if(dateEntries.isEmpty()) {
+				ok = false;
+				logger.error("No dates from file '" + file + "'.");
+			}
+			for(Entry<String, String> dateEntry : dateEntries) {
+				String source = dateEntry.getKey();
+				DateType sourceType = null;
+				String dateStr = dateEntry.getValue();
+				ZonedDateTime date = null;
+				try {
+					date = ZonedDateTime.parse(dateStr);
+				} catch(DateTimeParseException pe) {
+					logger.error("Invalid Date '" + dateStr + "' for source '" + source +"' from file '" + file + "'.");
+				}
+				try {
+					sourceType = DateType.valueOf(source);
+				} catch(IllegalArgumentException iae) {
+					logger.error("Unexpected Date source '" + source +"' from file '" + file + "'.");
+				}
+				if(dates.get(sourceType) == null) {
+					dates.put(sourceType, date);
+				} else if(!dates.get(sourceType).equals(date)) {
+					ok = false;
+					logger.error("Date from file '" + file + "' for source '" + source + "' is not consistent with other files' dates for the same source.");
+				}
+			}
+		}
+		if(ok) {
+			return dates;
+		}
+		return null;
 	}
 
 }

@@ -41,6 +41,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
 import ca.bc.gov.ols.router.RoutingEngine;
+import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.NavInfoParameters;
@@ -60,6 +61,7 @@ import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.util.TimeHelper;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.StopWatch;
 
@@ -93,6 +95,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RouterDistanceResponse response = new RouterDistanceResponse(params, em.getDist(), em.getTime());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
+			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
 			return new RouterDistanceResponse(params);
@@ -109,9 +112,10 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcRoute(gf);
-			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions());
+			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
+			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
 			return new RouterRouteResponse(params);
@@ -128,9 +132,10 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDirections(gf);
-			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications());
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
+			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
 			return new RouterDirectionsResponse(params);
@@ -151,7 +156,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcRoute(gf);
-			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), visitOrder);
+			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalRouteResponse(params);
 		} catch(Throwable t) {
@@ -162,6 +167,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		response.setExecutionTime(sw.getElapsedTime());
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
+		setResponseDates(response);
 		return response;
 	}
 
@@ -177,7 +183,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcDirections(gf);
 			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
-					em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications(), visitOrder);
+					em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalDirectionsResponse(params);
 		} catch(Throwable t) {
@@ -188,12 +194,18 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		response.setExecutionTime(sw.getElapsedTime());
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
+		setResponseDates(response);
 		return response;
+	}
+
+	private void setResponseDates(ApiResponse response) {
+		response.setDataProcessingTimestamp(graph.getDates().get(DateType.PROCESSING_DATE));
+		response.setRoadNetworkTimestamp(graph.getDates().get(DateType.ITN_VINTAGE_DATE));
 	}
 
 	private EdgeMerger doRoute(RoutingParameters params) {
 		List<Point> points = params.getFullPoints();
-		SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide(), false);
+		SplitEdge[] edgeSplits = getEdges(points, params.getSnapDistance(), params.isCorrectSide(), false);
 		return doCoreRoute(params, edgeSplits);
 	}
 
@@ -224,8 +236,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
-			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.isCorrectSide(), true);
-			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.isCorrectSide(), true);
+			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
+			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.getSnapDistance(), params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
 				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
 				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
@@ -264,7 +276,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide(), false);
+		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
@@ -332,11 +344,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return optimizedEdgeSplits;
 	}
 	
-	private SplitEdge[] getEdges(List<Point> points, boolean correctSide, boolean allowNullEdges) {
+	private SplitEdge[] getEdges(List<Point> points, int snapDistance, boolean correctSide, boolean allowNullEdges) {
 		SplitEdge[] edgeSplits = new SplitEdge[points.size()];
 		int i = 0;
 		for(Point p : points) {
-			int edgeId = graph.findClosestEdge(p);
+			int edgeId = graph.findClosestEdge(p, snapDistance);
 			int[] edgeIds = null;
 			if(edgeId == BasicGraph.NO_EDGE) {
 				//throw new RuntimeException("ERROR: point not near any edge");
