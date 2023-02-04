@@ -23,14 +23,14 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.DayCode;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;

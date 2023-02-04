@@ -40,6 +40,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.RoutingEngine;
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
@@ -56,7 +57,6 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;

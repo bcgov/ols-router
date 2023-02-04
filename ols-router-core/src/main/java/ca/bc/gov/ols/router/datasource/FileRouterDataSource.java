@@ -4,9 +4,6 @@
  */
 package ca.bc.gov.ols.router.datasource;
 
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,26 +17,25 @@ import java.time.format.DateTimeParseException;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
@@ -49,6 +45,8 @@ import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.rowreader.TsvRowReader;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 public class FileRouterDataSource implements RouterDataSource {
 	private final static Logger logger = LoggerFactory.getLogger(FileRouterDataSource.class.getCanonicalName());

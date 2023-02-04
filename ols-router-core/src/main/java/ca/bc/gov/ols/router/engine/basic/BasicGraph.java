@@ -24,7 +24,7 @@ import org.locationtech.jts.index.strtree.STRtree;
 
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
