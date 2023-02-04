@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -22,13 +21,10 @@ import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.router.RouterFactory;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
@@ -96,10 +92,7 @@ public class RouterProcess {
 	}
 
 	public RouterProcess() {
-		Properties bootstrapConfig = RouterFactory.getBootstrapConfigFromEnvironment();
-		ConfigurationStore configStore = RouterConfigurationStoreFactory.getConfigurationStore(bootstrapConfig);
-		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, Integer.parseInt(configStore.getConfigParam("baseSrsCode").get()));
-		configStore.close();
+		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL); // SRS doesn't matter for what we are doing here 
 	}
 
 	public void process() {
