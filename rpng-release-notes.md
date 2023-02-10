@@ -13,7 +13,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ### Route Planner 2.2.0
 1. Route Planner 2.2.0 is backward compatible with Route Planner 2.x.
-2. The BC Route Planner response now includes timestamps indicating the road network data vintage as well as when the data was last processed.
+2. The BC Route Planner response now includes timestamps indicating when the data was last processed as well as the road network data vintage.
 3. Use the *enable* parameter to include a list of Transport Line ID's in the BC Route Planner response that are associated with the route.
 4. Use the *snapDistance* parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
 
