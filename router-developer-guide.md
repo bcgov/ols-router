@@ -474,600 +474,371 @@ and here's the json response:
 
 Here's a sample request for directions and a route in Vancouver partitioned by truck/non-truck route, in json, and known to have notifications:
 
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.0739278%2C49.284965%2C-123.0277521%2C49.3155266&followTruckRoute=true&partition=isTruckRoute
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1008354,49.273378%2C-123.12481,49.28455&followTruckRoute=true&partition=isTruckRoute
 
 and here's the json response:
 
 ```json
 {
-  "routeDescription": null,
-  "searchTimestamp": "2020-03-29 20:54:12",
-  "executionTime": 96,
-  "version": "2.1.0",
-  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
-  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
-  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
-  "srsCode": 4326,
-  "criteria": "fastest",
-  "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "km",
-  "points": [
-    [
-      -123.07393,
-      49.28496
-    ],
-    [
-      -123.02775,
-      49.31553
-    ]
-  ],
-  "routeFound": true,
-  "distance": 8.441,
-  "time": 746.5539234474583,
-  "timeText": "12 minutes 27 seconds",
-  "partition": "isTruckRoute",
-  "partitions": [
-    {
-      "index": 0,
-      "isTruckRoute": false
-    },
-    {
-      "index": 1,
-      "isTruckRoute": true
-    },
-    {
-      "index": 88,
-      "isTruckRoute": false
-    }
-  ],
-  "route": [
-    [
-      -123.07371,
-      49.28424
-    ],
-    [
-      -123.0758,
-      49.28397
-    ],
-    [
-      -123.07595,
-      49.28455
-    ],
-    [
-      -123.07605,
-      49.28469
-    ],
-    [
-      -123.07623,
-      49.28478
-    ],
-    [
-      -123.07644,
-      49.2848
-    ],
-    [
-      -123.07653,
-      49.28478
-    ],
-    [
-      -123.07666,
-      49.28475
-    ],
-    [
-      -123.07687,
-      49.28461
-    ],
-    [
-      -123.07703,
-      49.28436
-    ],
-    [
-      -123.07705,
-      49.28422
-    ],
-    [
-      -123.07709,
-      49.28381
-    ],
-    [
-      -123.07711,
-      49.28306
-    ],
-    [
-      -123.07713,
-      49.2822
-    ],
-    [
-      -123.07711,
-      49.28181
-    ],
-    [
-      -123.07711,
-      49.28158
-    ],
-    [
-      -123.0771,
-      49.28134
-    ],
-    [
-      -123.07412,
-      49.28131
-    ],
-    [
-      -123.07263,
-      49.28129
-    ],
-    [
-      -123.0704,
-      49.28125
-    ],
-    [
-      -123.06829,
-      49.28124
-    ],
-    [
-      -123.06557,
-      49.28121
-    ],
-    [
-      -123.06363,
-      49.28119
-    ],
-    [
-      -123.06169,
-      49.28118
-    ],
-    [
-      -123.05976,
-      49.28117
-    ],
-    [
-      -123.05784,
-      49.28117
-    ],
-    [
-      -123.05654,
-      49.28117
-    ],
-    [
-      -123.05458,
-      49.28117
-    ],
-    [
-      -123.05197,
-      49.28116
-    ],
-    [
-      -123.04934,
-      49.28116
-    ],
-    [
-      -123.04666,
-      49.28115
-    ],
-    [
-      -123.04403,
-      49.28116
-    ],
-    [
-      -123.03884,
-      49.28116
-    ],
-    [
-      -123.03619,
-      49.28116
-    ],
-    [
-      -123.03414,
-      49.28116
-    ],
-    [
-      -123.03233,
-      49.28115
-    ],
-    [
-      -123.03191,
-      49.28115
-    ],
-    [
-      -123.03177,
-      49.28115
-    ],
-    [
-      -123.03168,
-      49.28114
-    ],
-    [
-      -123.03152,
-      49.28114
-    ],
-    [
-      -123.03148,
-      49.28114
-    ],
-    [
-      -123.03128,
-      49.28114
-    ],
-    [
-      -123.03128,
-      49.28119
-    ],
-    [
-      -123.0313,
-      49.28138
-    ],
-    [
-      -123.03142,
-      49.28303
-    ],
-    [
-      -123.03137,
-      49.28371
-    ],
-    [
-      -123.03142,
-      49.28551
-    ],
-    [
-      -123.03139,
-      49.28583
-    ],
-    [
-      -123.03116,
-      49.28646
-    ],
-    [
-      -123.03089,
-      49.28686
-    ],
-    [
-      -123.03081,
-      49.28694
-    ],
-    [
-      -123.03073,
-      49.28701
-    ],
-    [
-      -123.03068,
-      49.28705
-    ],
-    [
-      -123.03053,
-      49.2872
-    ],
-    [
-      -123.03,
-      49.28771
-    ],
-    [
-      -123.02843,
-      49.28905
-    ],
-    [
-      -123.02831,
-      49.28916
-    ],
-    [
-      -123.02654,
-      49.29064
-    ],
-    [
-      -123.02631,
-      49.29096
-    ],
-    [
-      -123.0262,
-      49.29119
-    ],
-    [
-      -123.02613,
-      49.29158
-    ],
-    [
-      -123.02609,
-      49.2924
-    ],
-    [
-      -123.02616,
-      49.29535
-    ],
-    [
-      -123.02638,
-      49.30257
-    ],
-    [
-      -123.0264,
-      49.30306
-    ],
-    [
-      -123.02661,
-      49.30368
-    ],
-    [
-      -123.02667,
-      49.30386
-    ],
-    [
-      -123.02716,
-      49.30459
-    ],
-    [
-      -123.02732,
-      49.30482
-    ],
-    [
-      -123.02736,
-      49.30488
-    ],
-    [
-      -123.0274,
-      49.30498
-    ],
-    [
-      -123.02763,
-      49.30544
-    ],
-    [
-      -123.0278,
-      49.30602
-    ],
-    [
-      -123.02785,
-      49.30679
-    ],
-    [
-      -123.0278,
-      49.3081
-    ],
-    [
-      -123.0278,
-      49.30953
-    ],
-    [
-      -123.02768,
-      49.31011
-    ],
-    [
-      -123.02756,
-      49.31057
-    ],
-    [
-      -123.02741,
-      49.3109
-    ],
-    [
-      -123.02731,
-      49.31104
-    ],
-    [
-      -123.02713,
-      49.31118
-    ],
-    [
-      -123.02689,
-      49.31129
-    ],
-    [
-      -123.0263,
-      49.31142
-    ],
-    [
-      -123.02583,
-      49.31162
-    ],
-    [
-      -123.02551,
-      49.31184
-    ],
-    [
-      -123.02526,
-      49.31229
-    ],
-    [
-      -123.02518,
-      49.31239
-    ],
-    [
-      -123.02506,
-      49.31271
-    ],
-    [
-      -123.02436,
-      49.31393
-    ],
-    [
-      -123.0245,
-      49.31396
-    ],
-    [
-      -123.02486,
-      49.31405
-    ],
-    [
-      -123.02516,
-      49.31412
-    ],
-    [
-      -123.02552,
-      49.31413
-    ],
-    [
-      -123.02566,
-      49.31414
-    ],
-    [
-      -123.02629,
-      49.31399
-    ],
-    [
-      -123.02688,
-      49.31366
-    ],
-    [
-      -123.02722,
-      49.31345
-    ],
-    [
-      -123.02774,
-      49.31311
-    ],
-    [
-      -123.02773,
-      49.31393
-    ],
-    [
-      -123.0277,
-      49.31553
-    ]
-  ],
-  "notifications": [],
-  "directions": [
-    {
-      "type": "START",
-      "name": "Stewart St",
-      "distance": 0.155,
-      "time": 15,
-      "heading": "WEST",
-      "text": "Head west on Stewart St for 150 m (15 seconds)",
-      "point": [
-        -123.07371,
-        49.28424
+   "routeDescription": null,
+   "searchTimestamp": "2023-02-14 23:34:28",
+   "executionTime": 2,
+   "version": "2.1.7-RELEASE",
+   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+   "srsCode": 4326,
+   "criteria": "fastest",
+   "enable": "gdf,ldf,tc,tr,xc",
+   "distanceUnit": "km",
+   "points": [
+      [
+         -123.10084,
+         49.27338
       ],
-      "notifications": [
-        {
-          "type": "TruckRestriction",
-          "message": "Restricted Access - Port of Vancouver"
-        }
+      [
+         -123.12481,
+         49.28455
       ]
-    },
-    {
-      "type": "TURN_RIGHT",
-      "name": "Clark Dr",
-      "distance": 0.519,
-      "time": 50,
-      "text": "Turn right onto Clark Dr for 500 m (50 seconds)",
-      "point": [
-        -123.0758,
-        49.28397
-      ]
-    },
-    {
-      "type": "TURN_LEFT",
-      "name": "Hastings St",
-      "distance": 3.337,
-      "time": 297,
-      "text": "Turn left onto Hastings St for 3.3 km (4 minutes 57 seconds)",
-      "point": [
-        -123.0771,
-        49.28134
-      ]
-    },
-    {
-      "type": "TURN_LEFT",
-      "name": "Hastings St Onramp",
-      "distance": 0.944,
-      "time": 106,
-      "text": "Turn left onto Hastings St Onramp for 950 m (1 minute 46 seconds)",
-      "point": [
-        -123.03128,
-        49.28114
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Trans-Canada Hwy",
-      "distance": 0.262,
-      "time": 13,
-      "text": "Continue onto Trans-Canada Hwy for 250 m (13 seconds)",
-      "point": [
-        -123.02843,
-        49.28905
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Ironworkers Memorial Bridge",
-      "distance": 1.418,
-      "time": 73,
-      "text": "Continue onto Ironworkers Memorial Bridge for 1.4 km (1 minute 13 seconds)",
-      "point": [
-        -123.02631,
-        49.29096
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Trans-Canada Hwy",
-      "distance": 0.665,
-      "time": 34,
-      "text": "Continue onto Trans-Canada Hwy for 650 m (34 seconds)",
-      "point": [
-        -123.02661,
-        49.30368
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Lillooet Rd Offramp",
-      "distance": 0.299,
-      "time": 33,
-      "text": "Continue onto Lillooet Rd Offramp for 300 m (33 seconds)",
-      "point": [
-        -123.0278,
-        49.30953
-      ]
-    },
-    {
-      "type": "CONTINUE",
-      "name": "Lillooet Rd",
-      "distance": 0.281,
-      "time": 52,
-      "text": "Continue onto Lillooet Rd for 300 m (52 seconds)",
-      "point": [
-        -123.02583,
-        49.31162
+   ],
+   "routeFound": true,
+   "distance": 2.96,
+   "time": 346.54662096533104,
+   "timeText": "5 minutes 47 seconds",
+   "partition": "isTruckRoute",
+   "partitions": [
+      {
+         "index": 0,
+         "isTruckRoute": true
+      }
+   ],
+   "route": [
+      [
+         -123.10096,
+         49.27302
       ],
-      "notifications": [
-        {
-          "type": "TruckRestriction",
-          "message": "No Vehicles with a GVW of 30,000 kg or more are allowed to operate or be present on this road"
-        }
+      [
+         -123.10118,
+         49.27305
+      ],
+      [
+         -123.10164,
+         49.27305
+      ],
+      [
+         -123.10158,
+         49.27382
+      ],
+      [
+         -123.10167,
+         49.27435
+      ],
+      [
+         -123.10183,
+         49.27491
+      ],
+      [
+         -123.10186,
+         49.27499
+      ],
+      [
+         -123.10204,
+         49.27577
+      ],
+      [
+         -123.10212,
+         49.27608
+      ],
+      [
+         -123.1023,
+         49.27661
+      ],
+      [
+         -123.10254,
+         49.27692
+      ],
+      [
+         -123.10268,
+         49.27703
+      ],
+      [
+         -123.10284,
+         49.27716
+      ],
+      [
+         -123.10315,
+         49.27738
+      ],
+      [
+         -123.10325,
+         49.27743
+      ],
+      [
+         -123.10342,
+         49.27751
+      ],
+      [
+         -123.1037,
+         49.27763
+      ],
+      [
+         -123.10428,
+         49.27775
+      ],
+      [
+         -123.10616,
+         49.27805
+      ],
+      [
+         -123.10683,
+         49.27826
+      ],
+      [
+         -123.10764,
+         49.27865
+      ],
+      [
+         -123.10786,
+         49.27871
+      ],
+      [
+         -123.10808,
+         49.27875
+      ],
+      [
+         -123.10835,
+         49.27874
+      ],
+      [
+         -123.1087,
+         49.27866
+      ],
+      [
+         -123.11037,
+         49.27789
+      ],
+      [
+         -123.1108,
+         49.27782
+      ],
+      [
+         -123.11175,
+         49.27787
+      ],
+      [
+         -123.11215,
+         49.27781
+      ],
+      [
+         -123.11264,
+         49.27763
+      ],
+      [
+         -123.11326,
+         49.27735
+      ],
+      [
+         -123.11363,
+         49.2771
+      ],
+      [
+         -123.11381,
+         49.27689
+      ],
+      [
+         -123.11396,
+         49.27644
+      ],
+      [
+         -123.11405,
+         49.27634
+      ],
+      [
+         -123.11424,
+         49.27614
+      ],
+      [
+         -123.11475,
+         49.27578
+      ],
+      [
+         -123.11516,
+         49.27623
+      ],
+      [
+         -123.11558,
+         49.27654
+      ],
+      [
+         -123.11601,
+         49.27681
+      ],
+      [
+         -123.11659,
+         49.27717
+      ],
+      [
+         -123.11749,
+         49.27777
+      ],
+      [
+         -123.11798,
+         49.27811
+      ],
+      [
+         -123.11845,
+         49.27844
+      ],
+      [
+         -123.11898,
+         49.27875
+      ],
+      [
+         -123.11948,
+         49.27905
+      ],
+      [
+         -123.11992,
+         49.27933
+      ],
+      [
+         -123.12041,
+         49.27965
+      ],
+      [
+         -123.12087,
+         49.27996
+      ],
+      [
+         -123.12139,
+         49.28033
+      ],
+      [
+         -123.12191,
+         49.28065
+      ],
+      [
+         -123.12244,
+         49.28099
+      ],
+      [
+         -123.12337,
+         49.28157
+      ],
+      [
+         -123.12176,
+         49.28264
+      ],
+      [
+         -123.12223,
+         49.28293
+      ],
+      [
+         -123.1228,
+         49.28328
+      ],
+      [
+         -123.12479,
+         49.28456
       ]
-    },
-    {
-      "type": "TURN_LEFT",
-      "name": "Old Lillooet Rd",
-      "distance": 0.291,
-      "time": 36,
-      "text": "Turn left onto Old Lillooet Rd for 300 m (36 seconds)",
-      "point": [
-        -123.02436,
-        49.31393
-      ]
-    },
-    {
-      "type": "TURN_SHARP_RIGHT",
-      "name": "Premier St",
-      "distance": 0.269,
-      "time": 37,
-      "text": "Turn sharp right onto Premier St for 250 m (37 seconds)",
-      "point": [
-        -123.02774,
-        49.31311
-      ]
-    },
-    {
-      "type": "FINISH",
-      "text": "Finish!",
-      "point": [
-        -123.0277,
-        49.31553
-      ]
-    }
-  ]
+   ],
+   "notifications": [],
+   "directions": [
+      {
+         "type": "START",
+         "name": "Terminal Ave",
+         "distance": 0.049,
+         "time": 11,
+         "heading": "WEST",
+         "text": "Head west on Terminal Ave for 50 m (11 seconds)",
+         "point": [
+            -123.10096,
+            49.27302
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Quebec St",
+         "distance": 0.4,
+         "time": 41,
+         "text": "Turn right onto Quebec St for 400 m (41 seconds)",
+         "point": [
+            -123.10164,
+            49.27305
+         ]
+      },
+      {
+         "type": "CONTINUE",
+         "name": "Expo Blvd",
+         "distance": 1.135,
+         "time": 102,
+         "text": "Continue onto Expo Blvd for 1.1 km (1 minute 42 seconds)",
+         "point": [
+            -123.1023,
+            49.27661
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Smithe St",
+         "distance": 0.902,
+         "time": 131,
+         "text": "Turn right onto Smithe St for 900 m (2 minutes 11 seconds)",
+         "point": [
+            -123.11475,
+            49.27578
+         ],
+         "notifications": [
+            {
+               "type": "TruckRestriction",
+               "message": "Vehicles over 15.25 meters in length may only use this road between 7:00 am and 6:00 pm, Monday to Sunday"
+            }
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Hornby St",
+         "distance": 0.167,
+         "time": 24,
+         "text": "Turn right onto Hornby St for 150 m (24 seconds)",
+         "point": [
+            -123.12337,
+            49.28157
+         ],
+         "notifications": [
+            {
+               "type": "TruckRestriction",
+               "message": "Vehicles over 15.25 meters in length may only use this road between 7:00 am and 6:00 pm, Monday to Sunday"
+            }
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Robson St",
+         "distance": 0.307,
+         "time": 39,
+         "text": "Turn left onto Robson St for 300 m (39 seconds)",
+         "point": [
+            -123.12176,
+            49.28264
+         ],
+         "notifications": [
+            {
+               "type": "TruckRestriction",
+               "message": "Vehicles over 15.25 meters in length may only use this road between 7:00 am and 6:00 pm, Monday to Sunday"
+            }
+         ]
+      },
+      {
+         "type": "FINISH",
+         "text": "Finish!",
+         "point": [
+            -123.12479,
+            49.28456
+         ]
+      }
+   ]
 }
 ```
 
