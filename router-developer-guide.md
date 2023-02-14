@@ -56,6 +56,7 @@ Attribute Name |	Type
 [copyrightLicense](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
+[enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
@@ -105,7 +106,7 @@ and here is the json response:
 ## Route Resource
 The route resource represents the shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default the output SRS is Geographics (e.g., 4326<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
+1. Shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default the output SRS is Geographics WGS 84 (e.g., 4326<br>https://router.api.gov.bc.ca/route.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
    
 2. Shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/route.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
 
@@ -161,103 +162,99 @@ and here's the json response:
 
 ```json
 {
-  "routeDescription": null,
-  "searchTimestamp": "2020-03-29 23:38:35",
-  "executionTime": 4,
-  "version": "2.1.0",
-  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
-  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
-  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
-  "srsCode": 4326,
-  "criteria": "fastest",
-  "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "km",
-  "points": [
-    [
-      -123.11389,
-      49.26111
-    ],
-    [
-      -123.11166,
-      49.26551
-    ]
-  ],
-  "routeFound": true,
-  "distance": 0.874,
-  "time": 131.30227738040392,
-  "timeText": "2 minutes 11 seconds",
-  "partition": "isFerry,isTruckRoute,locality",
-  "partitions": [
-    {
-      "index": 0,
-      "isFerry": false,
-      "isTruckRoute": false,
-      "locality": "Vancouver"
-    },
-    {
-      "index": 3,
-      "isFerry": false,
-      "isTruckRoute": true,
-      "locality": "Vancouver"
-    },
-    {
-      "index": 9,
-      "isFerry": false,
-      "isTruckRoute": false,
-      "locality": "Vancouver"
-    }
-  ],
-  "route": [
-    [
-      -123.11297,
-      49.2611
-    ],
-    [
-      -123.11297,
-      49.26129
-    ],
-    [
-      -123.11291,
-      49.26221
-    ],
-    [
-      -123.11289,
-      49.26318
-    ],
-    [
-      -123.11478,
-      49.2632
-    ],
-    [
-      -123.11476,
-      49.26404
-    ],
-    [
-      -123.11474,
-      49.26493
-    ],
-    [
-      -123.11473,
-      49.2653
-    ],
-    [
-      -123.11473,
-      49.26538
-    ],
-    [
-      -123.11467,
-      49.26576
-    ],
-    [
-      -123.11279,
-      49.26573
-    ],
-    [
-      -123.11165,
-      49.26569
-    ]
-  ]
+   "routeDescription": null,
+   "searchTimestamp": "2023-02-14 23:28:56",
+   "executionTime": 1,
+   "version": "2.1.7-RELEASE",
+   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+   "srsCode": 4326,
+   "criteria": "fastest",
+   "enable": "gdf,ldf,tc,tr,xc",
+   "distanceUnit": "km",
+   "points": [
+      [
+         -123.11389,
+         49.26111
+      ],
+      [
+         -123.11166,
+         49.26551
+      ]
+   ],
+   "routeFound": true,
+   "distance": 0.874,
+   "time": 131.71439858979718,
+   "timeText": "2 minutes 12 seconds",
+   "partition": "isFerry,isTruckRoute,locality",
+   "partitions": [
+      {
+         "index": 0,
+         "isFerry": false,
+         "isTruckRoute": false,
+         "locality": "Vancouver"
+      },
+      {
+         "index": 3,
+         "isFerry": false,
+         "isTruckRoute": true,
+         "locality": "Vancouver"
+      },
+      {
+         "index": 8,
+         "isFerry": false,
+         "isTruckRoute": false,
+         "locality": "Vancouver"
+      }
+   ],
+   "route": [
+      [
+         -123.11297,
+         49.2611
+      ],
+      [
+         -123.11297,
+         49.26129
+      ],
+      [
+         -123.11291,
+         49.26221
+      ],
+      [
+         -123.11289,
+         49.26318
+      ],
+      [
+         -123.11478,
+         49.2632
+      ],
+      [
+         -123.11476,
+         49.26404
+      ],
+      [
+         -123.11474,
+         49.26493
+      ],
+      [
+         -123.11473,
+         49.26538
+      ],
+      [
+         -123.11467,
+         49.26576
+      ],
+      [
+         -123.11279,
+         49.26573
+      ],
+      [
+         -123.11165,
+         49.26569
+      ]
+   ]
 }
 ```
  
@@ -265,7 +262,7 @@ and here's the json response:
 ##  Directions Resource
 The directions resource represents the turn-by-turn directions, shortest or fastest route between given points and the length and duration of that route. Here are some examples:
 
-1. Directions and shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for an output spatial reference system of BC Albers (e.g., 3005). By default, the output SRS is Geographics (e.g., 4326)<br>https://router.api.gov.bc.ca/directions.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
+1. Directions and shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for an output spatial reference system of BC Albers (e.g., 3005). By default, the output SRS is Geographics WGS 84 (e.g., 4326)<br>https://router.api.gov.bc.ca/directions.json?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&outputSRS=3005&criteria=shortest<br>
    
 2. Directions and shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/directions.kml?points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
 
@@ -322,159 +319,155 @@ and here's the json response:
 
 ```json
 {
-  "routeDescription": null,
-  "searchTimestamp": "2020-03-29 22:52:31",
-  "executionTime": 3,
-  "version": "2.1.0",
-  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
-  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
-  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
-  "srsCode": 4326,
-  "criteria": "fastest",
-  "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "km",
-  "points": [
-    [
-      -123.11389,
-      49.26111
-    ],
-    [
-      -123.11166,
-      49.26551
-    ]
-  ],
-  "routeFound": true,
-  "distance": 0.874,
-  "time": 131.30227738040392,
-  "timeText": "2 minutes 11 seconds",
-  "partition": "isFerry,isTruckRoute,locality",
-  "partitions": [
-    {
-      "index": 0,
-      "isFerry": false,
-      "isTruckRoute": false,
-      "locality": "Vancouver"
-    },
-    {
-      "index": 3,
-      "isFerry": false,
-      "isTruckRoute": true,
-      "locality": "Vancouver"
-    },
-    {
-      "index": 9,
-      "isFerry": false,
-      "isTruckRoute": false,
-      "locality": "Vancouver"
-    }
-  ],
-  "route": [
-    [
-      -123.11297,
-      49.2611
-    ],
-    [
-      -123.11297,
-      49.26129
-    ],
-    [
-      -123.11291,
-      49.26221
-    ],
-    [
-      -123.11289,
-      49.26318
-    ],
-    [
-      -123.11478,
-      49.2632
-    ],
-    [
-      -123.11476,
-      49.26404
-    ],
-    [
-      -123.11474,
-      49.26493
-    ],
-    [
-      -123.11473,
-      49.2653
-    ],
-    [
-      -123.11473,
-      49.26538
-    ],
-    [
-      -123.11467,
-      49.26576
-    ],
-    [
-      -123.11279,
-      49.26573
-    ],
-    [
-      -123.11165,
-      49.26569
-    ]
-  ],
-  "notifications": [],
-  "directions": [
-    {
-      "type": "START",
-      "name": "Yukon St",
-      "distance": 0.231,
-      "time": 30,
-      "heading": "NORTH",
-      "text": "Head north on Yukon St for 250 m (30 seconds)",
-      "point": [
-        -123.11297,
-        49.2611
+   "routeDescription": null,
+   "searchTimestamp": "2023-02-14 23:31:1",
+   "executionTime": 1,
+   "version": "2.1.7-RELEASE",
+   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+   "srsCode": 4326,
+   "criteria": "fastest",
+   "enable": "gdf,ldf,tc,tr,xc",
+   "distanceUnit": "km",
+   "points": [
+      [
+         -123.11389,
+         49.26111
+      ],
+      [
+         -123.11166,
+         49.26551
       ]
-    },
-    {
-      "type": "TURN_LEFT",
-      "name": "Broadway",
-      "distance": 0.138,
-      "time": 28,
-      "text": "Turn left onto Broadway for 150 m (28 seconds)",
-      "point": [
-        -123.11289,
-        49.26318
+   ],
+   "routeFound": true,
+   "distance": 0.874,
+   "time": 131.71439858979718,
+   "timeText": "2 minutes 12 seconds",
+   "partition": "isFerry,isTruckRoute,locality",
+   "partitions": [
+      {
+         "index": 0,
+         "isFerry": false,
+         "isTruckRoute": false,
+         "locality": "Vancouver"
+      },
+      {
+         "index": 3,
+         "isFerry": false,
+         "isTruckRoute": true,
+         "locality": "Vancouver"
+      },
+      {
+         "index": 8,
+         "isFerry": false,
+         "isTruckRoute": false,
+         "locality": "Vancouver"
+      }
+   ],
+   "route": [
+      [
+         -123.11297,
+         49.2611
+      ],
+      [
+         -123.11297,
+         49.26129
+      ],
+      [
+         -123.11291,
+         49.26221
+      ],
+      [
+         -123.11289,
+         49.26318
+      ],
+      [
+         -123.11478,
+         49.2632
+      ],
+      [
+         -123.11476,
+         49.26404
+      ],
+      [
+         -123.11474,
+         49.26493
+      ],
+      [
+         -123.11473,
+         49.26538
+      ],
+      [
+         -123.11467,
+         49.26576
+      ],
+      [
+         -123.11279,
+         49.26573
+      ],
+      [
+         -123.11165,
+         49.26569
       ]
-    },
-    {
-      "type": "TURN_RIGHT",
-      "name": "Cambie St",
-      "distance": 0.285,
-      "time": 44,
-      "text": "Turn right onto Cambie St for 300 m (44 seconds)",
-      "point": [
-        -123.11478,
-        49.2632
-      ]
-    },
-    {
-      "type": "TURN_RIGHT",
-      "name": "6th Ave",
-      "distance": 0.221,
-      "time": 30,
-      "text": "Turn right onto 6th Ave for 200 m (30 seconds)",
-      "point": [
-        -123.11467,
-        49.26576
-      ]
-    },
-    {
-      "type": "FINISH",
-      "text": "Finish!",
-      "point": [
-        -123.11165,
-        49.26569
-      ]
-    }
-  ]
+   ],
+   "notifications": [],
+   "directions": [
+      {
+         "type": "START",
+         "name": "Yukon St",
+         "distance": 0.231,
+         "time": 30,
+         "heading": "NORTH",
+         "text": "Head north on Yukon St for 250 m (30 seconds)",
+         "point": [
+            -123.11297,
+            49.2611
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "W Broadway",
+         "distance": 0.138,
+         "time": 29,
+         "text": "Turn left onto W Broadway for 150 m (29 seconds)",
+         "point": [
+            -123.11289,
+            49.26318
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Cambie St",
+         "distance": 0.285,
+         "time": 43,
+         "text": "Turn right onto Cambie St for 300 m (43 seconds)",
+         "point": [
+            -123.11478,
+            49.2632
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "W 6th Ave",
+         "distance": 0.221,
+         "time": 29,
+         "text": "Turn right onto W 6th Ave for 200 m (29 seconds)",
+         "point": [
+            -123.11467,
+            49.26576
+         ]
+      },
+      {
+         "type": "FINISH",
+         "text": "Finish!",
+         "point": [
+            -123.11165,
+            49.26569
+         ]
+      }
+   ]
 }
 ```
 
