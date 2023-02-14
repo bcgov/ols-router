@@ -867,7 +867,7 @@ Attribute Name |	Type
 [routeDescription](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeDescription) | String
 [searchTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#searchTimestamp) | Datetime
 [executionTime](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#executionTime) | Real
-[routingExecutionTime](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#executionTime) | Real
+[routeExecutionTime](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#executionTime) | Real
 [optimizationExecutionTime](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#executionTime) | Real
 [version](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#version) | String 
 [disclaimer](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disclaimer) | String
@@ -876,6 +876,7 @@ Attribute Name |	Type
 [copyrightLicense](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
+[enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
@@ -889,59 +890,153 @@ Attribute Name |	Type
 Here is a sample json response:
 
 ```json
-    {
-	"routeDescription": "",
-	"searchTimestamp": "2018-02-20 16:36:39.254",
-	"executionTime": 332,
-	"routingExecutionTime": 16,
-	"optimizationExecutionTime": 313,
-	"version": "2.0.0",
-	"disclaimer": "http://www2.gov.bc.ca/gov/content/home/disclaimer",
-	"privacyStatement": "http://www2.gov.bc.ca/gov/content/home/privacy",
-	"copyrightNotice": "Copyright 2015 Province of British Columbia - Open Government License",
-	"copyrightLicense": "http://www.data.gov.bc.ca/local/dbc/docs/license/OGL-vbc2.0.pdf",
-	"srsCode": 4326,
-	"criteria": "fastest",
-	"distanceUnit": "km",
-	"points": [
-		[-123.36517, 48.42545],
-		[-123.35587, 48.42445],
-		[-123.36057, 48.42323],
-		[-123.36002, 48.42915],
-		[-123.36479, 48.42455]
-	],
-	"routeFound": true,
-	"distance": 1.916,
-	"time": 157,
-	"timeText": "2 minutes 37 seconds",
-	"visitOrder": [0, 3, 2, 4, 1],
-	"route": [
-		[-123.36517, 48.42545],
-		[-123.36508, 48.42544],
-		[-123.36533, 48.42465],
-		[-123.36478, 48.42459],
-		[-123.36478, 48.42459],
-		[-123.36249, 48.42432],
-		[-123.36269, 48.42352],
-		[-123.36056, 48.42327],
-		[-123.36056, 48.42327],
-		[-123.35992, 48.42319],
-		[-123.35985, 48.42352],
-		[-123.35972, 48.42401],
-		[-123.3569, 48.42373],
-		[-123.35674, 48.42451],
-		[-123.35588, 48.42442],
-		[-123.35588, 48.42442],
-		[-123.35674, 48.42451],
-		[-123.35611, 48.42709],
-		[-123.35618, 48.42732],
-		[-123.35606, 48.42833],
-		[-123.35599, 48.42884],
-		[-123.35885, 48.42901],
-		[-123.35928, 48.42914],
-		[-123.36002, 48.42919]
-	]
-    }
+{
+   "routeDescription": null,
+   "searchTimestamp": "2023-02-14 23:44:47",
+   "executionTime": 87,
+   "routingExecutionTime": 2,
+   "optimizationExecutionTime": 83,
+   "version": "2.1.7-RELEASE",
+   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+   "srsCode": 4326,
+   "criteria": "fastest",
+   "enable": "gdf,ldf,tc,tr,xc",
+   "distanceUnit": "km",
+   "points": [
+      [
+         -123.36517,
+         48.42545
+      ],
+      [
+         -123.35587,
+         48.42445
+      ],
+      [
+         -123.36057,
+         48.42323
+      ],
+      [
+         -123.36002,
+         48.42915
+      ],
+      [
+         -123.36479,
+         48.42455
+      ]
+   ],
+   "routeFound": true,
+   "distance": 1.919,
+   "time": 273.1071662398253,
+   "timeText": "4 minutes 33 seconds",
+   "visitOrder": [
+      0,
+      3,
+      2,
+      4,
+      1
+   ],
+   "route": [
+      [
+         -123.36517,
+         48.42545
+      ],
+      [
+         -123.36508,
+         48.42544
+      ],
+      [
+         -123.36533,
+         48.42465
+      ],
+      [
+         -123.36478,
+         48.42459
+      ],
+      [
+         -123.36249,
+         48.42432
+      ],
+      [
+         -123.36269,
+         48.42352
+      ],
+      [
+         -123.36056,
+         48.42327
+      ],
+      [
+         -123.35992,
+         48.42319
+      ],
+      [
+         -123.35985,
+         48.42352
+      ],
+      [
+         -123.35972,
+         48.42401
+      ],
+      [
+         -123.3569,
+         48.42373
+      ],
+      [
+         -123.35674,
+         48.42451
+      ],
+      [
+         -123.35588,
+         48.42442
+      ],
+      [
+         -123.35674,
+         48.42451
+      ],
+      [
+         -123.35654,
+         48.42537
+      ],
+      [
+         -123.35631,
+         48.42627
+      ],
+      [
+         -123.35611,
+         48.42709
+      ],
+      [
+         -123.35618,
+         48.42732
+      ],
+      [
+         -123.35611,
+         48.42795
+      ],
+      [
+         -123.35606,
+         48.42833
+      ],
+      [
+         -123.35599,
+         48.42884
+      ],
+      [
+         -123.35885,
+         48.42901
+      ],
+      [
+         -123.35928,
+         48.42914
+      ],
+      [
+         -123.36002,
+         48.42919
+      ]
+   ]
+}
 ```
 
 The visitOrder values need a bit more explanation. The points in the request in example 2 above are given in the following order:
@@ -999,6 +1094,7 @@ Attribute Name |	Type
 [copyrightLicense](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
+[enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
@@ -1013,116 +1109,355 @@ Attribute Name |	Type
 Here is a sample json response:
 
 ```json
-    {
-	"routeDescription": "",
-	"searchTimestamp": "2018-02-20 16:09:36.298",
-	"executionTime": 325,
-	"routingExecutionTime": 15,
-	"optimizationExecutionTime": 304,
-	"version": "2.1.0",
-	"disclaimer": "http://www2.gov.bc.ca/gov/content/home/disclaimer",
-	"privacyStatement": "http://www2.gov.bc.ca/gov/content/home/privacy",
-	"copyrightNotice": "Copyright 2015 Province of British Columbia - Open Government License",
-	"copyrightLicense": "http://www.data.gov.bc.ca/local/dbc/docs/license/OGL-vbc2.0.pdf",
-	"srsCode": 4326,
-	"criteria": "fastest",
-	"distanceUnit": "km",
-	"points": [
-		[-123.36517, 48.42545],
-		[-123.35587, 48.42445],
-		[-123.36057, 48.42323],
-		[-123.36002, 48.42915],
-		[-123.36479, 48.42455]
-	],
-	"routeFound": true,
-	"distance": 1.916,
-	"time": 157,
-	"timeText": "2 minutes 37 seconds",
-	"visitOrder": [0, 3, 2, 4, 1],
-	"route": [
-		[-123.36517, 48.42545],
-		[-123.36508, 48.42544],
-		[-123.36533, 48.42465],
-		[-123.36478, 48.42459],
-		[-123.36478, 48.42459],
-		[-123.36249, 48.42432],
-		[-123.36269, 48.42352],
-		[-123.36056, 48.42327],
-		[-123.36056, 48.42327],
-		[-123.35992, 48.42319],
-		[-123.35985, 48.42352],
-		[-123.35972, 48.42401],
-		[-123.3569, 48.42373],
-		[-123.35674, 48.42451],
-		[-123.35588, 48.42442],
-		[-123.35588, 48.42442],
-		[-123.35674, 48.42451],
-		[-123.35611, 48.42709],
-		[-123.35618, 48.42732],
-		[-123.35606, 48.42833],
-		[-123.35599, 48.42884],
-		[-123.35885, 48.42901],
-		[-123.35928, 48.42914],
-		[-123.36002, 48.42919]
-	],
-	"notifications": [],
-	"directions": [{
-		"text": "Continue onto View St for 7 m (0 seconds)",
-		"point": [-123.36517, 48.42545]
-	}, {
-		"text": "Turn right onto Douglas St for 90 m (6 seconds)",
-		"point": [-123.36508, 48.42544]
-	}, {
-		"text": "Turn left onto Fort St for 40 m (3 seconds)",
-		"point": [-123.36533, 48.42465]
-	}, {
-		"text": "Stopover 1",
-		"point": [-123.36478, 48.42459]
-	}, {
-		"text": "Continue onto Fort St for 150 m (15 seconds)",
-		"point": [-123.36478, 48.42459]
-	}, {
-		"text": "Turn right onto Blanshard St for 90 m (6 seconds)",
-		"point": [-123.36249, 48.42432]
-	}, {
-		"text": "Turn left onto Broughton St for 150 m (14 seconds)",
-		"point": [-123.36269, 48.42352]
-	}, {
-		"text": "Stopover 2",
-		"point": [-123.36056, 48.42327]
-	}, {
-		"text": "Continue onto Broughton St for 50 m (4 seconds)",
-		"point": [-123.36056, 48.42327]
-	}, {
-		"text": "Turn left onto Quadra St for 95 m (11 seconds)",
-		"point": [-123.35992, 48.42319]
-	}, {
-		"text": "Turn right onto Fort St for 200 m (15 seconds)",
-		"point": [-123.35972, 48.42401]
-	}, {
-		"text": "Turn left onto Vancouver St for 90 m (6 seconds)",
-		"point": [-123.3569, 48.42373]
-	}, {
-		"text": "Turn right onto View St for 65 m (5 seconds)",
-		"point": [-123.35674, 48.42451]
-	}, {
-		"text": "Stopover 3",
-		"point": [-123.35588, 48.42442]
-	}, {
-		"text": "Continue onto View St for 65 m (5 seconds)",
-		"point": [-123.35588, 48.42442]
-	}, {
-		"text": "Turn right onto Vancouver St for 500 m (39 seconds)",
-		"point": [-123.35674, 48.42451]
-	}, {
-		"text": "Turn left onto Balmoral Rd for 200 m (15 seconds)",
-		"point": [-123.35599, 48.42884]
-	}, {
-		"text": "Turn slight right onto Fisgard St for 90 m (6 seconds)",
-		"point": [-123.35885, 48.42901]
-	}, {
-		"text": "Finish!",
-		"point": [-123.36002, 48.42919]
-	}]
-    }
+{
+   "routeDescription": null,
+   "searchTimestamp": "2023-02-14 23:48:49",
+   "executionTime": 80,
+   "routingExecutionTime": 1,
+   "optimizationExecutionTime": 77,
+   "version": "2.1.7-RELEASE",
+   "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+   "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+   "srsCode": 4326,
+   "criteria": "fastest",
+   "enable": "gdf,ldf,tc,tr,xc",
+   "distanceUnit": "km",
+   "points": [
+      [
+         -123.36517,
+         48.42545
+      ],
+      [
+         -123.35587,
+         48.42445
+      ],
+      [
+         -123.36057,
+         48.42323
+      ],
+      [
+         -123.36002,
+         48.42915
+      ],
+      [
+         -123.36479,
+         48.42455
+      ]
+   ],
+   "routeFound": true,
+   "distance": 1.919,
+   "time": 273.1071662398253,
+   "timeText": "4 minutes 33 seconds",
+   "visitOrder": [
+      0,
+      3,
+      2,
+      4,
+      1
+   ],
+   "route": [
+      [
+         -123.36517,
+         48.42545
+      ],
+      [
+         -123.36508,
+         48.42544
+      ],
+      [
+         -123.36533,
+         48.42465
+      ],
+      [
+         -123.36478,
+         48.42459
+      ],
+      [
+         -123.36249,
+         48.42432
+      ],
+      [
+         -123.36269,
+         48.42352
+      ],
+      [
+         -123.36056,
+         48.42327
+      ],
+      [
+         -123.35992,
+         48.42319
+      ],
+      [
+         -123.35985,
+         48.42352
+      ],
+      [
+         -123.35972,
+         48.42401
+      ],
+      [
+         -123.3569,
+         48.42373
+      ],
+      [
+         -123.35674,
+         48.42451
+      ],
+      [
+         -123.35588,
+         48.42442
+      ],
+      [
+         -123.35674,
+         48.42451
+      ],
+      [
+         -123.35654,
+         48.42537
+      ],
+      [
+         -123.35631,
+         48.42627
+      ],
+      [
+         -123.35611,
+         48.42709
+      ],
+      [
+         -123.35618,
+         48.42732
+      ],
+      [
+         -123.35611,
+         48.42795
+      ],
+      [
+         -123.35606,
+         48.42833
+      ],
+      [
+         -123.35599,
+         48.42884
+      ],
+      [
+         -123.35885,
+         48.42901
+      ],
+      [
+         -123.35928,
+         48.42914
+      ],
+      [
+         -123.36002,
+         48.42919
+      ]
+   ],
+   "notifications": [],
+   "directions": [
+      {
+         "type": "START",
+         "name": "View St",
+         "distance": 0.007,
+         "time": 9,
+         "heading": "EAST",
+         "text": "Head east on View St for 7 m (9 seconds)",
+         "point": [
+            -123.36517,
+            48.42545
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Douglas St",
+         "distance": 0.089,
+         "time": 15,
+         "text": "Turn right onto Douglas St for 90 m (15 seconds)",
+         "point": [
+            -123.36508,
+            48.42544
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Fort St",
+         "distance": 0.042,
+         "time": 7,
+         "text": "Turn left onto Fort St for 40 m (7 seconds)",
+         "point": [
+            -123.36533,
+            48.42465
+         ]
+      },
+      {
+         "type": "STOPOVER",
+         "text": "Stopover 1",
+         "point": [
+            -123.36478,
+            48.42459
+         ]
+      },
+      {
+         "type": "START",
+         "name": "Fort St",
+         "distance": 0.173,
+         "time": 23,
+         "heading": "EAST",
+         "text": "Head east on Fort St for 150 m (23 seconds)",
+         "point": [
+            -123.36478,
+            48.42459
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Blanshard St",
+         "distance": 0.091,
+         "time": 13,
+         "text": "Turn right onto Blanshard St for 90 m (13 seconds)",
+         "point": [
+            -123.36249,
+            48.42432
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Broughton St",
+         "distance": 0.16,
+         "time": 18,
+         "text": "Turn left onto Broughton St for 150 m (18 seconds)",
+         "point": [
+            -123.36269,
+            48.42352
+         ]
+      },
+      {
+         "type": "STOPOVER",
+         "text": "Stopover 2",
+         "point": [
+            -123.36056,
+            48.42327
+         ]
+      },
+      {
+         "type": "START",
+         "name": "Broughton St",
+         "distance": 0.048,
+         "time": 17,
+         "heading": "EAST",
+         "text": "Head east on Broughton St for 50 m (17 seconds)",
+         "point": [
+            -123.36056,
+            48.42327
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Quadra St",
+         "distance": 0.093,
+         "time": 19,
+         "text": "Turn left onto Quadra St for 95 m (19 seconds)",
+         "point": [
+            -123.35992,
+            48.42319
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Fort St",
+         "distance": 0.212,
+         "time": 23,
+         "text": "Turn right onto Fort St for 200 m (23 seconds)",
+         "point": [
+            -123.35972,
+            48.42401
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Vancouver St",
+         "distance": 0.088,
+         "time": 15,
+         "text": "Turn left onto Vancouver St for 90 m (15 seconds)",
+         "point": [
+            -123.3569,
+            48.42373
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "View St",
+         "distance": 0.064,
+         "time": 7,
+         "text": "Turn right onto View St for 65 m (7 seconds)",
+         "point": [
+            -123.35674,
+            48.42451
+         ]
+      },
+      {
+         "type": "STOPOVER",
+         "text": "Stopover 3",
+         "point": [
+            -123.35588,
+            48.42442
+         ]
+      },
+      {
+         "type": "START",
+         "name": "View St",
+         "distance": 0.064,
+         "time": 15,
+         "heading": "WEST",
+         "text": "Head west on View St for 65 m (15 seconds)",
+         "point": [
+            -123.35588,
+            48.42442
+         ]
+      },
+      {
+         "type": "TURN_RIGHT",
+         "name": "Vancouver St",
+         "distance": 0.485,
+         "time": 62,
+         "text": "Turn right onto Vancouver St for 500 m (1 minute 2 seconds)",
+         "point": [
+            -123.35674,
+            48.42451
+         ]
+      },
+      {
+         "type": "TURN_LEFT",
+         "name": "Balmoral Rd",
+         "distance": 0.214,
+         "time": 25,
+         "text": "Turn left onto Balmoral Rd for 200 m (25 seconds)",
+         "point": [
+            -123.35599,
+            48.42884
+         ]
+      },
+      {
+         "type": "CONTINUE",
+         "name": "Fisgard St",
+         "distance": 0.09,
+         "time": 6,
+         "text": "Continue onto Fisgard St for 90 m (6 seconds)",
+         "point": [
+            -123.35885,
+            48.42901
+         ]
+      },
+      {
+         "type": "FINISH",
+         "text": "Finish!",
+         "point": [
+            -123.36002,
+            48.42919
+         ]
+      }
+   ]
+}
 ```
