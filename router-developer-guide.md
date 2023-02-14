@@ -56,7 +56,6 @@ Attribute Name |	Type
 [copyrightLicense](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#copyrightLicense) | String
 [srsCode](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#srsCode) | Integer
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
-[enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
@@ -73,32 +72,32 @@ and here is the json response:
 
 ```json
 {
-  "routeDescription": "fastest distance in km and json",
-  "searchTimestamp": "2020-03-29 23:27:48",
-  "executionTime": 51,
-  "version": "2.1.0",
-  "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
-  "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-  "copyrightNotice": "Copyright 2020 Province of British Columbia - Open Government License",
-  "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
-  "srsCode": 4326,
-  "criteria": "fastest",
-  "enable": "gdf,ldf,tc,tr,xc",
-  "distanceUnit": "km",
-  "points": [
-    [
-      -123.70794,
-      48.77869
-    ],
-    [
-      -123.53785,
-      48.38201
-    ]
-  ],
-  "routeFound": true,
-  "distance": 56.118,
-  "time": 3189.2243494173135,
-  "timeText": "53 minutes 9 seconds"
+	routeDescription: "fastest distance in km and json",
+	searchTimestamp: "2023-02-14 23:2:40",
+	executionTime: 128,
+	version: "2.1.7-RELEASE",
+	disclaimer: "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
+	privacyStatement: "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
+	copyrightNotice: "Copyright 2022 Province of British Columbia - Open Government License",
+	copyrightLicense: "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
+	srsCode: 4326,
+	criteria: "fastest",
+	enable: "gdf,ldf,tc,tr,xc",
+	distanceUnit: "km",
+	points: [
+		[
+			-123.70794,
+			48.77869
+		],
+		[
+			-123.53785,
+			48.38201
+		]
+	],
+	routeFound: true,
+	distance: 68.046,
+	time: 3707.0444450034292,
+	timeText: "1 hour 1 minute"
 }
 ```
 
