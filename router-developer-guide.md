@@ -32,7 +32,7 @@ Do not put the apikey in the request URL because it will expose your api key.
 ## Distance Resource
 The distance resource represents the length and duration of the shortest or fastest route between given points. Here are some examples:
 
-1. Length of shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default, the output SRS is Geographics (e.g., 4326)<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest&outputSRS=3005<br>
+1. Length of shortest route in km and json between Duncan and Metchosin. Also includes an explicit request for a BC Albers output spatial reference system (e.g., 3005). By default, the output SRS is Geographics WGS 84 (e.g., 4326)<br>https://router.api.gov.bc.ca/distance.json?routeDescription=shortest%20distance%20in%20km%20and%20json&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest&outputSRS=3005<br>
    
 2. Length of shortest route in km and kml between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.kml?routeDescription=shortest%20distance%20in%20km%20and%20kml&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=shortest<br>
 
