@@ -124,7 +124,7 @@ https://router.api.gov.bc.ca/truck/route.json?points=-116.80488%2C49.69928%2C-11
 7. Fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
 https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality<br>
 
-8. Fastest route in km and json between Williams Lake and a mine. In this case we are trying to navigate to a location that is not found on the demographic road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
+8. Fastest route in km and json between Williams Lake and a mine. In this case, we are trying to navigate to a location that is not found on the road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
 https://router.api.gov.bc.ca/route.json?points=-122.14%2C52.1288889%2C-121.61941%2C52.54039&snapDistance=1200&apikey=JKM6YZujMf93wbQQVxAHM7XIWAWeaFX4<br>
    
 
@@ -283,7 +283,7 @@ https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%
 7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
 https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality<br>
 
-8. Directions and fastest route in km and json between Williams Lake and a mine. In this case we are trying to navigate to a location that is not found on the demographic road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
+8. Directions and fastest route in km and json between Williams Lake and a mine. In this case, we are trying to navigate to a location that is not found on the road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
 https://router.api.gov.bc.ca/directions.json?points=-122.14%2C52.1288889%2C-121.61941%2C52.54039&snapDistance=1200&apikey=JKM6YZujMf93wbQQVxAHM7XIWAWeaFX4<br>
 
 
