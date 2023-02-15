@@ -38,6 +38,12 @@ The distance resource represents the length and duration of the shortest or fast
 
 3. Length of fastest route in miles and html between Duncan and Metchosin<br>https://router.api.gov.bc.ca/distance.html?routeDescription=fastest%20distance%20in%20km%20and%20html&points=-123.707942%2C48.778691%2C-123.537850%2C48.382005&criteria=fastest&distanceUnit=mi<br>
 
+4. Length and time of shortest route in km between all pairs of fromPoints and toPoints.<br>
+https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=betweenPairs%20test%20case&fromPoints=-123.70794%2C48.77869%2C-123.53785%2C48.38200&toPoints=-124.972951%2C49.715181%2C-123.139464%2C49.704015&criteria=shortest<br>
+
+5. Length and time of shortest route in km between pairs fromPoints and toPoints. In this example, we use the maxPairs parameter to control the maximum number of pairs to return for each toPoint. Pairs are ordered by distance/time from fromPoint<br>
+https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=betweenPairs%20test%20case&fromPoints=-123.70794%2C48.77869%2C-123.53785%2C48.38200&toPoints=-124.972951%2C49.715181%2C-123.139464%2C49.704015&criteria=shortest&maxPairs=1<br>
+
 
 
 ### HTTP Response
