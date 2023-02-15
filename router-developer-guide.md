@@ -44,7 +44,7 @@ https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=between
 5. Length and time of shortest route in km between pairs fromPoints and toPoints. In this example, we use the maxPairs parameter to control the maximum number of pairs to return for each toPoint. Pairs are ordered by distance/time from fromPoint<br>
 https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=betweenPairs%20test%20case&fromPoints=-123.70794%2C48.77869%2C-123.53785%2C48.38200&toPoints=-124.972951%2C49.715181%2C-123.139464%2C49.704015&criteria=shortest&maxPairs=1<br>
 
-*The betweenPairs request can also be submitted to follow a truck route by changing '/distance' to '/truck/distance'
+**The betweenPairs request can also be submitted to follow a truck route by changing '/distance' to '/truck/distance'**
 
 
 
