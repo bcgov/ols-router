@@ -139,7 +139,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterRouteResponse(params, 
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null);
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null);
 		}
 		return response;
 	}
@@ -163,7 +163,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterDirectionsResponse(params,  
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null,
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
 					directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList());
 		}
 		return response;
@@ -233,7 +233,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalRouteResponse(params,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, visitOrder);
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, visitOrder);
 			}
 		} catch(Throwable t) {
 			response = new RouterOptimalRouteResponse(params);
@@ -263,7 +263,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalDirectionsResponse(params,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null,
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
 						directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList(), visitOrder);
 			}
 		} catch(Throwable t) {

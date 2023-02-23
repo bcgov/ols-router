@@ -6,11 +6,14 @@ package ca.bc.gov.ols.router.datasource;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.time.ZonedDateTime;
+import java.util.Map;
 
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
 
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnRestriction;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 
 /**
@@ -43,4 +46,6 @@ public interface RouterDataSource {
 
 	RowReader getLocalDistortionFieldReader() throws IOException;
 	
+	Map<DateType, ZonedDateTime> getDates();
+
 }

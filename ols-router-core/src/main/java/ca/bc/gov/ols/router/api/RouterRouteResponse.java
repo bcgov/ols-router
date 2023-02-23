@@ -14,15 +14,17 @@ public class RouterRouteResponse extends RouterDistanceResponse {
 
 	private LineString path;
 	private List<Partition> partitions;
+	private List<Integer> tlids;
 
 	public RouterRouteResponse(RoutingParameters params) {
 		super(params);
 	}
 
-	public RouterRouteResponse(RoutingParameters params, double distance, double time, LineString path, List<Partition> partitions) {
+	public RouterRouteResponse(RoutingParameters params, double distance, double time, LineString path, List<Partition> partitions, List<Integer> tlids) {
 		super(params, distance, time);
 		this.path = path;
 		this.partitions = partitions;
+		this.tlids = tlids;
 	}
 
 	public LineString getPath() {
@@ -31,6 +33,10 @@ public class RouterRouteResponse extends RouterDistanceResponse {
 	
 	public List<Partition> getPartitions() {
 		return partitions;
+	}
+	
+	public List<Integer> getTlids() {
+		return tlids;
 	}
 
 	@Override

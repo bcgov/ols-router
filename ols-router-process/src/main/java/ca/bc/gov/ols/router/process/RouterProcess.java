@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -22,19 +21,16 @@ import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.router.RouterFactory;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.DayCode;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
@@ -76,6 +72,7 @@ public class RouterProcess {
 	private static String dataDir = "C:/apps/router/data/";
 	private RowWriter logWriter;
 	private EnumMap<RoadClass,Double> trafficMultiplierMap = buildTrafficMultiplierMap();
+	private Map<String, String> dates;
 	
 	public static void main(String[] args) throws IOException {
 		if(args.length != 1) {
@@ -95,10 +92,7 @@ public class RouterProcess {
 	}
 
 	public RouterProcess() {
-		Properties bootstrapConfig = RouterFactory.getBootstrapConfigFromEnvironment();
-		ConfigurationStore configStore = RouterConfigurationStoreFactory.getConfigurationStore(bootstrapConfig);
-		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, Integer.parseInt(configStore.getConfigParam("baseSrsCode").get()));
-		configStore.close();
+		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL); // SRS doesn't matter for what we are doing here 
 	}
 
 	public void process() {
@@ -828,7 +822,8 @@ public class RouterProcess {
 
 	private TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
-		RowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
+		JsonRowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
+		dates = reader.getDates();
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
 		int count = 0;
 		while(reader.next()) {
@@ -960,7 +955,7 @@ public class RouterProcess {
 	
 	private void writeSegments(List<RpStreetSegment> segments) {
 		File streetsFile = new File(dataDir + "street_load_street_segments_router.json");
-		RowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments");
+		JsonRowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments", dates);
 		int segCount = 0;
 		for(RpStreetSegment seg : segments) {
 			Map<String,Object> row = new THashMap<String,Object>();

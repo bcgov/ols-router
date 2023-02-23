@@ -25,6 +25,7 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.RoadTruckNoticeEvent;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.CardinalDirection;
@@ -55,6 +56,7 @@ public class EdgeMerger {
 	private double time = 0;
 	private LineString route;
 	private List<Direction> directions;
+	private List<Integer> tlids;
 	private Set<Notification> notifications;
 	private List<Partition> partitions;
 	private EnumMap<Attribute,Object> partitionValues = null;
@@ -72,6 +74,9 @@ public class EdgeMerger {
 		if(calcDirections) {
 			directions = new ArrayList<Direction>();
 			notifications = new HashSet<Notification>();
+		}
+		if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
+			tlids = new ArrayList<Integer>();
 		}
 		if(partitionAttributes != null) {
 			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
@@ -175,6 +180,9 @@ public class EdgeMerger {
 						directions.add(curDir);
 					}
 				}
+				if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
+					tlids.add(graph.getSegmentId(edgeId));
+				}
 				
 				int waitTime = edges.waitTime(edgeIdx);
 				double edgeDist;
@@ -270,6 +278,10 @@ public class EdgeMerger {
 
 	public List<Partition> getPartitions() {
 		return partitions;
+	}
+	
+	public List<Integer> getTlids() {
+		return tlids;
 	}
 
 	public void calcDistance() {

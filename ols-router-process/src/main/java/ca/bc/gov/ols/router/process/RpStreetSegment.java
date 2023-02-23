@@ -6,19 +6,19 @@ package ca.bc.gov.ols.router.process;
 
 import java.util.EnumMap;
 
-import ca.bc.gov.ols.enums.DividerType;
-import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.router.data.StreetSegment;
-import ca.bc.gov.ols.router.data.enums.End;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
-import ca.bc.gov.ols.router.data.enums.XingClass;
-
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+
+import ca.bc.gov.ols.enums.DividerType;
+import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.StreetSegment;
+import ca.bc.gov.ols.router.data.enums.End;
+import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.XingClass;
 
 public class RpStreetSegment extends StreetSegment {
 
