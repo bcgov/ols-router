@@ -5,10 +5,8 @@
 package ca.bc.gov.ols.router.engine.basic;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +21,10 @@ import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
-import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
 import gnu.trove.map.TIntObjectMap;
 
@@ -37,11 +33,11 @@ public class BasicGraph {
 	
 	public static final int NO_EDGE = -1;
 	public static final int NO_NODE = -1;
+	public static final double MAX_SNAP_DISTANCE = 1000;
 	
 	private int nextNodeId = 0;
 	private int nextEdgeId = 0;
 	
-	private RouterConfig config;
 	private IntObjectArrayMap<Node> nodes;
 	private IntObjectArrayMap<Edge> edges;
 	private STRtree spatialIndex;
@@ -51,7 +47,6 @@ public class BasicGraph {
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField;
 	private VisLayers visLayers;
-	private Map<DateType, ZonedDateTime> dates;
 
 	public BasicGraph(int initialEdgeCapacity) {
 		nodes = new IntObjectArrayMap<Node>(initialEdgeCapacity/2);
@@ -69,13 +64,13 @@ public class BasicGraph {
 		return nodeId;
 	}
 	
-	public int[] addEdge(int fromNodeId, int toNodeId, int segmentId, LineString ls, 
+	public int[] addEdge(int fromNodeId, int toNodeId, LineString ls, 
 			boolean oneWay, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
 			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
-		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
+		EdgeData data = new EdgeData(ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
 				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
@@ -114,7 +109,7 @@ public class BasicGraph {
 		}		
 	}
 	
-	public int findClosestEdge(Point point, int snapDistance) {
+	public int findClosestEdge(Point point) {
 		int closestEdgeId = (Integer)spatialIndex.nearestNeighbour(point.getEnvelopeInternal(), NO_EDGE, new ItemDistance() {
 			@Override
 			public double distance(ItemBoundable item1, ItemBoundable item2) {
@@ -135,7 +130,7 @@ public class BasicGraph {
 				return geom1.distance(geom2);
 			}
 		});
-		if(point.distance(getLineString(closestEdgeId)) > snapDistance) {
+		if(point.distance(getLineString(closestEdgeId)) > MAX_SNAP_DISTANCE) {
 			return NO_EDGE;
 		}
 		return closestEdgeId;
@@ -185,11 +180,7 @@ public class BasicGraph {
 	public void setVisLayers(VisLayers visLayers) {
 		this.visLayers = visLayers;
 	}
-
-	public int getSegmentId(int edgeId) {
-		return edges.get(edgeId).data.segmentId;
-	}
-
+	
 	public double getLength(int edgeId) {
 		return edges.get(edgeId).data.length;
 	}
@@ -354,14 +345,6 @@ public class BasicGraph {
 		return edges.get(edgeId).data.roadClass;
 	}
 
-	public void setDates(Map<DateType, ZonedDateTime> dates) {
-		this.dates = dates;
-	}
-	
-	public Map<DateType, ZonedDateTime> getDates() {
-		return dates;
-	}
-
 }
 
 class Node {
@@ -375,7 +358,6 @@ class Node {
 }
 
 class EdgeData {
-	final int segmentId; 
 	final LineString ls;
 	final double length;
 	final float fromAngle;
@@ -396,12 +378,11 @@ class EdgeData {
 	final XingClass toXingClass;
 	final boolean isDeadEnded;
 	
-	public EdgeData(int segmentId, LineString ls, short speedLimit, 
+	public EdgeData(LineString ls, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
 			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
-		this.segmentId = segmentId;
 		this.ls = ls;
 		this.length = ls.getLength();
 		this.fromAngle = (float) Angle.angle(ls.getCoordinateN(0), ls.getCoordinateN(1));

@@ -16,7 +16,6 @@ public enum RouteOption {
 	LOCAL_DISTORTION_FIELD("ldf"),
 	SCHEDULING("sc"), 
 	TIME_DEPENDENCY("td"),
-	TRANSPORT_LINE_ID("tl"),
 	TRAFFIC("tf"),
 	TURN_COSTS("tc"),
 	TURN_RESTRICTIONS("tr"),

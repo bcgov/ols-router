@@ -21,8 +21,8 @@ public class RouterOptimalRouteResponse extends RouterRouteResponse implements R
 	}
 	
 	public RouterOptimalRouteResponse(RoutingParameters params, double distance, double time, LineString path, 
-			List<Partition> partitions, List<Integer> tlids, int[] visitOrder) {
-		super(params, distance, time, path, partitions, tlids);
+			List<Partition> partitions, int[] visitOrder) {
+		super(params, distance, time, path, partitions);
 		this.visitOrder = visitOrder;
 	}
 

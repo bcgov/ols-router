@@ -7,7 +7,6 @@ package ca.bc.gov.ols.router.rest.messageconverters.html;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -20,7 +19,6 @@ import ca.bc.gov.ols.router.api.RouterDistanceResponse;
 import ca.bc.gov.ols.router.api.RouterOptimizedResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.rest.messageconverters.ConverterHelper;
 import ca.bc.gov.ols.router.util.TimeHelper;
@@ -29,8 +27,6 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-
-import com.datastax.oss.driver.shaded.guava.common.collect.Lists;
 
 public class HtmlConverterHelper extends ConverterHelper {
 	
@@ -148,14 +144,6 @@ public class HtmlConverterHelper extends ConverterHelper {
 			routeStr.append("</table>");
 		}
 		writeField("route", routeStr, false);		
-
-		if(response.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
-			String tlidStr = "";
-			if(response.getTlids() != null) {
-				tlidStr = response.getTlids().stream().map(tlid -> tlid.toString()).collect(Collectors.joining(","));
-			}
-			writeField("tlids", tlidStr, false);
-		}
 	}
 	
 	protected void writeFields(RouterDirectionsResponse response) throws IOException {

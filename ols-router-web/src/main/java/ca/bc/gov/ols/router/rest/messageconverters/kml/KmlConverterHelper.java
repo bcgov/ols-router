@@ -144,7 +144,6 @@ public class KmlConverterHelper extends ConverterHelper {
 		out.write("</coordinates>\r\n"
 				+ "</LineString>\r\n"
 				+ "</Placemark>\r\n");
-		
 	}
 
 	protected void writeFields(RouterDirectionsResponse response) throws IOException {

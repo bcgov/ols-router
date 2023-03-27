@@ -5,17 +5,22 @@
 package ca.bc.gov.ols.router.datasource;
 
 import java.io.IOException;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.PrecisionModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
+import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
+import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
 import ca.bc.gov.ols.router.open511.parser.Open511Parser;
 import ca.bc.gov.ols.rowreader.RowReader;
@@ -61,8 +66,6 @@ public class RouterDataLoader {
 
 		graphBuilder.addSchedules(dataSource.getGtfs(), dataSource.getGTFSMappingReader());
 
-		graphBuilder.setDates(dataSource.getDates());
-		
 		long elapsedTime = System.currentTimeMillis() - startTime;
 		logger.info("Finished loading Router data structure ({} secs).", elapsedTime / 1000);
 		logger.debug("Memory in use after loading(Megs): {}",

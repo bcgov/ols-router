@@ -5,7 +5,6 @@
 package ca.bc.gov.ols.router.api;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -29,8 +28,6 @@ public class ApiResponse {
 	protected RoutingCriteria criteria;
 	protected Set<RouteOption> enabledOptions;
 	protected String routeDescription;
-	protected ZonedDateTime dataProcessingTimestamp;
-	protected ZonedDateTime roadNetworkTimestamp;
 	protected EnumSet<Attribute> partition;
 
 	public ApiResponse(RoutingParameters params) {
@@ -98,22 +95,6 @@ public class ApiResponse {
 
 	public void setRouteDescription(String routeDescription) {
 		this.routeDescription = routeDescription;
-	}
-
-	public void setDataProcessingTimestamp(ZonedDateTime dataProcessingTimestamp) {
-		this.dataProcessingTimestamp = dataProcessingTimestamp;
-	}
-
-	public ZonedDateTime getDataProcessingTimestamp() {
-		return dataProcessingTimestamp;
-	}
-
-	public void setRoadNetworkTimestamp(ZonedDateTime roadNetworkTimestamp) {
-		this.roadNetworkTimestamp = roadNetworkTimestamp;
-	}
-
-	public ZonedDateTime getRoadNetworkTimestamp() {
-		return roadNetworkTimestamp;
 	}
 	
 	public EnumSet<Attribute> getPartition() {

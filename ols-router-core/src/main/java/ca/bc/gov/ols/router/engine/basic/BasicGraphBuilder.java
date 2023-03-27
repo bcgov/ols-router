@@ -14,7 +14,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -78,7 +77,6 @@ import ca.bc.gov.ols.router.time.TemporalSet;
 import ca.bc.gov.ols.router.time.TemporalSetIntersection;
 import ca.bc.gov.ols.router.time.TemporalSetUnion;
 import ca.bc.gov.ols.router.time.WeeklyDateRange;
-import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
 
@@ -120,7 +118,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		int toIntId = seg.getEndIntersectionId();
 		int toNodeId = getNodeId(toIntId, ls.getEndPoint());
 		boolean oneWay = seg.getTravelDirection() != TravelDirection.BIDIRECTIONAL;
-		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, seg.getSegmentId(), ls, oneWay, seg.getSpeedLimit(), 
+		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, ls, oneWay, seg.getSpeedLimit(), 
 				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(), 
 				seg.getRoadClass(), seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
@@ -245,7 +243,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 			if(evt.getRoads().get(0).getDelay() != null
 					|| RoadState.CLOSED.equals(evt.getRoads().get(0).getState())) {
 				Geometry geom = reprojector.reproject(evt.getGeography(), config.getBaseSrsCode());
-				int edgeId = graph.findClosestEdge((Point)geom, config.getDefaultSnapDistance());
+				int edgeId = graph.findClosestEdge((Point)geom);
 				if(edgeId != BasicGraph.NO_EDGE) {
 					// determine the schedule
 					TemporalSet schedule = null;
@@ -595,11 +593,6 @@ public class BasicGraphBuilder implements GraphBuilder {
 			toFrags.add(tr.getToFragment());
 		}
 		return toFrags;
-	}
-
-	@Override
-	public void setDates(Map<DateType, ZonedDateTime> dates) {
-		graph.setDates(dates);
 	}
 
 }

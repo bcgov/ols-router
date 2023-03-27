@@ -17,7 +17,7 @@ import ca.bc.gov.ols.config.ConfigurationParameter;
 import ca.bc.gov.ols.config.ConfigurationStore;
 
 public class RouterConfig {
-	public static final String VERSION = "2.2.0";
+	public static final String VERSION = "2.1.6";
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
@@ -47,7 +47,6 @@ public class RouterConfig {
 	protected double[] defaultTurnCost = {3,1,5,2};
 	protected String defaultGlobalDistortionField = "";
 	private double defaultTruckRouteMultiplier = 9;
-	private int defaultSnapDistance = 1000;
 		
 	public RouterConfig() {
 		INSTANCE = this;
@@ -113,9 +112,6 @@ public class RouterConfig {
 					break;
 				case "defaultTruckRouteMultiplier":
 					defaultTruckRouteMultiplier = Double.parseDouble(value);
-					break;
-				case "defaultSnapDistance":
-					defaultSnapDistance = Integer.parseInt(value); 
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -208,10 +204,6 @@ public class RouterConfig {
 
 	public double getDefaultTruckRouteMultiplier() {
 		return defaultTruckRouteMultiplier;
-	}
-
-	public int getDefaultSnapDistance() {
-		return defaultSnapDistance;
 	}
 
 	

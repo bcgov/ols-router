@@ -16,11 +16,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
-import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
@@ -70,7 +70,6 @@ public class RoutingParameters {
 	private boolean setEnableCalled = false;
 	private boolean turnCostsSet = false;
 	private boolean followTruckRouteSet = false;
-	private int snapDistance = 1000;
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -91,7 +90,6 @@ public class RoutingParameters {
 		turnCostMap = defaultTurnCostMap.get(vehicleType);
 		globalDistortionField = defaultGlobalDistortionField;
 		truckRouteMultiplier = config.getDefaultTruckRouteMultiplier();
-		snapDistance = config.getDefaultSnapDistance();
 	}
 
 	private static EnumMap<TrafficImpactor,Double> buildXingCostMap(double[] xingCost) {
@@ -414,14 +412,6 @@ public class RoutingParameters {
 		return enabledOptions;
 	}
 	
-	public int getSnapDistance() {
-		return snapDistance;
-	}
-
-	public void setSnapDistance(int snapDistance) {
-		this.snapDistance = snapDistance;
-	}
-
 	public void setPartition(String partitionList) {
 		partitionAttributes = Attribute.fromList(partitionList);
 	}

@@ -72,8 +72,6 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.name("criteria").value(response.getCriteria().toString());
 		jw.name("enable").value(RouteOption.setToString(response.getEnabledOptions()));
 		jw.name("distanceUnit").value(response.getDistanceUnit().abbr());
-		jw.name("dataProcessingTimestamp").value(response.getDataProcessingTimestamp().toString());
-		jw.name("roadNetworkTimestamp").value(response.getRoadNetworkTimestamp().toString());
 	}
 	
 	protected void writeFields(RouterDistanceResponse response) throws IOException {
@@ -179,17 +177,6 @@ public class JsonConverterHelper extends ConverterHelper {
 			}
 		}
 		jw.endArray();
-		
-		if(response.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
-			jw.name("tlids");
-			jw.beginArray();
-			if(response.getTlids() != null) {
-				for(Integer tlid : response.getTlids()) {
-					jw.value(tlid);
-				}
-			}
-			jw.endArray();
-		}
 	}
 	
 	protected void writeFields(RouterDirectionsResponse response) throws IOException {

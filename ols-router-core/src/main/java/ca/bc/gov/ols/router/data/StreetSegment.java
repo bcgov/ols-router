@@ -9,8 +9,8 @@ import org.locationtech.jts.geom.LineString;
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.enums.SurfaceType;
-import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.data.enums.SurfaceType;
+import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 
 public class StreetSegment {
