@@ -31,7 +31,7 @@ import ca.bc.gov.ols.router.rest.messageconverters.kml.KmlErrorMessageConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.kml.KmlResponseConverter;
 
 @Configuration
-@ComponentScan("ca.bc.gov.app.router.rest")
+@ComponentScan("ca.bc.gov.ols.router.rest")
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
 		
