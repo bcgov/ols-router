@@ -30,6 +30,7 @@ public class RouterConfigurationStoreFactory {
 		logger.info("RouterConfigurationStoreFactory.getConfigurationStore() called");
 		
 		String configStoreClassName = bootstrapConfig.getProperty("OLS_ROUTER_CONFIGURATION_STORE");
+		logger.info("OLS_ROUTER_CONFIGURATION_STORE = " + configStoreClassName);
 		try {
 			Class<?> cl = Class.forName(configStoreClassName);
 			Constructor<?> con = cl.getConstructor(new Class[] {Properties.class});
