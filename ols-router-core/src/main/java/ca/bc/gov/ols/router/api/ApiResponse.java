@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Point;
@@ -17,6 +18,8 @@ import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.engine.basic.Attribute;
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.rowreader.DateType;
 
 public class ApiResponse {
 
@@ -33,7 +36,7 @@ public class ApiResponse {
 	protected ZonedDateTime roadNetworkTimestamp;
 	protected EnumSet<Attribute> partition;
 
-	public ApiResponse(RoutingParameters params) {
+	public ApiResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
 		timeStamp = LocalDateTime.now();
 		callback = params.getCallback();
 		srsCode = params.getOutputSRS();
@@ -41,6 +44,8 @@ public class ApiResponse {
 		criteria = params.getCriteria();
 		enabledOptions = params.getEnabledOptions();
 		routeDescription = params.getRouteDescription();
+		dataProcessingTimestamp = dates.get(DateType.PROCESSING_DATE);
+		roadNetworkTimestamp = dates.get(DateType.ITN_VINTAGE_DATE);
 		partition = params.getPartition();
 	}
 	

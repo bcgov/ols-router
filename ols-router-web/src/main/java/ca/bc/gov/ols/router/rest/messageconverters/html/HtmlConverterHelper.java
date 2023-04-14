@@ -9,7 +9,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
@@ -29,8 +29,6 @@ import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-
-import com.datastax.oss.driver.shaded.guava.common.collect.Lists;
 
 public class HtmlConverterHelper extends ConverterHelper {
 	
@@ -94,6 +92,8 @@ public class HtmlConverterHelper extends ConverterHelper {
 		writeField("srsCode", response.getSrsCode());
 		writeField("criteria", response.getCriteria().toString());		
 		writeField("distanceUnit", response.getDistanceUnit().abbr());
+		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
+		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
 	}
 	
 	protected void writeFields(RouterDistanceResponse response) throws IOException {
