@@ -103,7 +103,7 @@ public class RouterFactory {
 		bootstrapConfig.setProperty("OLS_CASSANDRA_KEYSPACE", Optional.ofNullable(System.getenv("OLS_CASSANDRA_KEYSPACE")).orElse("bgeo"));
 		bootstrapConfig.setProperty("OLS_CASSANDRA_REPL_FACTOR", Optional.ofNullable(System.getenv("OLS_CASSANDRA_REPL_FACTOR")).orElse("2"));
 		bootstrapConfig.setProperty("OLS_ROUTER_CONFIGURATION_STORE", Optional.ofNullable(System.getenv("OLS_ROUTER_CONFIGURATION_STORE"))
-				.orElse("ca.bc.gov.ols.config.CassandraConfigurationStore"));
+				.orElse("ca.bc.gov.ols.config.FileConfigurationStore"));
 		return bootstrapConfig;
 	}
 
