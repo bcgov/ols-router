@@ -4,16 +4,21 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.Geometry;
+
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.rowreader.DateType;
 
 public class IsochroneResponse extends ApiResponse {
 	private List<Geometry> polygons;
 	private int zoneSize = 0;
 
-	public IsochroneResponse(List<Geometry> polygons, RoutingParameters params) {
-		super(params);
+	public IsochroneResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, List<Geometry> polygons) {
+		super(params, dates);
 		this.polygons = polygons;
 		this.zoneSize = params.getZoneSize();
 	}
