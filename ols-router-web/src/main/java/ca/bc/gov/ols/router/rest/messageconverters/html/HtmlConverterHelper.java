@@ -30,7 +30,9 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 
-import com.datastax.oss.driver.shaded.guava.common.collect.Lists;
+// the following line is not used and will cause compilation error
+// Mike May 11, 2023
+// import com.datastax.oss.driver.shaded.guava.common.collect.Lists;
 
 public class HtmlConverterHelper extends ConverterHelper {
 	
