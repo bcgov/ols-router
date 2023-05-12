@@ -5,7 +5,6 @@
 package ca.bc.gov.ols.router.rest.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,7 +35,6 @@ import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.rest.GeotoolsGeometryReprojector;
 import ca.bc.gov.ols.router.rest.exceptions.InvalidParameterException;
 import ca.bc.gov.ols.util.StopWatch;

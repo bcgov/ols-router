@@ -4,14 +4,18 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.Partition;
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.router.notifications.Notification;
+import ca.bc.gov.ols.rowreader.DateType;
 
 
 public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse implements RouterOptimizedResponse{
@@ -20,14 +24,14 @@ public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse im
 	private long optimizationExecutionTime;
 	private int[] visitOrder;
 	
-	public RouterOptimalDirectionsResponse(RoutingParameters params) {
-		super(params);
+	public RouterOptimalDirectionsResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
+		super(params, dates);
 		visitOrder = new int[0];
 	}
 	
-	public RouterOptimalDirectionsResponse(RoutingParameters params, double distance, double time, LineString path, 
+	public RouterOptimalDirectionsResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time, LineString path, 
 			List<Partition> partitions, List<Integer> tlids, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
-		super(params, distance, time, path, partitions, tlids, directions, notifications);
+		super(params, dates, distance, time, path, partitions, tlids, directions, notifications);
 		this.visitOrder = visitOrder;
 	}
 

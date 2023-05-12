@@ -4,12 +4,16 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.rowreader.DateType;
 
 public class RouterDistanceBetweenPairsResponse extends ApiResponse {
 
@@ -21,8 +25,8 @@ public class RouterDistanceBetweenPairsResponse extends ApiResponse {
 	protected String[] errors;
 	private int curResult = 0;
 
-	public RouterDistanceBetweenPairsResponse(RoutingParameters params) {
-		super(params);
+	public RouterDistanceBetweenPairsResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
+		super(params, dates);
 		fromPoints = params.getFromPoints();
 		toPoints = params.getToPoints();
 		maxPairs = params.getMaxPairs();

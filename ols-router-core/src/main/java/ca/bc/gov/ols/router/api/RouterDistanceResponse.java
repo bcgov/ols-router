@@ -4,11 +4,15 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.rowreader.DateType;
 
 public class RouterDistanceResponse extends ApiResponse {
 
@@ -16,15 +20,15 @@ public class RouterDistanceResponse extends ApiResponse {
 	protected double distance;
 	protected double time;
 
-	public RouterDistanceResponse(RoutingParameters params) {
-		super(params);
+	public RouterDistanceResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
+		super(params, dates);
 		points = params.getPoints();
 		distance = -1;
 		time = -1;
 	}
 
-	public RouterDistanceResponse(RoutingParameters params, double distance, double time) {
-		super(params);
+	public RouterDistanceResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time) {
+		super(params, dates);
 		points = params.getPoints();
 		this.distance = DistanceUnit.METRE.convertTo(distance, params.getDistanceUnit());
 		this.time = time;
