@@ -14,10 +14,12 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.stereotype.Component;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
 
+@Component
 public class JsonResponseConverter extends AbstractHttpMessageConverter<ApiResponse> {
 
 	@Autowired

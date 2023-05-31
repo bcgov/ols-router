@@ -70,10 +70,13 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<ols-util.version>1.3.2-SNAPSHOT</ols-util.version>
 		<cassandraContactPoint>hummingbird.animals</cassandraContactPoint>
 		<cassandraLocalDatacenter>datacenter1</cassandraLocalDatacenter>
 		<environment>devel</environment>
 		<com.graphhopper.version>0.5.0</com.graphhopper.version>
+		<junit.jupiter.version>5.6.2</junit.jupiter.version>
+		<slf4j.version>2.0.4</slf4j.version>
 	</properties>
 
 	<modules>
@@ -98,7 +101,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
 				<configuration>
-					<release>11</release>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -351,6 +354,37 @@
 			</properties>
 		</profile>
 	</profiles>
+	
+		<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ca.bc.gov.ols</groupId>
+				<artifactId>ols-util</artifactId>
+				<version>${ols-util.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.trove4j</groupId>
+				<artifactId>trove4j</artifactId>
+				<version>3.0.3</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<distributionManagement>
 		<repository>
 			<id>central</id>
