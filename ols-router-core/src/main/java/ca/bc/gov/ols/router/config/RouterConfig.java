@@ -27,7 +27,6 @@ public class RouterConfig {
 	private static final Logger logger = LoggerFactory.getLogger(RouterConfig.class.getCanonicalName());
 	
 	private static RouterConfig INSTANCE;
-	
 	protected ConfigurationStore configStore;
 	protected int baseSrsCode = -1;
 	protected String dataSourceClassName;
@@ -48,6 +47,7 @@ public class RouterConfig {
 	protected String defaultGlobalDistortionField = "";
 	private double defaultTruckRouteMultiplier = 9;
 	private int defaultSnapDistance = 1000;
+	private int defaultSimplifyThreshold = 250;
 		
 	public RouterConfig() {
 		INSTANCE = this;
@@ -116,6 +116,9 @@ public class RouterConfig {
 					break;
 				case "defaultSnapDistance":
 					defaultSnapDistance = Integer.parseInt(value); 
+					break;
+				case "defaultSimplifyThreshold":
+					defaultSimplifyThreshold = Integer.parseInt(value); 
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -214,6 +217,9 @@ public class RouterConfig {
 		return defaultSnapDistance;
 	}
 
-	
+	public int getDefaultSimplifyThreshold() {
+		return defaultSimplifyThreshold;
+	}
+
 
 }

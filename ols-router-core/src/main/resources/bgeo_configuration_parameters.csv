@@ -18,3 +18,4 @@ ROUTER,defaultTurnCost,"3,1,5,2"
 ROUTER,defaultTruckRouteMultiplier,"9"
 ROUTER,defaultGlobalDistortionField,""
 ROUTER,defaultSnapDistance,1000
+ROUTER,defaultSimplifyThreshold,250
