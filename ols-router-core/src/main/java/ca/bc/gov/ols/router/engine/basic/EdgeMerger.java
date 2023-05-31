@@ -251,6 +251,71 @@ public class EdgeMerger {
 		}
 		
 	}
+	
+	private void simplifyDirections() {
+		
+		String nstreet;
+		String pstreet;
+		double ndist;
+		double ntime;
+		double cdist;
+		double ctime;
+		boolean combinedLast = false;
+		
+		List<Direction> newDirections;
+		newDirections = new ArrayList<Direction>();
+		
+		newDirections.add(directions.get(0)); //always going to have the same start
+		// for each direction. Skip the first and last as those will never change and will be out of bounds if included in the loop
+		for(int directionIdx = 1; directionIdx < directions.size()-1; directionIdx++) {
+			Direction prev; 
+			if(combinedLast) {
+				prev = newDirections.get(newDirections.size()-1);
+			}else {
+				prev = directions.get(directionIdx - 1);
+			}
+			Direction cur = directions.get(directionIdx);
+			Direction next = directions.get(directionIdx + 1);
+			
+			if( prev instanceof AbstractTravelDirection && cur instanceof AbstractTravelDirection && next instanceof AbstractTravelDirection) {
+				pstreet = ((AbstractTravelDirection)prev).getStreetName();
+				nstreet = ((AbstractTravelDirection)next).getStreetName();
+				cdist = ((AbstractTravelDirection)cur).getDistance();
+				ctime = ((AbstractTravelDirection)cur).getTime();
+				ndist = ((AbstractTravelDirection)next).getDistance();
+				ntime = ((AbstractTravelDirection)next).getTime();
+			
+			}else {
+				newDirections.add(cur); 
+				continue;
+			}
+			
+			//if you are continuing on the same road (next's name = prev's name), and the current segment distance is < X meters, combine them 
+			if(pstreet.equals(nstreet) && cdist < params.getSimplifyThreshold()) {
+				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
+				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'next'
+				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'next'
+				
+				
+				//check types of current and previous, they should both be continue in the case where we want to combine them 
+				if (next.getType() == StreetDirectionType.CONTINUE.name() && next.getType().equals(cur.getType()) ) {
+					//do nothing, the types are as expected to combine.
+				}else {
+					newDirections.add(cur);
+					combinedLast = false;
+					continue;
+				}
+				
+				newDirections.add(prev);
+				directionIdx++;//skip one more index after a merge.
+				combinedLast = true;
+			}else {
+				newDirections.add(cur);
+				combinedLast = false;
+			}
+		}
+		directions = newDirections;
+	}
 
 	public double getDist() {
 		return dist;
@@ -297,6 +362,9 @@ public class EdgeMerger {
 		calcRoute = true;
 		calcDirections  = true;
 		mergeEdges(gf);
+		if(params.isSimplifyDirections() == true) {
+			simplifyDirections();
+		}
 	}
 
 }
