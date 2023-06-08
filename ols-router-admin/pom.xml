@@ -9,11 +9,6 @@
   <packaging>war</packaging>
   <name>OLS Router Admin</name>
   
-  <properties>
-    <springframework.version>6.0.9</springframework.version>
-    <springframework.security.version>6.1.0</springframework.security.version>
-  </properties>
-
   <build>
     <plugins>
       <plugin>

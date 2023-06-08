@@ -71,9 +71,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<ols-util.version>1.3.2-SNAPSHOT</ols-util.version>
-		<cassandraContactPoint>hummingbird.animals</cassandraContactPoint>
-		<cassandraLocalDatacenter>datacenter1</cassandraLocalDatacenter>
-		<environment>devel</environment>
+		<springframework.version>6.0.9</springframework.version>
+		<springframework.security.version>6.1.0</springframework.security.version>
 		<com.graphhopper.version>0.5.0</com.graphhopper.version>
 		<junit.jupiter.version>5.6.2</junit.jupiter.version>
 		<slf4j.version>2.0.4</slf4j.version>

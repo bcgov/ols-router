@@ -76,8 +76,8 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value = "/validate", method = RequestMethod.POST)
-	public ModelAndView doValidate(@RequestParam("file") MultipartFile file) {
-		ConfigurationStore exportConfig = new FileExportConfigurationStore(file);
+	public ModelAndView doValidate(@RequestParam("file") MultipartFile file) throws IOException {
+		ConfigurationStore exportConfig = new FileExportConfigurationStore(file.getInputStream());
 		ConfigurationStore localConfig = adminApp.getConfigStore();
 		ConfigurationComparison comparison = new ConfigurationComparison(localConfig, exportConfig);
 		ModelAndView modelAndView = new ModelAndView("view/validate", "exportConfig", exportConfig);
@@ -86,8 +86,8 @@ public class AdminController {
 	}
 
 	@RequestMapping(value = "/import", method = RequestMethod.POST)
-	public ModelAndView doImport(@RequestParam("file") MultipartFile file) {
-		FileExportConfigurationStore exportConfig = new FileExportConfigurationStore(file);
+	public ModelAndView doImport(@RequestParam("file") MultipartFile file) throws IOException {
+		FileExportConfigurationStore exportConfig = new FileExportConfigurationStore(file.getInputStream());
 		if(exportConfig.getErrors().isEmpty()) {
 			adminApp.getConfigStore().replaceWith(exportConfig);
 			return new ModelAndView("view/import", "errors", exportConfig.getErrors());
