@@ -18,13 +18,6 @@
   <artifactId>ols-router-web</artifactId>
   <packaging>jar</packaging>
   
-  <properties>
-    <m2eclipse.wtp.contextRoot>/pub/router</m2eclipse.wtp.contextRoot>
-    <geotools.version>22.5</geotools.version>
-    <springframework.version>6.0.9</springframework.version>
-    <springframework.security.version>6.1.0</springframework.security.version>
-  </properties>
-
   <build>
     <plugins>
       <plugin>
