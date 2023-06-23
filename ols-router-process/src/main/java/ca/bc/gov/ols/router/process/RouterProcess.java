@@ -5,7 +5,6 @@
 package ca.bc.gov.ols.router.process;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +36,6 @@ import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
-import ca.bc.gov.ols.router.rdm.RdmParser;
-import ca.bc.gov.ols.router.rdm.Restriction;
 import ca.bc.gov.ols.rowreader.CsvRowReader;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.JsonRowWriter;
@@ -78,7 +74,6 @@ public class RouterProcess {
 	private static final String STREET_NAMES_ON_SEG_FILE = "street_load_street_name_on_seg_xref.json";
 	private static final String LOCALITIES_FILE = "street_load_localities.json";
 	private static final String STREETS_FILE = "street_load_street_segments.json";
-	private static final String RDM_RESTRICTION_FILE = "restrictions_active.json";
 	private RowWriter logWriter;
 	private EnumMap<RoadClass,Double> trafficMultiplierMap = buildTrafficMultiplierMap();
 	private Map<String, String> dates;
@@ -113,7 +108,6 @@ public class RouterProcess {
 
 		TIntObjectHashMap<String> streetNameById = loadStreetNames(dataDir + STREET_NAMES_FILE);
 		TIntIntHashMap streetNameIdBySegmentId = loadStreetNameOnSegs(dataDir + STREET_NAMES_ON_SEG_FILE);
-		TIntObjectHashMap<List<Restriction>> restrictionsBySegmentId = loadRdmRestrictions(dataDir + RDM_RESTRICTION_FILE);
 
 		// load localities into a lookup table
 		logger.info("Loading Localities");
@@ -229,46 +223,7 @@ public class RouterProcess {
 				droppedSegs++;
 				continue;
 			}
-			
-			// apply restrictions from RDM
-			List<Restriction> restrictions = restrictionsBySegmentId.get(segmentId);
-			if(restrictions != null) {
-				for(Restriction r : restrictions) {
-					switch(r.restrictionType) { 
-					case "HORIZONTAL":
-						if(!Double.isNaN(maxWidth)) {
-							if(r.permitableValue == maxWidth) {
-								rdmRestrictionMatches++;
-							} else {
-								rdmRestrictionDiffs++;
-								logger.info("RDM Width Restriction overlaps with ITN restriction: {} : {}", r.permitableValue, maxWidth);
-							}
-							maxWidth = Math.min(maxWidth, r.permitableValue);
-						} else {
-							maxWidth = r.permitableValue;
-						}
-						rdmRestrictionsApplied++;
-						break;
-					case "VERTICAL":
-						if(!Double.isNaN(maxHeight)) {
-							if(r.permitableValue == maxHeight) {
-								rdmRestrictionMatches++;
-							} else {
-								rdmRestrictionDiffs++;
-								logger.info("RDM Height Restriction overlaps with ITN restriction: {} : {}", r.permitableValue, maxHeight);
-							}
-							maxHeight = Math.min(maxHeight, r.permitableValue);
-						} else {
-							maxHeight = r.permitableValue;
-						}
-						rdmRestrictionsApplied++;
-						break;
-					default:
-						logger.warn("Unknown restriction type: {}", r.restrictionType);
-					}
-				}
-			}
-			
+						
 			String name = streetNameById.get(streetNameIdBySegmentId.get(segmentId));
 			
 			RpStreetSegment segment = new RpStreetSegment(segmentId, centerLine,
@@ -1178,25 +1133,6 @@ public class RouterProcess {
 		row.put("MESSAGE", message);
 		row.put("geom", se.getSegment().getCenterLine());
 		logWriter.writeRow(row);
-	}
-
-	private TIntObjectHashMap<List<Restriction>> loadRdmRestrictions(String filename) throws IOException {
-		logger.info("Loading RDM Restrictions...");
-		int count = 0;
-		TIntObjectHashMap<List<Restriction>> restrictionMap = new TIntObjectHashMap<List<Restriction>>();
-		RdmParser parser = new RdmParser(new GeometryFactory(new PrecisionModel(), 4326));
-		List<Restriction> restrictions = parser.parseRestrictions(new FileReader(filename));
-		for(Restriction r : restrictions) {
-			List<Restriction> segRestrictions = restrictionMap.get(r.networkSegmentId);
-			if(segRestrictions == null) {
-				segRestrictions = new ArrayList<Restriction>();
-				restrictionMap.put(r.networkSegmentId, segRestrictions);
-			}
-			segRestrictions.add(r);
-			count++;
-		}
-		logger.info("RDM restrictions loaded: {}", count);
-		return restrictionMap;
 	}
 	
 }

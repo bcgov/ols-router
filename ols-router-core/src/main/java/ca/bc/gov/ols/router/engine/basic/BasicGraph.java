@@ -47,6 +47,7 @@ public class BasicGraph {
 	private STRtree spatialIndex;
 	private TurnLookup turnCostLookup;
 	private EventLookup eventLookup;
+	private RestrictionLookup restrictionLookup;
 	private TrafficLookup trafficLookup;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField;
@@ -161,7 +162,15 @@ public class BasicGraph {
 	public void setEventLookup(EventLookup eventLookup) {
 		this.eventLookup = eventLookup;
 	}
+	
+	public void setRestrictionLookup(RestrictionLookup restrictionLookup) {
+		this.restrictionLookup = restrictionLookup;
+	}
 
+	public RestrictionLookup getRestrictionLookup() {
+		return restrictionLookup;
+	}
+	
 	public void setTrafficLookup(TrafficLookup trafficLookup) {
 		this.trafficLookup = trafficLookup;
 	}
@@ -274,29 +283,29 @@ public class BasicGraph {
 		return edge.data.toImp;
 	}
 
-	public double getMaxHeight(int edgeId) {
-		return edges.get(edgeId).data.maxHeight;
-	}
-
-	public double getMaxWidth(int edgeId) {
-		return edges.get(edgeId).data.maxWidth;
-	}
-
-	public Integer getFromMaxWeight(int edgeId) {
-		Edge edge = edges.get(edgeId);
-		if(edge.reversed) {
-			return edges.get(edgeId).data.toMaxWeight;
-		}
-		return edges.get(edgeId).data.fromMaxWeight;
-	}
-
-	public Integer getToMaxWeight(int edgeId) {
-		Edge edge = edges.get(edgeId);
-		if(edge.reversed) {
-			return edges.get(edgeId).data.fromMaxWeight;
-		}
-		return edges.get(edgeId).data.toMaxWeight;
-	}
+//	public double getMaxHeight(int edgeId) {
+//		return edges.get(edgeId).data.maxHeight;
+//	}
+//
+//	public double getMaxWidth(int edgeId) {
+//		return edges.get(edgeId).data.maxWidth;
+//	}
+//
+//	public Integer getFromMaxWeight(int edgeId) {
+//		Edge edge = edges.get(edgeId);
+//		if(edge.reversed) {
+//			return edges.get(edgeId).data.toMaxWeight;
+//		}
+//		return edges.get(edgeId).data.fromMaxWeight;
+//	}
+//
+//	public Integer getToMaxWeight(int edgeId) {
+//		Edge edge = edges.get(edgeId);
+//		if(edge.reversed) {
+//			return edges.get(edgeId).data.fromMaxWeight;
+//		}
+//		return edges.get(edgeId).data.toMaxWeight;
+//	}
 
 	public boolean isTruckRoute(int edgeId) {
 		return edges.get(edgeId).data.isTruckRoute;
@@ -361,7 +370,7 @@ public class BasicGraph {
 	public Map<DateType, ZonedDateTime> getDates() {
 		return dates;
 	}
-
+	
 }
 
 class Node {
@@ -387,10 +396,10 @@ class EdgeData {
 	final RoadClass roadClass;
 	final TrafficImpactor fromImp;
 	final TrafficImpactor toImp;
-	final double maxHeight;
-	final double maxWidth;
-	final Integer fromMaxWeight;
-	final Integer toMaxWeight;
+//	final double maxHeight;
+//	final double maxWidth;
+//	final Integer fromMaxWeight;
+//	final Integer toMaxWeight;
 	final boolean isTruckRoute;
 	final XingClass fromXingClass;
 	final XingClass toXingClass;
@@ -414,10 +423,10 @@ class EdgeData {
 		this.roadClass = roadClass;
 		this.fromImp = fromImp;
 		this.toImp = toImp;
-		this.maxHeight = maxHeight;     
-		this.maxWidth = maxWidth;      
-		this.fromMaxWeight = fromMaxWeight;    
-		this.toMaxWeight = toMaxWeight;    
+//		this.maxHeight = maxHeight;     
+//		this.maxWidth = maxWidth;      
+//		this.fromMaxWeight = fromMaxWeight;    
+//		this.toMaxWeight = toMaxWeight;    
 		this.isTruckRoute = isTruckRoute;
 		this.fromXingClass = fromXingClass;
 		this.toXingClass = toXingClass;

@@ -55,10 +55,12 @@ import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
+import ca.bc.gov.ols.router.rdm.Restriction;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.StopWatch;
@@ -420,28 +422,32 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				double maxHeight = graph.getMaxHeight(edgeId);
-				double maxWidth = graph.getMaxWidth(edgeId);
-				StringBuilder sb = new StringBuilder();
-				if(!Double.isNaN(maxHeight)) {
-					sb.append("Max Height:" + maxHeight + "\n");
-				}
-				if(!Double.isNaN(maxWidth)) {
-					sb.append("Max Width:" + maxWidth + "\n");
-				}	
-				String hardList = sb.toString();
-				if(!hardList.isEmpty()) {
+				List<Restriction> rs = graph.getRestrictionLookup().lookup(edgeId);
+				if(rs != null) {
+					StringBuilder sb = new StringBuilder();
+					for(Restriction r : rs) {
+						if(r.type == RestrictionType.VERTICAL) {
+							sb.append("Max Height:" + r.permitableValue + " (" + r.source + ")\n");
+						}
+						if(r.type == RestrictionType.HORIZONTAL) {
+							sb.append("Max Width:" + r.permitableValue + " (" + r.source + ")\n");
+						}
+						if(r.type == RestrictionType.WEIGHT) {
+							sb.append("Max Weight:" + r.permitableValue + " (" + r.source + ")\n");
+						}
+					}
+					String hardList = sb.toString();
 					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
 				}
-				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
-				if(fromMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
-				}
-				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
-				if(toMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
-				}
+//				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
+//				if(fromMaxWeight != null) {
+//					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
+//				}
+//				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
+//				if(toMaxWeight != null) {
+//					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
+//				}
 			}
 			// Truck Routes
 			if(params.getTypes().contains(NavInfoType.TRK) && graph.isTruckRoute(edgeId)) {

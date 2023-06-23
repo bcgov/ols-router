@@ -4,6 +4,6 @@
  */
 package ca.bc.gov.ols.router.open511.enums;
 
-public enum RestrictionType {
+public enum Open511RestrictionType {
 	SPEED, WIDTH, HEIGHT, WEIGHT, AXLE_WEIGHT;
 }

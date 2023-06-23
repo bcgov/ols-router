@@ -4,17 +4,17 @@
  */
 package ca.bc.gov.ols.router.open511;
 
-import ca.bc.gov.ols.router.open511.enums.RestrictionType;
+import ca.bc.gov.ols.router.open511.enums.Open511RestrictionType;
 
 public class Restriction {
-	private RestrictionType restrictionType;
+	private Open511RestrictionType restrictionType;
 	private double value;
 	
-	public RestrictionType getRestrictionType() {
+	public Open511RestrictionType getRestrictionType() {
 		return restrictionType;
 	}
 	
-	public void setRestrictionType(RestrictionType restrictionType) {
+	public void setRestrictionType(Open511RestrictionType restrictionType) {
 		this.restrictionType = restrictionType;
 	}
 	

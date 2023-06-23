@@ -243,11 +243,6 @@ public class FileRouterDataSource implements RouterDataSource {
 		return null;
 	}
 	
-	@Override
-	public RowReader getTurnClassReader() {
-		return getXsvRowReader("turn_classes");
-	}
-
 	protected TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = getStreetNames();
@@ -347,6 +342,16 @@ public class FileRouterDataSource implements RouterDataSource {
 		return getXsvRowReader("turn_restrictions");
 	}
 	
+	@Override
+	public Reader getRestrictionReader() throws IOException {
+		return new InputStreamReader(getInputStream("restrictions_active.json"));
+	}
+
+	@Override
+	public RowReader getTurnClassReader() {
+		return getXsvRowReader("turn_classes");
+	}
+
 	@Override
 	public Reader getOpen511Reader() throws IOException {
 		return new InputStreamReader(getInputStream("active_events.json"));
