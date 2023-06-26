@@ -262,6 +262,20 @@ public class EdgeMerger {
 		double ctime;
 		boolean combinedLast = false;
 		
+		
+		//testing original instruction totals, used in check afterward to compare to simplified ones
+		//double odist = 0;
+		//double otime = 0;
+		//for(int directionIdx = 0; directionIdx < directions.size()-1; directionIdx++) {
+		//	Direction c = directions.get(directionIdx);
+		//	odist = odist + ((AbstractTravelDirection)c).getDistance();
+		//	otime = otime + ((AbstractTravelDirection)c).getTime();
+		//	
+			//System.out.println("Distanceorig:" + ((AbstractTravelDirection)c).getDistance());
+		//}
+		
+		
+		
 		List<Direction> newDirections;
 		newDirections = new ArrayList<Direction>();
 		
@@ -292,11 +306,6 @@ public class EdgeMerger {
 			
 			//if you are continuing on the same road (next's name = prev's name), and the current segment distance is < X meters, combine them 
 			if(pstreet.equals(nstreet) && cdist < params.getSimplifyThreshold()) {
-				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
-				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'next'
-				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'next'
-				
-				
 				//check types of current and previous, they should both be continue in the case where we want to combine them 
 				if (next.getType() == StreetDirectionType.CONTINUE.name() && next.getType().equals(cur.getType()) ) {
 					//do nothing, the types are as expected to combine.
@@ -305,6 +314,10 @@ public class EdgeMerger {
 					combinedLast = false;
 					continue;
 				}
+
+				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
+				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'next'
+				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'next'
 				
 				newDirections.add(prev);
 				directionIdx++;//skip one more index after a merge.
@@ -314,6 +327,30 @@ public class EdgeMerger {
 				combinedLast = false;
 			}
 		}
+		//always have to add the finish instruction at the end.
+		newDirections.add(directions.get(directions.size()-1));
+		
+		//testing for matching time and distance before and after simplify, probably don't want this in production
+//		ndist = 0;
+//		ntime = 0;
+//		for(int directionIdx = 0; directionIdx < newDirections.size()-1; directionIdx++) {
+//			Direction cur = newDirections.get(directionIdx);
+//			ndist = ndist + ((AbstractTravelDirection)cur).getDistance();
+//			ntime = ntime + ((AbstractTravelDirection)cur).getTime();
+//			
+//			//System.out.println("Distance1:" + ((AbstractTravelDirection)cur).getDistance());
+//		}
+//		
+//		double drem = odist - ndist;
+//		double trem = otime - ntime;
+//		if(drem > 1 || drem < -1) {
+//			System.out.println("Distance Mismatch" + odist + " <->" + ndist);
+//		}
+//		if(trem > 1 || trem < -1) {
+//			System.out.println("Time Mismatch"+ otime + " <->" + ntime);
+//		}
+		
+		
 		directions = newDirections;
 	}
 
