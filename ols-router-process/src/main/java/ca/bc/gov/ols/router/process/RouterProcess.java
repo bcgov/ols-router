@@ -21,6 +21,9 @@ import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.SurfaceType;
@@ -138,9 +141,6 @@ public class RouterProcess {
 		TIntObjectHashMap<RpStreetSegment> ferrySegments = new TIntObjectHashMap<RpStreetSegment>();
 		rr = new JsonRowReader(dataDir + STREETS_FILE, geometryFactory);
 		int segCount = 0;
-		int rdmRestrictionsApplied = 0;
-		int rdmRestrictionMatches = 0;
-		int rdmRestrictionDiffs = 0;
 
 		while(rr.next()) {
 			segCount++;
@@ -218,6 +218,15 @@ public class RouterProcess {
 				toRightTR = TurnTimeCode.convert(rr.getString("to_right_turn_restriction"));
 			}
 			
+			JsonObject motData = rr.getJson("ministry_of_transport_data");
+			String ownership = null;
+			if(motData != null) {
+				JsonElement value = motData.get("ownership");
+				if(value != null) {
+					ownership = value.getAsString();
+				}
+			}
+			
 			// skip virtual and unRouteable segments
 			if((roadClass != RoadClass.FERRY && isVirtual) || !roadClass.isRouteable()) {
 				droppedSegs++;
@@ -234,6 +243,7 @@ public class RouterProcess {
 					speedLimit,  surfaceType,
 					maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
+					ownership,
 					false, isVirtual,
 					fromLeftTR, fromCentreTR, fromRightTR, toLeftTR, toCentreTR, toRightTR);
 			if(RoadClass.FERRY.equals(roadClass)) {
@@ -265,9 +275,6 @@ public class RouterProcess {
 			logger.error("No street segments found - cannot continue!");
 			return;
 		}
-		logger.info("RDM Restrictions applied: {}", rdmRestrictionsApplied);
-		logger.info("RDM/ITN Matching Restrictions: {}", rdmRestrictionMatches);
-		logger.info("RDM/ITN Different Restrictions: {}", rdmRestrictionDiffs);
 		
 		outputTraffic(segments);
 		
@@ -417,6 +424,7 @@ public class RouterProcess {
 		        				seg.getFromMaxWeight(),seg.getToMaxWeight(), 
 		        				seg.isTruckRoute(),
 		        				seg.getHighwayRoute1(), seg.getHighwayRoute2(), seg.getHighwayRoute3(),
+		        				seg.getOwnership(),
 		        				seg.isDeadEnded(), seg.isVirtual(), 
 		        				null, null, null, null, null, null));
 		        		ferryCount++;
@@ -992,6 +1000,7 @@ public class RouterProcess {
 			} else {
 				row.put("VEHICLE_MAX_WIDTH", Double.isNaN(seg.getMaxWidth()) ? null : seg.getMaxWidth());
 			}
+			row.put("OWNERSHIP", seg.getOwnership());
 			if(seg.isDeadEnded()) {
 				row.put("DEAD_ENDED_IND", "Y");
 			}

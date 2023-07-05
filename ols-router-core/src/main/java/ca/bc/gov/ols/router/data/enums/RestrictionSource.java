@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 public enum RestrictionSource {
 	ITN,
 	RDM,
-	BMIS,
 	UNKNOWN;
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionSource.class.getCanonicalName());

@@ -88,20 +88,25 @@ public class RouterDataLoader {
 	
 	private void loadRestrictions(Reader reader) throws IOException{
 		JsonReader jr = new JsonReader(reader);
+		int count = 0;
+		int invalidCount = 0;
 		jr.beginArray();
 		while(jr.hasNext()) {
-			parseRestriction(jr);
+			if(!parseRestriction(jr)) invalidCount++;
+			count++;
 		}
 		jr.close();
+		logger.info("Read {} RDM restrictions from file.", count);
+		logger.info("Invalid (negative) restriction values: {}", invalidCount);
 	}
 	
-	private void parseRestriction(JsonReader jr) throws IOException {
+	private boolean parseRestriction(JsonReader jr) throws IOException {
 		jr.beginObject();
 		int restrictionId = -1;
 		RestrictionType type = RestrictionType.UNKNOWN;
 		double value = 0;
 		int segId = 0;
-		RestrictionSource source = RestrictionSource.UNKNOWN;
+		String featureSource = null; // possibly required in future
 		double azimuth = -1;
 		while(jr.hasNext()) {			
 			String name = jr.nextName();
@@ -119,7 +124,11 @@ public class RouterDataLoader {
 				}
 				break;
 			case "RESTRICTION_AZIMUTH":
-				azimuth = jr.nextDouble();
+				if(jr.peek() == JsonToken.NUMBER) {
+					azimuth = jr.nextDouble();
+				} else {
+					jr.skipValue();
+				}
 				break;
 			case "NETWORK_SEGMENT_ID":
 				segId = jr.nextInt();
@@ -127,10 +136,10 @@ public class RouterDataLoader {
 			case "FEATURE_SOURCE_SYSTEM":
 				JsonToken next = jr.peek();
 				if(next == JsonToken.STRING) {
-					source = RestrictionSource.convert(jr.nextString());
+					featureSource = jr.nextString();
 				} else {
 					jr.skipValue();
-					source = RestrictionSource.RDM;
+					featureSource = null;
 				}
 				break;
 			default:
@@ -138,11 +147,11 @@ public class RouterDataLoader {
 			}
 		}
 		jr.endObject();
-		if(value <= 0) return;
-		Restriction r = new Restriction(source, type, value);
-		r.id = restrictionId;
+		if(value <= 0) return false;
+		Restriction r = new Restriction(restrictionId, RestrictionSource.RDM, type, value);
 		r.segmentId = segId;
 		graphBuilder.addRestriction(segId, r, azimuth);
+		return true;
 	}
 	
 }

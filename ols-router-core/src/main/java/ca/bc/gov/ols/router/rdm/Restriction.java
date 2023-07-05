@@ -5,7 +5,7 @@ import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
 
 public class Restriction {
-	public int id = 0;
+	public final int id;
 	public final RestrictionSource source;
 	public final RestrictionType type;
 	// LaneType laneType;
@@ -15,7 +15,8 @@ public class Restriction {
 	// String publicComment;
 	public int segmentId;
 
-	public Restriction(RestrictionSource source, RestrictionType type, double value) {
+	public Restriction(int id, RestrictionSource source, RestrictionType type, double value) {
+		this.id = id;
 		this.source = source;
 		this.type = type;
 		this.permitableValue = value;

@@ -21,6 +21,7 @@ public class RouterConfig {
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
+	public static final String MOT_OWNERSHIP = "Ministry Of Transportation";
 	public static final int EXPECTED_EDGES = 400000;
 	protected static final String APP_ID = "ROUTER";
 	public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Canada/Pacific");

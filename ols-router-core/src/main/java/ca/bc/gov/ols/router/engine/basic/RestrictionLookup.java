@@ -63,12 +63,18 @@ class RestrictionAnalyzer implements TIntObjectProcedure<ArrayList<Restriction>>
 	
 	private final XsvRowWriter writer;
 	private final List<String> schema;
-	int overlapCount = 0;
-	int itnCount = 0;
+	private int overlapCount = 0;
+	private int itnHeightCount = 0;
+	private int itnWidthCount = 0;
+	private int itnWeightCount = 0;
+	private int rdmHeightCount = 0;
+	private int rdmWidthCount = 0;
+	private int rdmWeightCount = 0;
+
 	
 	public RestrictionAnalyzer() {
 		schema = List.of("ITN Segment ID", "Percent Diff", "ITN Restriction", "RDM Restrictions");
-		writer = new XsvRowWriter(new File("C:\\apps\\router\\data\\ITN-RDM Restriction Overlaps Analysis 14June2023.csv"), ',',schema, true);
+		writer = new XsvRowWriter(new File("C:\\apps\\router\\data\\ITN-RDM Restriction Overlaps Analysis 28June2023.csv"), ',',schema, true);
 	}
 	
 	@Override
@@ -81,10 +87,36 @@ class RestrictionAnalyzer implements TIntObjectProcedure<ArrayList<Restriction>>
 				if(r.type == type) {
 					if(r.source == RestrictionSource.ITN) {
 						itn = r;
-						itnCount++;
+						switch(r.type) {
+						case HORIZONTAL:
+							itnWidthCount++;
+							break;
+						case VERTICAL:
+							itnHeightCount++;
+							break;
+						case WEIGHT:
+							itnWeightCount++;
+							break;
+						case UNKNOWN:
+						default:
+							break;
+						}
 					} else {
 						rdm.add(r);
-					}
+						switch(r.type) {
+						case HORIZONTAL:
+							rdmWidthCount++;
+							break;
+						case VERTICAL:
+							rdmHeightCount++;
+							break;
+						case WEIGHT:
+							rdmWeightCount++;
+							break;
+						case UNKNOWN:
+						default:
+							break;
+						}					}
 				}
 			}
 			if(itn != null && !rdm.isEmpty()) {
@@ -108,7 +140,12 @@ class RestrictionAnalyzer implements TIntObjectProcedure<ArrayList<Restriction>>
 	
 	public void summarize() {
 		writer.close();
-		logger.info("Number of ITN Restrictions: {}", itnCount);
+		logger.info("ITN restrictions loaded: height: {} width: {} weight: {} total: {}", 
+				itnHeightCount, itnWidthCount, itnWeightCount, 
+				itnHeightCount + itnWidthCount + itnWeightCount);
+		logger.info("RDM restrictions loaded: height: {} width: {} weight: {} total: {}", 
+				rdmHeightCount, rdmWidthCount, rdmWeightCount, 
+				rdmHeightCount + rdmWidthCount + rdmWeightCount);
 		logger.info("Number of Restriction overlaps: {}", overlapCount);
 	}
 }

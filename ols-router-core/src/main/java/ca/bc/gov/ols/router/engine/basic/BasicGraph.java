@@ -75,9 +75,10 @@ public class BasicGraph {
 			String leftLocality, String rightLocality, String name, 
 			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
-			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, 
+			boolean isDeadEnded, String ownership) {
 		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
-				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded);
+				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded, ownership);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
 		if(!oneWay) {
@@ -363,6 +364,11 @@ public class BasicGraph {
 		return edges.get(edgeId).data.roadClass;
 	}
 
+	public String getOwnership(int edgeId) {
+		return edges.get(edgeId).data.ownership;
+	}
+	
+
 	public void setDates(Map<DateType, ZonedDateTime> dates) {
 		this.dates = dates;
 	}
@@ -370,7 +376,7 @@ public class BasicGraph {
 	public Map<DateType, ZonedDateTime> getDates() {
 		return dates;
 	}
-	
+
 }
 
 class Node {
@@ -404,12 +410,13 @@ class EdgeData {
 	final XingClass fromXingClass;
 	final XingClass toXingClass;
 	final boolean isDeadEnded;
+	final String ownership;
 	
 	public EdgeData(int segmentId, LineString ls, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
 			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
-			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded, String ownership) {
 		this.segmentId = segmentId;
 		this.ls = ls;
 		this.length = ls.getLength();
@@ -431,6 +438,7 @@ class EdgeData {
 		this.fromXingClass = fromXingClass;
 		this.toXingClass = toXingClass;
 		this.isDeadEnded = isDeadEnded;
+		this.ownership = ownership;
 	}
 }
 
