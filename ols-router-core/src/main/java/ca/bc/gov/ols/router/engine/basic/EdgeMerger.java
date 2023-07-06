@@ -260,19 +260,19 @@ public class EdgeMerger {
 		double ntime;
 		double cdist;
 		double ctime;
-		boolean combinedLast = false;
+		//boolean combinedLast = false;
 		
 		
-		//testing original instruction totals, used in check afterward to compare to simplified ones
-		//double odist = 0;
-		//double otime = 0;
-		//for(int directionIdx = 0; directionIdx < directions.size()-1; directionIdx++) {
-		//	Direction c = directions.get(directionIdx);
-		//	odist = odist + ((AbstractTravelDirection)c).getDistance();
-		//	otime = otime + ((AbstractTravelDirection)c).getTime();
-		//	
-			//System.out.println("Distanceorig:" + ((AbstractTravelDirection)c).getDistance());
-		//}
+		//testing - get original instruction totals, used in check afterward to compare to simplified ones
+//		double odist = 0;
+//		double otime = 0;
+//		for(int directionIdx = 0; directionIdx < directions.size()-1; directionIdx++) {
+//			Direction c = directions.get(directionIdx);
+//			odist = odist + ((AbstractTravelDirection)c).getDistance();
+//			otime = otime + ((AbstractTravelDirection)c).getTime();
+//			
+//			//System.out.println("Distanceorig:" + ((AbstractTravelDirection)c).getDistance());
+//		}
 		
 		
 		
@@ -280,14 +280,10 @@ public class EdgeMerger {
 		newDirections = new ArrayList<Direction>();
 		
 		newDirections.add(directions.get(0)); //always going to have the same start
-		// for each direction. Skip the first and last as those will never change and will be out of bounds if included in the loop
+		// for each direction. Skip the first since we want to look at prev and next each time, 0 index isn't useful. Skip the last, it is always a "finish!" instruction and never combined, we add it at the end to our new list.
 		for(int directionIdx = 1; directionIdx < directions.size()-1; directionIdx++) {
 			Direction prev; 
-			if(combinedLast) {
-				prev = newDirections.get(newDirections.size()-1);
-			}else {
-				prev = directions.get(directionIdx - 1);
-			}
+			prev = newDirections.get(newDirections.size()-1);
 			Direction cur = directions.get(directionIdx);
 			Direction next = directions.get(directionIdx + 1);
 			
@@ -307,24 +303,19 @@ public class EdgeMerger {
 			//if you are continuing on the same road (next's name = prev's name), and the current segment distance is < X meters, combine them 
 			if(pstreet.equals(nstreet) && cdist < params.getSimplifyThreshold()) {
 				//check types of current and previous, they should both be continue in the case where we want to combine them 
-				if (next.getType() == StreetDirectionType.CONTINUE.name() && next.getType().equals(cur.getType()) ) {
-					//do nothing, the types are as expected to combine.
-				}else {
-					newDirections.add(cur);
-					combinedLast = false;
-					continue;
+				if (next.getType() != StreetDirectionType.CONTINUE.name() || cur.getType() != StreetDirectionType.CONTINUE.name()) {
+				    newDirections.add(cur);
+				    continue;
 				}
 
 				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
-				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'next'
-				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'next'
+				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'prev'
+				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'prev'
 				
 				newDirections.add(prev);
 				directionIdx++;//skip one more index after a merge.
-				combinedLast = true;
 			}else {
 				newDirections.add(cur);
-				combinedLast = false;
 			}
 		}
 		//always have to add the finish instruction at the end.
