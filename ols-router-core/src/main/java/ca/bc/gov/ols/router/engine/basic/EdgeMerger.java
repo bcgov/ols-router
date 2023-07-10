@@ -260,8 +260,6 @@ public class EdgeMerger {
 		double ntime;
 		double cdist;
 		double ctime;
-		//boolean combinedLast = false;
-		
 		
 		//testing - get original instruction totals, used in check afterward to compare to simplified ones
 //		double odist = 0;
@@ -311,6 +309,18 @@ public class EdgeMerger {
 				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
 				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'prev'
 				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'prev'
+
+				//copy over any notifications from 'cur' and 'next' which we are merging into 'prev'
+				if( cur.getNotifications() != null ) {
+					for(Notification n : cur.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
+				if( next.getNotifications() != null ) {
+					for(Notification n : next.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
 				
 				newDirections.add(prev);
 				directionIdx++;//skip one more index after a merge.
