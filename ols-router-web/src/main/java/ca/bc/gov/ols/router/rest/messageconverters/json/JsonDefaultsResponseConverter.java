@@ -89,6 +89,9 @@ public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<
 		jw.name("turnCost");
 		jw.value(joinArray(config.getDefaultTurnCost()));
 		
+		jw.name("simplifyThreshold");
+		jw.value(config.getDefaultSimplifyThreshold());
+		
 		jw.endObject(); //wrapper
 		out.flush();
 	}
