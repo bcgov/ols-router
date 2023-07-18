@@ -27,9 +27,6 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.SurfaceType;
@@ -110,6 +107,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind"));
 			TravelDirection travelDir = TravelDirection.convert(segmentReader.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(segmentReader.getString("divider_type"));
+			int numLanesLeft = segmentReader.getInt("num_lanes_left");
+			int numLanesRight = segmentReader.getInt("num_lanes_right");
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("start_traffic_impactor"));
 			TrafficImpactor endTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("end_traffic_impactor"));
 			short speedLimit = adjustSpeedLimit((short)segmentReader.getInt("speed_limit"), roadClass);
@@ -159,8 +158,10 @@ public class FileRouterDataSource implements RouterDataSource {
 			}
 			StreetSegment segment = new StreetSegment(segmentId, centerLine,  
 					startIntersectionId, endIntersectionId, 
-					leftLocality, rightLocality, fullName, roadClass,
-					travelDir, dividerType, startTrafficImpactor, endTrafficImpactor, 
+					leftLocality, rightLocality, fullName, 
+					roadClass, travelDir, dividerType,
+					numLanesLeft, numLanesRight,
+					startTrafficImpactor, endTrafficImpactor, 
 					speedLimit, surfaceType, maxHeight, maxWidth, 
 					fromMaxWeight, toMaxWeight,	isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,

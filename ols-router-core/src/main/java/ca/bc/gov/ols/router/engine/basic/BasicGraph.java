@@ -73,11 +73,12 @@ public class BasicGraph {
 	public int[] addEdge(int fromNodeId, int toNodeId, int segmentId, LineString ls, 
 			boolean oneWay, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, int numLanesLeft, int numLanesRight,
+			TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, 
 			boolean isDeadEnded, String ownership) {
-		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
+		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, numLanesLeft, numLanesRight, fromImp, toImp,
 				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded, ownership);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
@@ -263,9 +264,17 @@ public class BasicGraph {
 	public String getLocality(int edgeId) {
 		Edge edge = edges.get(edgeId);
 		if(edge.reversed) {
-			return edges.get(edgeId).data.leftLocality;
+			return edge.data.leftLocality;
 		}
 		return edge.data.rightLocality;
+	}
+
+	public int getNumLanes(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edge.data.numLanesLeft;
+		}
+		return edge.data.numLanesRight;
 	}
 
 	public TrafficImpactor getFromImpactor(int edgeId) {
@@ -400,6 +409,8 @@ class EdgeData {
 	final String rightLocality;
 	final String name;
 	final RoadClass roadClass;
+	final int numLanesLeft;
+	final int numLanesRight;
 	final TrafficImpactor fromImp;
 	final TrafficImpactor toImp;
 //	final double maxHeight;
@@ -414,7 +425,8 @@ class EdgeData {
 	
 	public EdgeData(int segmentId, LineString ls, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, int numLanesLeft, int numLanesRight, 
+			TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded, String ownership) {
 		this.segmentId = segmentId;
@@ -428,6 +440,8 @@ class EdgeData {
 		this.rightLocality = rightLocality;
 		this.name = name;
 		this.roadClass = roadClass;
+		this.numLanesLeft = numLanesLeft;
+		this.numLanesRight = numLanesRight;
 		this.fromImp = fromImp;
 		this.toImp = toImp;
 //		this.maxHeight = maxHeight;     

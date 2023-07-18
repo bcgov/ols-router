@@ -44,8 +44,10 @@ public class ApiResponse {
 		criteria = params.getCriteria();
 		enabledOptions = params.getEnabledOptions();
 		routeDescription = params.getRouteDescription();
-		dataProcessingTimestamp = dates.get(DateType.PROCESSING_DATE);
-		roadNetworkTimestamp = dates.get(DateType.ITN_VINTAGE_DATE);
+		if(dates != null) {
+			dataProcessingTimestamp = dates.get(DateType.PROCESSING_DATE);
+			roadNetworkTimestamp = dates.get(DateType.ITN_VINTAGE_DATE);
+		}
 		partition = params.getPartition();
 	}
 	

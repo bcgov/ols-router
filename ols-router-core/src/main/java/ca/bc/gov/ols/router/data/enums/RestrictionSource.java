@@ -5,8 +5,7 @@ import org.slf4j.LoggerFactory;
 
 public enum RestrictionSource {
 	ITN,
-	RDM,
-	UNKNOWN;
+	RDM;
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionSource.class.getCanonicalName());
 	
@@ -23,7 +22,7 @@ public enum RestrictionSource {
 			}
         } 
 		logger.warn("Invalid RestrictionSource value: '{}'.", restrictionSource);
-		return UNKNOWN;
+		return null;
 	}
 	
 }

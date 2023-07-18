@@ -24,6 +24,8 @@ public class StreetSegment {
 	protected final RoadClass roadClass;
 	protected final TravelDirection travelDirection;
 	protected final DividerType dividerType;
+	protected final int numLanesLeft;
+	protected final int numLanesRight;
 	protected final TrafficImpactor startTrafficImpactor;
 	protected final TrafficImpactor endTrafficImpactor;
 	protected final short speedLimit;
@@ -46,7 +48,8 @@ public class StreetSegment {
 	public StreetSegment(int segmentId, LineString centerLine, 
 			int startIntersectionId, int endIntersectionId, 
 			String leftLocality, String rightLocality, String name, RoadClass roadClass,
-			TravelDirection travelDirection, DividerType dividerType, 
+			TravelDirection travelDirection, DividerType dividerType,
+			int numLanesLeft, int numLanesRight,
 			TrafficImpactor startTrafficImpactor, TrafficImpactor endTrafficImpactor, 
 			short speedLimit, SurfaceType surfaceType,
 			double maxHeight, double maxWidth, 
@@ -67,6 +70,8 @@ public class StreetSegment {
 		this.roadClass = roadClass;
 		this.travelDirection = travelDirection;
 		this.dividerType = dividerType;
+		this.numLanesLeft = numLanesLeft;
+		this.numLanesRight = numLanesRight;
 		this.startTrafficImpactor = startTrafficImpactor;
 		this.endTrafficImpactor = endTrafficImpactor;
 		this.speedLimit = speedLimit;
@@ -137,6 +142,14 @@ public class StreetSegment {
 	
 	public DividerType getDividerType() {
 		return dividerType;
+	}
+	
+	public int getNumLanesLeft() {
+		return numLanesLeft;
+	}
+
+	public int getNumLanesRight() {
+		return numLanesRight;
 	}
 
 	public TrafficImpactor getStartTrafficImpactor() {

@@ -155,6 +155,8 @@ public class RouterProcess {
 			TravelDirection travelDir = TravelDirection.convert(
 					rr.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(rr.getString("divider_type"));
+			int numLanesLeft = rr.getInt("num_lanes_left");
+			int numLanesRight = rr.getInt("num_lanes_right");
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(rr.getString("start_traffic_impactor"));
 			TrafficImpactor endTrafficImpactor = TrafficImpactor.convert(rr.getString("end_traffic_impactor"));
 			short speedLimit = (short)rr.getInt("speed_limit");
@@ -238,8 +240,9 @@ public class RouterProcess {
 			RpStreetSegment segment = new RpStreetSegment(segmentId, centerLine,
 					startIntersectionId, endIntersectionId, 
 					leftLocality, rightLocality, name,
-					roadClass, travelDir,
-					dividerType, startTrafficImpactor, endTrafficImpactor, 
+					roadClass, travelDir, dividerType,
+					numLanesLeft, numLanesRight,
+					startTrafficImpactor, endTrafficImpactor, 
 					speedLimit,  surfaceType,
 					maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
@@ -418,6 +421,7 @@ public class RouterProcess {
 		        		segments.add(new RpStreetSegment(seg.getSegmentId(), newLine, fr.startEnd.getIntersectionId(),
 		        				fr.endEnd.getIntersectionId(), "Ferry", "Ferry", seg.getName(), seg.getRoadClass(),
 		        				seg.getTravelDirection(), seg.getDividerType(),
+		        				seg.getNumLanesLeft(), seg.getNumLanesRight(),
 		        				fr.startEnd.getTrafficImpactor(), fr.endEnd.getTrafficImpactor(),
 		        				seg.getSpeedLimit(), seg.getSurfaceType(), 
 		        				seg.getMaxHeight(), seg.getMaxWidth(), 
@@ -987,6 +991,8 @@ public class RouterProcess {
 			row.put("ROAD_CLASS", seg.getRoadClass());
 			row.put("TRAVEL_DIRECTION", seg.getTravelDirection());
 			row.put("DIVIDER_TYPE", seg.getDividerType().toString());
+			row.put("NUM_LANES_LEFT", seg.getNumLanesLeft());
+			row.put("NUM_LANES_RIGHT", seg.getNumLanesRight());
 			row.put("START_TRAFFIC_IMPACTOR", seg.getStartTrafficImpactor());
 			row.put("END_TRAFFIC_IMPACTOR", seg.getEndTrafficImpactor());
 			row.put("SPEED_LIMIT", (int)seg.getSpeedLimit());

@@ -22,7 +22,7 @@ public interface GraphBuilder {
 
 	public abstract void addEdge(StreetSegment seg);
 
-	public default void addRestriction(int segmentId, Restriction r, double azimuth) {}
+	public default void addRestriction(Restriction r, double azimuth) {}
 	
 	public abstract void addTurnRestriction(TurnRestriction cost);
 

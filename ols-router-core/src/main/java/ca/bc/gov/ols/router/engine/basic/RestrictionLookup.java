@@ -6,13 +6,12 @@ package ca.bc.gov.ols.router.engine.basic;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datastax.oss.driver.shaded.guava.common.collect.Lists;
 
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
@@ -27,6 +26,7 @@ public class RestrictionLookup {
 	private TIntObjectHashMap<ArrayList<Restriction>> restrictions = new TIntObjectHashMap<ArrayList<Restriction>>();
 	
 	public void addRestriction(int edgeId, Restriction r) {
+		if(r == null) return;
 		ArrayList<Restriction> rs = restrictions.get(edgeId);
 		if(rs == null) {
 			rs = new ArrayList<Restriction>(1);
@@ -45,14 +45,15 @@ public class RestrictionLookup {
 		});
 	}
 	
-	public List<Restriction> lookup(int edgeId) {
-		List<Restriction> rs = restrictions.get(edgeId);
+	public List<Restriction> lookup(RestrictionSource source, int edgeId) {
+		List<Restriction> list = restrictions.get(edgeId);
+		if(list == null) return Collections.emptyList();
+		return list.stream().filter(r -> source == null || r.source == source).toList();
 		// TODO filter restrictions that apply to a given time
-		return rs;
 	}
 
-	public void analyze() {
-		RestrictionAnalyzer ra = new RestrictionAnalyzer();
+	public void analyze(BasicGraph graph) {
+		RestrictionAnalyzer ra = new RestrictionAnalyzer(graph);
 		restrictions.forEachEntry(ra);
 		ra.summarize();
 	}
@@ -61,6 +62,7 @@ public class RestrictionLookup {
 class RestrictionAnalyzer implements TIntObjectProcedure<ArrayList<Restriction>> {
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionAnalyzer.class.getCanonicalName());
 	
+	private BasicGraph graph;
 	private final XsvRowWriter writer;
 	private final List<String> schema;
 	private int overlapCount = 0;
@@ -72,13 +74,22 @@ class RestrictionAnalyzer implements TIntObjectProcedure<ArrayList<Restriction>>
 	private int rdmWeightCount = 0;
 
 	
-	public RestrictionAnalyzer() {
+	public RestrictionAnalyzer(BasicGraph graph) {
+		this.graph = graph;
 		schema = List.of("ITN Segment ID", "Percent Diff", "ITN Restriction", "RDM Restrictions");
 		writer = new XsvRowWriter(new File("C:\\apps\\router\\data\\ITN-RDM Restriction Overlaps Analysis 28June2023.csv"), ',',schema, true);
 	}
 	
 	@Override
 	public boolean execute(int edgeId, ArrayList<Restriction> rs) {
+		// for RDM restrictions, check if they are on a lane that doesn't exist on ITN segment
+		for(Restriction r : rs) {
+			int lanes = graph.getNumLanes(edgeId);
+			if(r.laneNumber > lanes) {
+				logger.warn("RDM Restriction {} on lane {}; segment {} has only {} lanes", r.id, r.laneNumber, r.segmentId, lanes);
+			}
+		}
+		
 		// for each restriction type, check if there is more than one source
 		for(RestrictionType type : RestrictionType.values()) {
 			Restriction itn = null;

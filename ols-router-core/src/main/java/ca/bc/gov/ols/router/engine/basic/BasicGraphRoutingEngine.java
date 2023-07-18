@@ -388,14 +388,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			if(offset > maxOffset) {
 				offset = maxOffset; 
 			}
-			// Segment Ids
-			if(params.getTypes().contains(NavInfoType.ID)) {
+			// Segment Ids (don't want to duplicate for each edge so only show the forward direction edges)
+			if(params.getTypes().contains(NavInfoType.ID) && !graph.getReversed(edgeId)) {
 				double proportion = 0.4;
-				if(graph.getReversed(edgeId)) {
-					proportion = 0.6;
-				}
 				Coordinate c = lil.extractPoint(lil.getEndIndex()*proportion);
-				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + edgeId, 90));
+				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + graph.getSegmentId(edgeId), 90));
 			}
 			// one-way markers
 			if(params.getTypes().contains(NavInfoType.DIR)) {
@@ -422,12 +419,12 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				List<Restriction> rs = graph.getRestrictionLookup().lookup(edgeId);
-				if(rs != null) {
+				List<Restriction> rs = graph.getRestrictionLookup().lookup(null, edgeId);
+				if(!rs.isEmpty()) {
 					StringBuilder sb = new StringBuilder();
 					for(Restriction r : rs) {
 						if(r.type == RestrictionType.VERTICAL) {
-							sb.append("Max Height:" + r.permitableValue + " (" + r.source + ")\n");
+							sb.append("Max Height:" + r.permitableValue + " (lane: " + r.laneNumber + ")(" + r.source + ")\n");
 						}
 						if(r.type == RestrictionType.HORIZONTAL) {
 							sb.append("Max Width:" + r.permitableValue + " (" + r.source + ")\n");
@@ -440,14 +437,6 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
 					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
 				}
-//				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
-//				if(fromMaxWeight != null) {
-//					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
-//				}
-//				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
-//				if(toMaxWeight != null) {
-//					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
-//				}
 			}
 			// Truck Routes
 			if(params.getTypes().contains(NavInfoType.TRK) && graph.isTruckRoute(edgeId)) {

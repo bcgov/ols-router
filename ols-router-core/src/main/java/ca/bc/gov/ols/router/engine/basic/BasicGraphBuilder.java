@@ -4,11 +4,6 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
-
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -28,14 +23,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.onebusaway.gtfs.impl.GtfsDaoImpl;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -47,6 +34,13 @@ import org.locationtech.jts.index.strtree.ItemBoundable;
 import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.linearref.LengthIndexedLine;
+import org.onebusaway.gtfs.impl.GtfsDaoImpl;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
@@ -85,6 +79,10 @@ import ca.bc.gov.ols.router.util.Azimuth;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
 
 public class BasicGraphBuilder implements GraphBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraphBuilder.class.getCanonicalName());
@@ -108,20 +106,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	private List<Integer> ferryEdges;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<RoadTruckNoticeEvent> truckNoticeIdMap = new TIntObjectHashMap<RoadTruckNoticeEvent>();
-	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();
-	private int itnHeightCount = 0;
-	private int itnWidthCount = 0;
-	private int itnWeightCount = 0;
-	private int itnSkippedHeightCount = 0;
-	private int itnSkippedWidthCount = 0;
-	private int itnSkippedWeightCount = 0;
-	private int rdmHeightCount = 0;
-	private int rdmWidthCount = 0;
-	private int rdmWeightCount = 0;
-	private int rdmSkippedHeightCount = 0;
-	private int rdmSkippedWidthCount = 0;
-	private int rdmSkippedWeightCount = 0;
-	
+	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();	
 	
 	public BasicGraphBuilder(RouterConfig config, GeometryReprojector reprojector) {
 		graph = new BasicGraph(RouterConfig.EXPECTED_EDGES);
@@ -144,8 +129,9 @@ public class BasicGraphBuilder implements GraphBuilder {
 		int toNodeId = getNodeId(toIntId, ls.getEndPoint());
 		boolean oneWay = seg.getTravelDirection() != TravelDirection.BIDIRECTIONAL;
 		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, seg.getSegmentId(), ls, oneWay, seg.getSpeedLimit(), 
-				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(), 
-				seg.getRoadClass(), seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
+				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(),
+				seg.getRoadClass(), seg.getNumLanesLeft(), seg.getNumLanesRight(),
+				seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
 				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), 
 				seg.isDeadEnded(), seg.getOwnership() == null ? null : seg.getOwnership().intern());
@@ -155,122 +141,91 @@ public class BasicGraphBuilder implements GraphBuilder {
 				ferryEdges.add(edgeId);
 			}
 		}
-		// Ignore ITN restrictions on MOT ownership segments 
-		boolean motOwned = RouterConfig.MOT_OWNERSHIP.equalsIgnoreCase(seg.getOwnership());
 		
 		// add ITN restrictions
 		if(!Double.isNaN(seg.getMaxHeight())) {
-			itnHeightCount += edgeIds.length;
-			if(motOwned) {
-				itnSkippedHeightCount += edgeIds.length;
-			} else {
-				Restriction r = new Restriction(nextItnRestrictionId++, RestrictionSource.ITN, RestrictionType.VERTICAL, seg.getMaxHeight());
-				r.segmentId = seg.getSegmentId();
-				for(int edgeId : edgeIds) {
-					restrictionLookup.addRestriction(edgeId, r);
-				}
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.VERTICAL)
+					.permitableValue(seg.getMaxHeight())
+					.segmentId(seg.getSegmentId())
+					.build();
+			for(int edgeId : edgeIds) {
+				restrictionLookup.addRestriction(edgeId, r);
 			}
 		}
+
 		if(!Double.isNaN(seg.getMaxWidth())) {
-			itnWidthCount += edgeIds.length;
-			if(motOwned) {
-				itnSkippedWidthCount += edgeIds.length;
-			} else {
-				Restriction r = new Restriction(nextItnRestrictionId++, RestrictionSource.ITN, RestrictionType.HORIZONTAL, seg.getMaxWidth());
-				r.segmentId = seg.getSegmentId();
-				for(int edgeId : edgeIds) {
-					restrictionLookup.addRestriction(edgeId, r);
-				}
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.HORIZONTAL)
+					.permitableValue(seg.getMaxWidth())
+					.segmentId(seg.getSegmentId())
+					.build();
+			for(int edgeId : edgeIds) {
+				restrictionLookup.addRestriction(edgeId, r);
 			}
 		}
+
 		if(seg.getFromMaxWeight() != null) {
-			itnWeightCount++;
-			if(motOwned) {
-				itnSkippedWeightCount++;
-			} else {
-				Restriction r = new Restriction(nextItnRestrictionId++, RestrictionSource.ITN, RestrictionType.WEIGHT, seg.getFromMaxWeight());
-				r.segmentId = seg.getSegmentId();
-				restrictionLookup.addRestriction(edgeIds[0], r);
-			}
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.WEIGHT)
+					.permitableValue(seg.getFromMaxWeight())
+					.segmentId(seg.getSegmentId())
+					.build();
+			restrictionLookup.addRestriction(edgeIds[0], r);
 		}
+
 		if(seg.getToMaxWeight() != null) {
 			if(edgeIds.length != 2) {
 				logger.warn("ITN ToMaxWeight Restriction on one way segment: {}", seg.getSegmentId());
 			} else {
-				itnWeightCount++;
-				if(motOwned) {
-					itnSkippedWeightCount++;
-				} else {
-					Restriction r = new Restriction(nextItnRestrictionId++, RestrictionSource.ITN, RestrictionType.WEIGHT, seg.getToMaxWeight());
-					r.segmentId = seg.getSegmentId();
-					restrictionLookup.addRestriction(edgeIds[1], r);
-				}
+				Restriction r = Restriction.builder()
+						.id(nextItnRestrictionId++)
+						.source(RestrictionSource.ITN)
+						.type(RestrictionType.WEIGHT)
+						.permitableValue(seg.getToMaxWeight())
+						.segmentId(seg.getSegmentId())
+						.build();
+				restrictionLookup.addRestriction(edgeIds[1], r);
 			}
 		}
 	
 	}
 	
 	@Override
-	public void addRestriction(int segmentId, Restriction r, double azimuth) {
-		int[] edgeIds = edgeIdBySegId.get(segmentId);
+	public void addRestriction(Restriction r, double azimuth) {
+		if(r == null) return;
+		int[] edgeIds = edgeIdBySegId.get(r.segmentId);
 		if(edgeIds == null) {
-			logger.warn("RDM Restriction on unknown segmentID: {}", segmentId);
+			logger.warn("RDM Restriction on unknown segmentID: {}", r.segmentId);
 			return;
 		}
-		switch(r.type) {
-		case HORIZONTAL:
-			rdmWidthCount += edgeIds.length;
-			break;
-		case VERTICAL:
-			rdmHeightCount ++;
-			break;
-		case WEIGHT:
-			rdmWeightCount += edgeIds.length;
-			break;
-		case UNKNOWN:
-		default:
-			break;
-		}
-		// Ignore RDM restrictions on non-MOT ownership segments 
-		boolean motOwned = RouterConfig.MOT_OWNERSHIP.equalsIgnoreCase(graph.getOwnership(edgeIds[0]));
-		if(r.source == RestrictionSource.RDM && !motOwned) {
-			switch(r.type) {
-			case HORIZONTAL:
-				rdmSkippedWidthCount += edgeIds.length;
-				break;
-			case VERTICAL:
-				rdmSkippedHeightCount++;
-				break;
-			case WEIGHT:
-				rdmSkippedWeightCount += edgeIds.length;
-				break;
-			case UNKNOWN:
-			default:
-				break;
+		// negative azimuth means both directions
+		if(azimuth < 0) {
+			// both directions
+			for(int edgeId : edgeIds) {
+				restrictionLookup.addRestriction(edgeId, r);
 			}
 		} else {
-			// negative azimuth means both directions
-			if(azimuth < 0) {
-				// both directions
-				for(int edgeId : edgeIds) {
-					restrictionLookup.addRestriction(edgeId, r);
-				}
+			// determine the direction of the restriction
+			LineString ls = graph.getLineString(edgeIds[0]);
+			double azimuthDiff = Azimuth.compareAzimuth(ls, azimuth);
+			if(azimuthDiff > AZIMUTH_TOLERANCE && azimuthDiff < 180 - AZIMUTH_TOLERANCE) {
+				// azimuth difference is out of tolerance
+				logger.warn("RDM Restriction with out-of tolerance azimuth (diff: {}) on segmentId: {}", String.format("%.0f", azimuthDiff), r.segmentId);
+			} else if(azimuthDiff <= AZIMUTH_TOLERANCE) {
+				// azimuth in same direction as linestring
+				restrictionLookup.addRestriction(edgeIds[0], r);
+			} else if(edgeIds.length == 2) {
+				// azimuth in reverse direction of linestring
+				restrictionLookup.addRestriction(edgeIds[1], r);
 			} else {
-				// determine the direction of the restriction
-				LineString ls = graph.getLineString(edgeIds[0]);
-				double azimuthDiff = Azimuth.compareAzimuth(ls, azimuth);
-				if(azimuthDiff > AZIMUTH_TOLERANCE && azimuthDiff < 180 - AZIMUTH_TOLERANCE) {
-					// azimuth difference is out of tolerance
-					logger.warn("RDM Restriction with out-of tolerance azimuth (diff: {}) on segmentId: {}", String.format("%.0f", azimuthDiff), segmentId);
-				} else if(azimuthDiff <= AZIMUTH_TOLERANCE) {
-					// azimuth in same direction as linestring
-					restrictionLookup.addRestriction(edgeIds[0], r);
-				} else if(edgeIds.length == 2) {
-					// azimuth in reverse direction of linestring
-					restrictionLookup.addRestriction(edgeIds[1], r);
-				} else {
-					logger.warn("RDM Restriction on reverse of one-way segmentId: {}", segmentId);
-				}
+				logger.warn("RDM Restriction on reverse of one-way segmentId: {}", r.segmentId);
 			}
 		}
 	}
@@ -690,19 +645,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
 		restrictionLookup.compact();
-		restrictionLookup.analyze();
-		logger.info("ITN restrictions input: height: {} width: {} weight: {} total: {}", 
-				itnHeightCount, itnWidthCount, itnWeightCount, 
-				itnHeightCount + itnWidthCount + itnWeightCount);
-		logger.info("RDM restrictions input: height: {} width: {} weight: {} total: {}", 
-				rdmHeightCount, rdmWidthCount, rdmWeightCount, 
-				rdmHeightCount + rdmWidthCount + rdmWeightCount);
-		logger.info("Skipped ITN restrictions due to MOTI ownership: height: {} width: {} weight: {} total: {}", 
-				itnSkippedHeightCount, itnSkippedWidthCount, itnSkippedWeightCount, 
-				itnSkippedHeightCount + itnSkippedWidthCount + itnSkippedWeightCount);
-		logger.info("Skipped RDM restrictions due to non-MOTI ownership: height: {} width: {} weight: {} total: {}",
-				rdmSkippedHeightCount, rdmSkippedWidthCount, rdmSkippedWeightCount, 
-				rdmSkippedHeightCount + rdmSkippedWidthCount + rdmSkippedWeightCount);
+		restrictionLookup.analyze(graph);
 		graph.setRestrictionLookup(restrictionLookup);
 		graph.setTrafficLookup(trafficLookupBuilder.build());
 		graph.setLocalDistortionField(localDistortionField);

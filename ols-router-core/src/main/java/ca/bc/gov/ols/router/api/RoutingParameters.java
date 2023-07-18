@@ -19,6 +19,7 @@ import org.locationtech.jts.geom.Point;
 import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
@@ -70,6 +71,7 @@ public class RoutingParameters {
 	private boolean setEnableCalled = false;
 	private boolean turnCostsSet = false;
 	private boolean followTruckRouteSet = false;
+	private RestrictionSource restrictionSource = RestrictionSource.ITN;
 	private int snapDistance = 1000;
 	
 	static {
@@ -428,6 +430,14 @@ public class RoutingParameters {
 	
 	public EnumSet<Attribute> getPartition() {
 		return partitionAttributes;
+	}
+	
+	public void setRestrictionSource(RestrictionSource restrictionSource) {
+		this.restrictionSource = restrictionSource;
+	}
+	
+	public RestrictionSource getRestrictionSource() {
+		return restrictionSource;
 	}
 
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {

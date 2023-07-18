@@ -216,7 +216,7 @@ public class DijkstraShortestPath {
 				
 				// filter the edge based on restrictions
 				if(params.getHeight() != null || params.getWeight() != null || params.getWidth() != null) {
-					List<Restriction> restrictions = graph.getRestrictionLookup().lookup(edgeId);
+					List<Restriction> restrictions = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
 					for(Restriction r : restrictions) {
 						if(r.restricts(params)) {
 							// TODO deal with Lane-based restrictions

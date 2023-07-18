@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Reader;
 
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
 import ca.bc.gov.ols.router.open511.parser.Open511Parser;
 import ca.bc.gov.ols.router.rdm.Restriction;
+import ca.bc.gov.ols.router.rdm.RestrictionBuilder;
+import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.RowReader;
 
 public class RouterDataLoader {
@@ -60,7 +63,7 @@ public class RouterDataLoader {
 		Open511Parser parser = new Open511Parser(new GeometryFactory(new PrecisionModel(),4326));
 		graphBuilder.addEvents(parser.parseEventResponse(dataSource.getOpen511Reader()));
 		
-		loadRestrictions(dataSource.getRestrictionReader());
+		loadRestrictions(dataSource.getRestrictionReader(), new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, 3005));
 		
 		graphBuilder.addTraffic(dataSource.getTrafficReader());
 		
@@ -86,13 +89,13 @@ public class RouterDataLoader {
 		}
 	}
 	
-	private void loadRestrictions(Reader reader) throws IOException{
+	private void loadRestrictions(Reader reader, GeometryFactory gf) throws IOException{
 		JsonReader jr = new JsonReader(reader);
 		int count = 0;
 		int invalidCount = 0;
 		jr.beginArray();
 		while(jr.hasNext()) {
-			if(!parseRestriction(jr)) invalidCount++;
+			if(!parseRestriction(jr, gf)) invalidCount++;
 			count++;
 		}
 		jr.close();
@@ -100,28 +103,21 @@ public class RouterDataLoader {
 		logger.info("Invalid (negative) restriction values: {}", invalidCount);
 	}
 	
-	private boolean parseRestriction(JsonReader jr) throws IOException {
+	private boolean parseRestriction(JsonReader jr, GeometryFactory gf) throws IOException {
 		jr.beginObject();
-		int restrictionId = -1;
-		RestrictionType type = RestrictionType.UNKNOWN;
-		double value = 0;
-		int segId = 0;
-		String featureSource = null; // possibly required in future
+		RestrictionBuilder rb = Restriction.builder();
 		double azimuth = -1;
 		while(jr.hasNext()) {			
 			String name = jr.nextName();
 			switch(name) {
 			case "RESTRICTION_ID":
-				restrictionId = jr.nextInt();
+				rb.id(jr.nextInt());
 				break;
 			case "RESTRICTION_TYPE":
-				type = RestrictionType.convert(jr.nextString());
+				rb.type(RestrictionType.convert(jr.nextString()));
 				break;
 			case "PERMITABLE_VALUE":
-				value = jr.nextDouble();
-				if(value <= 0) {
-					logger.warn("Restriction permittable Value <= 0: ");
-				}
+				rb.permitableValue(jr.nextDouble());
 				break;
 			case "RESTRICTION_AZIMUTH":
 				if(jr.peek() == JsonToken.NUMBER) {
@@ -131,26 +127,36 @@ public class RouterDataLoader {
 				}
 				break;
 			case "NETWORK_SEGMENT_ID":
-				segId = jr.nextInt();
+				rb.segmentId(jr.nextInt());
+				break;
+			case "LANE_NUMBER":
+				if(jr.peek() == JsonToken.NUMBER) {
+					rb.laneNumber(jr.nextInt());
+				} else {
+					jr.skipValue();
+				}
 				break;
 			case "FEATURE_SOURCE_SYSTEM":
 				JsonToken next = jr.peek();
 				if(next == JsonToken.STRING) {
-					featureSource = jr.nextString();
+					rb.featureSource(jr.nextString());
 				} else {
 					jr.skipValue();
-					featureSource = null;
 				}
+				break;
+			case "GEOMETRY":
+				rb.location((Point)JsonRowReader.parseJsonGeometry(jr, gf));
 				break;
 			default:
 				jr.skipValue();
 			}
 		}
 		jr.endObject();
-		if(value <= 0) return false;
-		Restriction r = new Restriction(restrictionId, RestrictionSource.RDM, type, value);
-		r.segmentId = segId;
-		graphBuilder.addRestriction(segId, r, azimuth);
+		rb.source(RestrictionSource.RDM);
+		Restriction r = rb.build();
+		if(rb != null) {
+			graphBuilder.addRestriction(r, azimuth);
+		}
 		return true;
 	}
 	
