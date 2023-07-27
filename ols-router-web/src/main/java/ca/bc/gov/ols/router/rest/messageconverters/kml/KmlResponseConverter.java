@@ -14,11 +14,13 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.stereotype.Component;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.RouterDirectionsResponse;
 
+@Component
 public class KmlResponseConverter extends AbstractHttpMessageConverter<ApiResponse> {
 
 	@Autowired

@@ -42,7 +42,6 @@ import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
 import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.RoutingEngine;
-import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.NavInfoParameters;
@@ -61,7 +60,6 @@ import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.util.TimeHelper;
-import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.StopWatch;
 
@@ -92,16 +90,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDistance();
-			RouterDistanceResponse response = new RouterDistanceResponse(params, em.getDist(), em.getTime());
+			RouterDistanceResponse response = new RouterDistanceResponse(params, graph.getDates(), em.getDist(), em.getTime());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
-			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDistanceResponse(params);
+			return new RouterDistanceResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDistanceResponse(params);
+			return new RouterDistanceResponse(params, graph.getDates());
 		}
 	}
 	
@@ -112,16 +109,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcRoute(gf);
-			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids());
+			RouterRouteResponse response = new RouterRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
-			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterRouteResponse(params);
+			return new RouterRouteResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterRouteResponse(params);
+			return new RouterRouteResponse(params, graph.getDates());
 		}
 	}
 
@@ -132,16 +128,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDirections(gf);
-			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications());
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
-			setResponseDates(response);
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDirectionsResponse(params);
+			return new RouterDirectionsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDirectionsResponse(params);
+			return new RouterDirectionsResponse(params, graph.getDates());
 		}
 	}
 
@@ -156,18 +151,17 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcRoute(gf);
-			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), visitOrder);
+			response = new RouterOptimalRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), visitOrder);
 		} catch(IllegalArgumentException iae) {
-			response = new RouterOptimalRouteResponse(params);
+			response = new RouterOptimalRouteResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalRouteResponse(params);
+			response = new RouterOptimalRouteResponse(params, graph.getDates());
 		}
 		sw.stop();
 		response.setExecutionTime(sw.getElapsedTime());
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
-		setResponseDates(response);
 		return response;
 	}
 
@@ -182,25 +176,19 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcDirections(gf);
-			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates(), em.getDist(),em.getTime(), 
 					em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(IllegalArgumentException iae) {
-			response = new RouterOptimalDirectionsResponse(params);
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalDirectionsResponse(params);
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates());
 		}			
 		sw.stop();
 		response.setExecutionTime(sw.getElapsedTime());
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
-		setResponseDates(response);
 		return response;
-	}
-
-	private void setResponseDates(ApiResponse response) {
-		response.setDataProcessingTimestamp(graph.getDates().get(DateType.PROCESSING_DATE));
-		response.setRoadNetworkTimestamp(graph.getDates().get(DateType.ITN_VINTAGE_DATE));
 	}
 
 	private EdgeMerger doRoute(RoutingParameters params) {
@@ -233,7 +221,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			StopWatch sw = new StopWatch();
 			sw.start();
-			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
+			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
 			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
@@ -255,10 +243,10 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDistanceBetweenPairsResponse(params);
+			return new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDistanceBetweenPairsResponse(params);
+			return new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 		}
 	}
 

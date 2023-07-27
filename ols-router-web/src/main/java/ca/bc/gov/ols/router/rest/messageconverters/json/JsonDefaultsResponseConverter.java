@@ -16,6 +16,7 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.stereotype.Component;
 
 import com.google.gson.stream.JsonWriter;
 
@@ -24,6 +25,7 @@ import ca.bc.gov.ols.router.api.DefaultsResponse;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 
+@Component
 public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<DefaultsResponse> {
 
 	protected JsonDefaultsResponseConverter(MediaType mediaType) {

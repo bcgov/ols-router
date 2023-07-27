@@ -16,21 +16,14 @@
   <name>OLS Router Web</name>
 
   <artifactId>ols-router-web</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   
-  <properties>
-    <m2eclipse.wtp.contextRoot>/pub/router</m2eclipse.wtp.contextRoot>
-    <geotools.version>22.5</geotools.version>
-    <springframework.version>5.2.21.RELEASE</springframework.version>
-    <springframework.security.version>5.2.10.RELEASE</springframework.security.version>
-  </properties>
-
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.2</version>
       </plugin>
     </plugins>
   </build>
@@ -48,30 +41,29 @@
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
-                <artifactId>jsr-275</artifactId>
-                <groupId>javax.measure</groupId>
+          <artifactId>jsr-275</artifactId>
+          <groupId>javax.measure</groupId>
         </exclusion>
       </exclusions>
     </dependency>
     <dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.25</version>
     </dependency>
     <dependency>                                    
 	  <groupId>org.slf4j</groupId>                
 	  <artifactId>jcl-over-slf4j</artifactId>     
-	  <version>1.7.25</version>  
+	  <version>${slf4j.version}</version>  
 	</dependency>
     <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-slf4j-impl</artifactId>
-      <version>2.16.0</version>
+      <groupId>org.apache.commons</groupId>  
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
     </dependency>
     <dependency>
 	  <groupId>commons-io</groupId>
 	  <artifactId>commons-io</artifactId>
-	  <version>2.7</version>
+	  <version>2.11.0</version>
     </dependency>
     <dependency>
     	<groupId>org.geotools</groupId>
@@ -90,10 +82,15 @@
       <version>${geotools.version}</version>
     </dependency>    
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-servlet-api</artifactId>
-      <version>7.0.27</version>
-      <scope>provided</scope>
+	    <groupId>org.springframework.boot</groupId>
+	    <artifactId>spring-boot-starter-web</artifactId>
+	    <version>3.0.6</version>
+	    <exclusions>
+            <exclusion>
+            	<groupId>org.springframework.boot</groupId>
+            	<artifactId>spring-boot-starter-json</artifactId>
+            </exclusion>
+	    </exclusions>
     </dependency>
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
@@ -101,17 +98,6 @@
       <version>1.1.1</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${springframework.version}</version>
-      <exclusions>
-        <exclusion>
-	      <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-	    </exclusion>
-	  </exclusions>	
-	</dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
@@ -134,41 +120,40 @@
 	    </exclusion>
 	  </exclusions>	
 	</dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${springframework.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-	      <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-	    </exclusion>
-	  </exclusions>	
-	</dependency>
+  <dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+    <version>${springframework.version}</version>
+    <scope>test</scope>
+    <exclusions>
+      <exclusion>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+      </exclusion>
+    </exclusions>	
+  </dependency>
 	<dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>RELEASE</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <version>4.6.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <version>4.6.1</version>
-      <scope>test</scope>
-    </dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-text</artifactId>
+    <version>1.10.0</version>
+  </dependency>
+  <dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter</artifactId>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
+    <version>4.6.1</version>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <version>4.6.1</version>
+    <scope>test</scope>
+  </dependency>
   </dependencies>
   
   <repositories>

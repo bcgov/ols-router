@@ -59,6 +59,7 @@ public class RouterConfig {
 
 		Stream<ConfigurationParameter> configParams = configStore.getConfigParams();
 		configParams.forEach(configParam -> {
+			if(!configParam.getAppId().equals("ROUTER")) return;
 			String name = configParam.getConfigParamName();
 			String value = configParam.getConfigParamValue();
 			try {

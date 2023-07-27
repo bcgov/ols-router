@@ -7,7 +7,7 @@ package ca.bc.gov.ols.router.rest.messageconverters.kml;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
@@ -104,6 +104,12 @@ public class KmlConverterHelper extends ConverterHelper {
 				+ "</value></Data>\r\n"
 				+ "<Data name=\"distanceUnit\"><value>"
 				+ escape(response.getDistanceUnit().abbr())
+				+ "</value></Data>\r\n"
+				+ "<Data name=\"dataProcessingTimestamp\"><value>"
+				+ escape(String.valueOf(response.getDataProcessingTimestamp()))
+				+ "</value></Data>\r\n"
+				+ "<Data name=\"roadNetworkTimestamp\"><value>"
+				+ escape(String.valueOf(response.getRoadNetworkTimestamp()))
 				+ "</value></Data>\r\n"
 				+ "<Data name=\"time\"><value>"
 				+ escape(response.getTime())

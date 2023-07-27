@@ -17,62 +17,33 @@
 		<name>Province of British Columbia</name>
 		<url>http://www.gov.bc.ca/</url>
 	</organization>
-
+	
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
 	<scm>
 		<connection>scm:git:git://github.com/bcgov/ols-router.git</connection>
 		<developerConnection>scm:git:[fetch=]git://github.com/bcgov/ols-router.git[push=]git@github.com:bcgov/ols-router.git</developerConnection>
 		<url>https://github.com/bcgov/ols-router</url>
 	</scm>
-	
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-    		<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    	</license>
-	</licenses>
-	
-	<developers>
-		<developer>
-			<name>Chris Hodgson</name>
-			<organization>Refractions Research Inc</organization>
-			<organizationUrl>http://www.refractions.net/</organizationUrl>
-			<email>chodgson@refractions.net</email>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>America/Vancouver</timezone>
-		</developer>
-	</developers>
-
-	<contributors>
-		<contributor>
-			<name>Michael Ross</name>
-			<email>Michael.RA.Ross@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>http://www.gov.bc.ca</organizationUrl>
-			<roles>
-				<role>businessArchitect</role>
-			</roles>
-			<timezone>PST</timezone>
-		</contributor>
-		<contributor>
-			<name>Brian Kelsey</name>
-			<email>Brian.Kelsey@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>http://www.gov.bc.ca</organizationUrl>
-			<roles>
-				<role>businessTester</role>
-			</roles>
-			<timezone>PST</timezone>
-		</contributor>
-	</contributors>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<cassandraContactPoint>hummingbird.animals</cassandraContactPoint>
-		<cassandraLocalDatacenter>datacenter1</cassandraLocalDatacenter>
-		<environment>devel</environment>
+		<ols-util.version>1.3.2-SNAPSHOT</ols-util.version>
+		<springframework.version>6.0.10</springframework.version>
+		<springframework.security.version>6.1.1</springframework.security.version>
+		<springboot.version>3.1.1</springboot.version>
+		<junit.jupiter.version>5.9.3</junit.jupiter.version>
+		<maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+		<slf4j.version>2.0.7</slf4j.version>
+		<logback.version>1.4.8</logback.version>
+		<trove4j.version>3.0.3</trove4j.version>
+		<geotools.version>22.5</geotools.version>
 		<com.graphhopper.version>0.5.0</com.graphhopper.version>
 	</properties>
 
@@ -87,7 +58,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M7</version>
+				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<groups>Prod</groups>
 					<excludedGroups>Dev</excludedGroups>
@@ -96,15 +67,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.11.0</version>
 				<configuration>
-					<release>11</release>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>3.2.1</version>
 				<configuration>
 					<includePom>true</includePom>
 				</configuration>
@@ -121,7 +92,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
 						<id>javadoc-html</id>
@@ -271,86 +242,42 @@
 		</plugins>
 	</build>
 	
-	<profiles>
-		<profile>
-			<id>only-eclipse</id>
-			<activation>
-				<property>
-					<name>m2e.version</name>
-				</property>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-						<plugin>
-							<groupId>org.eclipse.m2e</groupId>
-							<artifactId>lifecycle-mapping</artifactId>
-							<version>1.0.0</version>
-							<configuration>
-								<lifecycleMappingMetadata>
-									<pluginExecutions>
-										<pluginExecution>
-											<pluginExecutionFilter>
-												<groupId>
-													org.codehaus.mojo
-												</groupId>
-												<artifactId>
-													license-maven-plugin
-												</artifactId>
-												<versionRange>
-													[1.8,)
-												</versionRange>
-												<goals>
-													<goal>
-														aggregate-add-third-party
-													</goal>
-												</goals>
-											</pluginExecutionFilter>
-											<action>
-												<ignore />
-											</action>
-										</pluginExecution>
-									</pluginExecutions>
-								</lifecycleMappingMetadata>
-							</configuration>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-		<profile>
-			<id>deliv</id>
-			<properties>
-				<cassandraContactPoint>nusakan.dmz</cassandraContactPoint>
-				<cassandraLocalDatacenter />
-				<environment>deliv</environment>
-			</properties>
-		</profile>
-		<profile>
-			<id>test</id>
-			<properties>
-				<cassandraContactPoint>nusakan.dmz</cassandraContactPoint>
-				<cassandraLocalDatacenter />
-				<environment>test</environment>
-			</properties>
-		</profile>
-		<profile>
-			<id>prod</id>
-			<properties>
-				<cassandraContactPoint>canopus.dmz</cassandraContactPoint>
-				<environment>prod</environment>
-			</properties>
-		</profile>
-		<profile>
-			<id>k8s</id>
-			<properties>
-				<cassandraContactPoint>cassandra</cassandraContactPoint>
-				<cassandraLocalDatacenter>datacenter1</cassandraLocalDatacenter>
-				<environment>k8s</environment>
-			</properties>
-		</profile>
-	</profiles>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit.jupiter.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ch.qos.logback</groupId>
+				<artifactId>logback-classic</artifactId>
+				<version>${logback.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>ca.bc.gov.ols</groupId>
+				<artifactId>ols-util</artifactId>
+				<version>${ols-util.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.trove4j</groupId>
+				<artifactId>trove4j</artifactId>
+				<version>${trove4j.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<distributionManagement>
 		<repository>
 			<id>central</id>

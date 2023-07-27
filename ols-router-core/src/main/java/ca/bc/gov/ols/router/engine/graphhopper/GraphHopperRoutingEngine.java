@@ -5,10 +5,12 @@
 package ca.bc.gov.ols.router.engine.graphhopper;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +65,7 @@ import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.FinishDirection;
 import ca.bc.gov.ols.router.directions.StreetDirection;
 import ca.bc.gov.ols.router.directions.StreetDirectionType;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.StopWatch;
 
 public class GraphHopperRoutingEngine implements RoutingEngine {
@@ -78,6 +81,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 	GeometryReprojector reprojector;
 	
 	private RouterGraphHopper graphHopper;
+	private Map<DateType, ZonedDateTime> dates;
 		
 	public GraphHopperRoutingEngine(RouterConfig config, RouterDataSource dataSource,
 			GeometryFactory geometryFactory, GeometryReprojector reprojector) throws IOException {
@@ -110,9 +114,9 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		ghResponse = graphHopper.route(ghRequest);
 		RouterDistanceResponse response;
 		if(ghResponse.hasErrors()) {
-			response = new RouterDistanceResponse(params);
+			response = new RouterDistanceResponse(params, dates);
 		} else {
-			response = new RouterDistanceResponse(params, 
+			response = new RouterDistanceResponse(params, dates, 
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
 					ghResponse.getTime()/1000);
 		}
@@ -135,9 +139,9 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		ghResponse = graphHopper.route(ghRequest);
 		RouterRouteResponse response;
 		if(ghResponse.hasErrors()) {
-			response = new RouterRouteResponse(params);
+			response = new RouterRouteResponse(params, dates);
 		} else {
-			response = new RouterRouteResponse(params, 
+			response = new RouterRouteResponse(params, dates, 
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
 					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null);
 		}
@@ -159,9 +163,9 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		ghResponse = graphHopper.route(ghRequest);
 		RouterDirectionsResponse response;
 		if(ghResponse.hasErrors()) {
-			response = new RouterDirectionsResponse(params);
+			response = new RouterDirectionsResponse(params, dates);
 		} else {
-			response = new RouterDirectionsResponse(params,  
+			response = new RouterDirectionsResponse(params, dates,  
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
 					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
 					directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList());
@@ -171,7 +175,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 
 //  Old Slow way
 //	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params) {
-//		RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
+//		RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, dates);
 //		response.setFromPoints(params.getFromPoints());
 //		response.setToPoints(params.getToPoints());
 //		for(Point from : params.getFromPoints()) {
@@ -191,7 +195,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 	 */
 	@Override
 	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params) {
-		RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
+		RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, dates);
 		for(Point from : params.getFromPoints()) {
 			GHRequest ghRequest = new GHRequest(toGHPointList(from, params.getToPoints()));			
 			ghRequest.setWeighting(params.getCriteria().toString());
@@ -229,14 +233,14 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			ghRequest.setWeighting(params.getCriteria().toString());
 			GHResponse ghResponse = graphHopper.route(ghRequest);
 			if(ghResponse.hasErrors()) {
-				response = new RouterOptimalRouteResponse(params);
+				response = new RouterOptimalRouteResponse(params, dates);
 			} else {
-				response = new RouterOptimalRouteResponse(params,  
+				response = new RouterOptimalRouteResponse(params, dates,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
 						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, visitOrder);
 			}
 		} catch(Throwable t) {
-			response = new RouterOptimalRouteResponse(params);
+			response = new RouterOptimalRouteResponse(params, dates);
 		}			
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
@@ -259,15 +263,15 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			ghRequest.setWeighting(params.getCriteria().toString());
 			GHResponse ghResponse = graphHopper.route(ghRequest);
 			if(ghResponse.hasErrors()) {
-				response = new RouterOptimalDirectionsResponse(params);
+				response = new RouterOptimalDirectionsResponse(params, dates);
 			} else {
-				response = new RouterOptimalDirectionsResponse(params,  
+				response = new RouterOptimalDirectionsResponse(params, dates,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
 						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
 						directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList(), visitOrder);
 			}
 		} catch(Throwable t) {
-			response = new RouterOptimalDirectionsResponse(params);
+			response = new RouterOptimalDirectionsResponse(params, dates);
 		}
 		response.setRoutingExecutionTime(routingTimer.getElapsedTime());
 		response.setOptimizationExecutionTime(optimizationTimer.getElapsedTime());
@@ -363,7 +367,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		List<Geometry> polygons = graphHopper.isoline(ghRequest);
 		
 		// TODO in progress
-		IsochroneResponse response = new IsochroneResponse(polygons, params);
+		IsochroneResponse response = new IsochroneResponse(params, dates, polygons);
 		return response;
 	}
 
@@ -380,7 +384,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		List<Geometry> polygons = graphHopper.loop(ghRequest);
 		
 		// TODO in progress
-		IsochroneResponse response = new IsochroneResponse(polygons, params);
+		IsochroneResponse response = new IsochroneResponse(params, dates, polygons);
 		return response;
 	}
 

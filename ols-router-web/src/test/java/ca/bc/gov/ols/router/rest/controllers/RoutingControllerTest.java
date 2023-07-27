@@ -59,7 +59,7 @@ class RoutingControllerTest {
         params.setCorrectSide(false);
         params.setDisable("sc,tf,ev,td");
         params.setRouteDescription("Routing_results");
-        RouterDistanceBetweenPairsResponse resp = ctrlr.distanceBetweenPairsGet(params, res);
+        RouterDistanceBetweenPairsResponse resp = ctrlr.distanceBetweenPairs(params, res);
         assertEquals(resp.getDistanceStr(0), "0.141");
         assertEquals(resp.getDistanceStr(1), "-1");
         assertEquals(resp.getError(0), null);
