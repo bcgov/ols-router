@@ -14,6 +14,7 @@ import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.AbstractHttpMessageConverter;
+import org.springframework.stereotype.Component;
 
 import com.google.gson.stream.JsonWriter;
 import org.locationtech.jts.geom.Geometry;
@@ -25,6 +26,7 @@ import ca.bc.gov.ols.router.api.NavInfoResponse;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.data.vis.VisTurnRestriction;
 
+@Component
 public class JsonNavInfoResponseConverter extends AbstractHttpMessageConverter<NavInfoResponse> {
 
 	@Autowired

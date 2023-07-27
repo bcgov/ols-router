@@ -6,14 +6,9 @@
     <version>2.2.0-SNAPSHOT</version>
   </parent>
   <artifactId>ols-router-admin</artifactId>
-  <packaging>war</packaging>
   <name>OLS Router Admin</name>
+  <packaging>jar</packaging>
   
-  <properties>
-    <springframework.version>5.3.18</springframework.version>
-    <springframework.security.version>5.1.2.RELEASE</springframework.security.version>
-  </properties>
-
   <build>
     <plugins>
       <plugin>
@@ -25,15 +20,57 @@
   </build>
   
   <dependencies>
+	<dependency>
+	  <groupId>jakarta.servlet</groupId>
+	  <artifactId>jakarta.servlet-api</artifactId>
+	  <version>6.0.0</version>
+	  <scope>provided</scope>
+	</dependency>
+	<dependency>
+	  <groupId>org.apache.tomcat.embed</groupId>
+	  <artifactId>tomcat-embed-jasper</artifactId>
+	  <version>10.1.9</version>
+	</dependency>
+	<dependency>
+	  <groupId>jakarta.servlet.jsp.jstl</groupId>
+	  <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+	  <version>3.0.0</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.glassfish.web</groupId>
+	  <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+	  <version>3.0.1</version>
+	</dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <version>${springboot.version}</version>
+      <exclusions>
+        <exclusion>
+	      <groupId>org.springframework.boot</groupId>
+		  <artifactId>spring-boot-starter-json</artifactId>
+	    </exclusion>
+	  </exclusions>	
+	</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${springframework.version}</version>
+      <exclusions>
+        <exclusion>
+	      <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+	    </exclusion>
+	  </exclusions>	
+	</dependency>
     <dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-api</artifactId>
-	  <version>1.7.25</version>
     </dependency>
     <dependency>                                    
 	  <groupId>org.slf4j</groupId>                
 	  <artifactId>jcl-over-slf4j</artifactId>     
-	  <version>1.7.25</version>  
+	  <version>${slf4j.version}</version>  
 	</dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -51,36 +88,14 @@
       <version>1.5</version>
     </dependency>
     <dependency>
-	  <groupId>net.sf.opencsv</groupId>
-	  <artifactId>opencsv</artifactId>
-	  <version>2.0</version>
-    </dependency>  
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-servlet-api</artifactId>
-      <version>9.0.14</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${springframework.version}</version>
-      <exclusions>
-        <exclusion>
-	      <groupId>commons-logging</groupId>
-	      <artifactId>commons-logging</artifactId>
-	    </exclusion>
-	  </exclusions>	
+	  <groupId>org.apache.commons</groupId>
+	  <artifactId>commons-text</artifactId>
+	  <version>1.10.0</version>
 	</dependency>
 	<dependency>
       <groupId>com.vividsolutions</groupId>
@@ -95,7 +110,6 @@
 	<dependency>
       <groupId>net.sf.trove4j</groupId>
       <artifactId>trove4j</artifactId>
-      <version>3.0.3</version>
     </dependency>        
     <dependency>
       <groupId>com.google.code.gson</groupId>

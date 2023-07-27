@@ -12,9 +12,7 @@
 	<name>OLS Router Core</name>
 	<artifactId>ols-router-core</artifactId>
 	<packaging>jar</packaging>
-	<properties>
-		<ols-util.version>1.3.1-SNAPSHOT</ols-util.version>
-	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -25,7 +23,6 @@
 		<dependency>
 			<groupId>ca.bc.gov.ols</groupId>
 			<artifactId>ols-util</artifactId>
-			<version>${ols-util.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.locationtech.jts</groupId>
@@ -35,12 +32,10 @@
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.25</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-dbcp</groupId>
@@ -62,16 +57,6 @@
 			<artifactId>jsprit-core</artifactId>
 			<version>1.7.2</version>
 		</dependency>
-		<!-- dependency>
-			<groupId>com.datastax.oss</groupId>
-			<artifactId>java-driver-core</artifactId>
-			<version>4.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.datastax.oss</groupId>
-			<artifactId>java-driver-mapper-runtime</artifactId>
-			<version>4.1.0</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.onebusaway</groupId>
 			<artifactId>onebusaway-gtfs</artifactId>
@@ -79,8 +64,8 @@
 		</dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
-				<artifactId>netty-common</artifactId>
-				<version>4.1.92.Final</version>
+			<artifactId>netty-common</artifactId>
+			<version>4.1.92.Final</version>
 			</dependency>
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
