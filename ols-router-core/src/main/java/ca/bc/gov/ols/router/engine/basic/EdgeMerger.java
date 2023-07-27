@@ -251,6 +251,109 @@ public class EdgeMerger {
 		}
 		
 	}
+	
+	private void simplifyDirections() {
+		
+		String nstreet;
+		String pstreet;
+		double ndist;
+		double ntime;
+		double cdist;
+		double ctime;
+		
+		//testing - get original instruction totals, used in check afterward to compare to simplified ones
+//		double odist = 0;
+//		double otime = 0;
+//		for(int directionIdx = 0; directionIdx < directions.size()-1; directionIdx++) {
+//			Direction c = directions.get(directionIdx);
+//			odist = odist + ((AbstractTravelDirection)c).getDistance();
+//			otime = otime + ((AbstractTravelDirection)c).getTime();
+//			
+//			//System.out.println("Distanceorig:" + ((AbstractTravelDirection)c).getDistance());
+//		}
+		
+		
+		
+		List<Direction> newDirections;
+		newDirections = new ArrayList<Direction>();
+		
+		newDirections.add(directions.get(0)); //always going to have the same start
+		// for each direction. Skip the first since we want to look at prev and next each time, 0 index isn't useful. Skip the last, it is always a "finish!" instruction and never combined, we add it at the end to our new list.
+		for(int directionIdx = 1; directionIdx < directions.size()-1; directionIdx++) {
+			Direction prev; 
+			prev = newDirections.get(newDirections.size()-1);
+			Direction cur = directions.get(directionIdx);
+			Direction next = directions.get(directionIdx + 1);
+			
+			if( prev instanceof AbstractTravelDirection && cur instanceof AbstractTravelDirection && next instanceof AbstractTravelDirection) {
+				pstreet = ((AbstractTravelDirection)prev).getStreetName();
+				nstreet = ((AbstractTravelDirection)next).getStreetName();
+				cdist = ((AbstractTravelDirection)cur).getDistance();
+				ctime = ((AbstractTravelDirection)cur).getTime();
+				ndist = ((AbstractTravelDirection)next).getDistance();
+				ntime = ((AbstractTravelDirection)next).getTime();
+			
+			}else {
+				newDirections.add(cur); 
+				continue;
+			}
+			
+			//if you are continuing on the same road (next's name = prev's name), and the current segment distance is < X meters, combine them 
+			if(pstreet.equals(nstreet) && cdist < params.getSimplifyThreshold()) {
+				//check types of current and previous, they should both be continue in the case where we want to combine them 
+				if (next.getType() != StreetDirectionType.CONTINUE.name() || cur.getType() != StreetDirectionType.CONTINUE.name()) {
+				    newDirections.add(cur);
+				    continue;
+				}
+
+				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
+				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'prev'
+				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'prev'
+
+				//copy over any notifications from 'cur' and 'next' which we are merging into 'prev'
+				if( cur.getNotifications() != null ) {
+					for(Notification n : cur.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
+				if( next.getNotifications() != null ) {
+					for(Notification n : next.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
+				
+				newDirections.add(prev);
+				directionIdx++;//skip one more index after a merge.
+			}else {
+				newDirections.add(cur);
+			}
+		}
+		//always have to add the finish instruction at the end.
+		newDirections.add(directions.get(directions.size()-1));
+		
+		//testing for matching time and distance before and after simplify, probably don't want this in production
+//		ndist = 0;
+//		ntime = 0;
+//		for(int directionIdx = 0; directionIdx < newDirections.size()-1; directionIdx++) {
+//			Direction cur = newDirections.get(directionIdx);
+//			ndist = ndist + ((AbstractTravelDirection)cur).getDistance();
+//			ntime = ntime + ((AbstractTravelDirection)cur).getTime();
+//			
+//			//System.out.println("Distance1:" + ((AbstractTravelDirection)cur).getDistance());
+//		}
+//		
+//		double drem = odist - ndist;
+//		double trem = otime - ntime;
+//		if(drem > 1 || drem < -1) {
+//			System.out.println("Distance Mismatch" + odist + " <->" + ndist);
+//		}
+//		if(trem > 1 || trem < -1) {
+//			System.out.println("Time Mismatch"+ otime + " <->" + ntime);
+//		}
+		
+		
+		directions = newDirections;
+	}
 
 	public double getDist() {
 		return dist;
@@ -297,6 +400,9 @@ public class EdgeMerger {
 		calcRoute = true;
 		calcDirections  = true;
 		mergeEdges(gf);
+		if(params.isSimplifyDirections() == true) {
+			simplifyDirections();
+		}
 	}
 
 }
