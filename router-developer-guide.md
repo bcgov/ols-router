@@ -1363,3 +1363,8 @@ Here is a sample json response:
 	}]
     }
 ```
+
+<br><br>
+<a name=APIReponseErrorCodes></a>
+## API reponse error codes
+Please refere to [this confluence document](https://dpdd.atlassian.net/wiki/spaces/~63d942f9724a5c79c7b7220a/pages/453476353/Router+API+Error+Codes) for the full list of API response errors.
