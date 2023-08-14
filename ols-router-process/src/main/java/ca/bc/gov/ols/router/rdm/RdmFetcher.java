@@ -1,34 +1,106 @@
 package ca.bc.gov.ols.router.rdm;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
 import java.net.URL;
-import java.net.URLConnection;
+import java.util.Map.Entry;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonWriter;
 
 public class RdmFetcher {
-
-	public static void main(String[] args) {
+	
+	//private static final String RDM_API = "https://dev-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
+	private static final String RDM_API = "https://tst-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
+	private static final String OUTPUT_FILE = "C:\\apps\\router\\data\\restrictions_active.json";
+	private static final String OUTPUT_GEOJSON_FILE = "C:\\apps\\router\\data\\restrictions_active.geojson";
+	private static final int OFFSET_INCREMENT = 250;
+	private static final String[] PROPERTIES = {"RESTRICTION_ID", "RESTRICTION_TYPE", "PERMITABLE_VALUE", "PUBLIC_COMMENT", "TRAVEL_DIRECTION", 
+			"GROUP_NAME", "LOCATION_ID", "LOCATION_ROAD_NAME", "NETWORK_SEGMENT_ID", "RESTRICTION_AZIMUTH", "NETWORK_VERSION", "LAST_UPDATE_CONTEXT",
+			"FEATURE_NAME", "FEATURE_SOURCE_SYSTEM", "FEATURE_SOURCE_SYSTEM_KEY"};
+	
+	private int offset = 0;
+	
+	public static void main(String[] args) throws IOException {
 		RdmFetcher fetcher = new RdmFetcher();
-		fetcher.convert();
-	}
-	
-	void convert() {
-		
-	}
-	
-	void fetch() throws IOException {
-		String urlString = "https://dev-rdm.th.gov.bc.ca/api/view/restrictions_active";
-		URL url = new URL(urlString);
-		URLConnection conn = url.openConnection();
-		conn.setRequestProperty("accept", "application/json");
-		conn.connect();
-		
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        while ((inputLine = in.readLine()) != null)
-            System.out.println(inputLine);
-        in.close();
+		fetcher.fetchAll();
 	}
 
+	private void fetchAll() throws IOException {
+		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+		
+		try(JsonWriter out = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPUT_FILE)), "UTF-8")));
+				JsonWriter geoJson = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPUT_GEOJSON_FILE)), "UTF-8")))) {
+			out.beginArray();
+			
+			geoJson.beginObject();
+			geoJson.name("type").value("FeatureCollection");
+			geoJson.name("features");
+			geoJson.beginArray();
+			
+			while(true) {
+				JsonElement json = JsonParser.parseReader(fetchNext());
+				JsonArray jsonArray = json.getAsJsonArray();
+				if(jsonArray.isEmpty()) {
+					break;
+				}
+				for(JsonElement element : jsonArray) {
+					gson.toJson(element, out);
+					
+					JsonObject obj = element.getAsJsonObject();
+					geoJson.beginObject();
+					geoJson.name("type").value("Feature");
+					geoJson.name("geometry");
+					gson.toJson(obj.get("GEOMETRY"), geoJson);
+					geoJson.name("properties");
+					geoJson.beginObject();
+					
+					for(Entry<String, JsonElement> entry: obj.entrySet()) {
+						String name = entry.getKey();
+						JsonElement value = entry.getValue();
+						if(name.equalsIgnoreCase("GEOMETRY")) continue;
+						geoJson.name(name);
+						if(value.isJsonPrimitive() || value.isJsonNull()) {
+							gson.toJson(value, geoJson);
+						} else if(value.isJsonObject()) {
+							JsonObject valueObj = value.getAsJsonObject();
+							if(valueObj.has("date")) {
+								gson.toJson(valueObj.get("date"), geoJson);
+							} else {
+								geoJson.value("Unknown Object");
+							}
+						} else {
+							geoJson.value("Unexpected Value");
+						}
+					}
+					geoJson.endObject();
+					geoJson.endObject();
+				}
+			}
+			out.endArray();
+			
+			geoJson.endArray();
+			geoJson.endObject();
+		}
+	}
+	
+	private Reader fetchNext() throws IOException {
+		URL url = new URL(RDM_API + "?offset=" + offset);
+		System.out.println(url.toString());
+		final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+		offset += OFFSET_INCREMENT;
+		return reader;
+	}
+		
 }

@@ -28,7 +28,8 @@ import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
-import ca.bc.gov.ols.router.rdm.Restriction;
+import ca.bc.gov.ols.router.restrictions.Constraint;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.util.LineStringSplitter;
 
 public class DijkstraShortestPath {
@@ -216,9 +217,9 @@ public class DijkstraShortestPath {
 				
 				// filter the edge based on restrictions
 				if(params.getHeight() != null || params.getWeight() != null || params.getWidth() != null) {
-					List<Restriction> restrictions = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
-					for(Restriction r : restrictions) {
-						if(r.restricts(params)) {
+					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					for(Constraint c : constraints) {
+						if(c.prevents(params)) {
 							// TODO deal with Lane-based restrictions
 							continue nextEdge;
 						}
@@ -253,7 +254,7 @@ public class DijkstraShortestPath {
 						if(waitAndTravelTime[1] > 0) {
 							waitTime = waitAndTravelTime[0]; 
 							overrideTravelSeconds = waitAndTravelTime[1];
-							logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
+							//logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
 						}
 					}
 				}

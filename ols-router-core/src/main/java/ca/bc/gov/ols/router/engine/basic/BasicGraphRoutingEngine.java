@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.algorithm.Distance;
@@ -55,14 +56,14 @@ import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
-import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
-import ca.bc.gov.ols.router.rdm.Restriction;
+import ca.bc.gov.ols.router.restrictions.Constraint;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
+import ca.bc.gov.ols.util.MapList;
 import ca.bc.gov.ols.util.StopWatch;
 
 public class BasicGraphRoutingEngine implements RoutingEngine {
@@ -419,23 +420,29 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				List<Restriction> rs = graph.getRestrictionLookup().lookup(null, edgeId);
-				if(!rs.isEmpty()) {
-					StringBuilder sb = new StringBuilder();
-					for(Restriction r : rs) {
-						if(r.type == RestrictionType.VERTICAL) {
-							sb.append("Max Height:" + r.permitableValue + " (lane: " + r.laneNumber + ")(" + r.source + ")\n");
+				List<Constraint> constraints = graph.getRestrictionLookup().lookup(null, edgeId);
+				MapList<Point,Constraint> constraintMap = new MapList<>();
+				for(Constraint c : constraints) {
+						if(params.getRestrictionSource() == null || c.getSource() == params.getRestrictionSource()) {
+							constraintMap.add(c.getLocation(), c);
 						}
-						if(r.type == RestrictionType.HORIZONTAL) {
-							sb.append("Max Width:" + r.permitableValue + " (" + r.source + ")\n");
+				}
+				if(!constraintMap.isEmpty()) {
+					for(Entry<Point, List<Constraint>> entry: constraintMap.entrySet()) {
+						String type = "";
+						String source = "";
+						StringBuilder sb = new StringBuilder();
+						for(Constraint c : entry.getValue()) {
+							type = c.getType().toString();
+							source = c.getSource().toString();
+							if(sb.length() > 0) {
+								sb.append("\n");
+							}
+							sb.append(c.getVisDescriptor());
 						}
-						if(r.type == RestrictionType.WEIGHT) {
-							sb.append("Max Weight:" + r.permitableValue + " (" + r.source + ")\n");
-						}
+						String hardList = sb.toString();
+						geoms.add(new VisFeature(entry.getKey(), NavInfoType.HR, type, source, hardList));
 					}
-					String hardList = sb.toString();
-					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
-					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
 				}
 			}
 			// Truck Routes

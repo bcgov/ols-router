@@ -32,6 +32,7 @@ import ca.bc.gov.ols.router.directions.CardinalDirection;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.FerryDirection;
 import ca.bc.gov.ols.router.directions.FinishDirection;
+import ca.bc.gov.ols.router.directions.LaneRequirement;
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.directions.StartDirection;
 import ca.bc.gov.ols.router.directions.StopoverDirection;
@@ -42,6 +43,8 @@ import ca.bc.gov.ols.router.notifications.FerryWaitNotification;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.router.notifications.OversizeNotification;
 import ca.bc.gov.ols.router.notifications.TruckNotification;
+import ca.bc.gov.ols.router.restrictions.Constraint;
+import ca.bc.gov.ols.router.restrictions.LaneBasedRestriction;
 
 public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
@@ -207,6 +210,7 @@ public class EdgeMerger {
 				}
 
 				if(calcDirections) {
+					double preDist = curDir.getDistance();
 					curDir.addDistance(edgeDist);
 					curDir.addTime(edgeTime);
 					if(waitTime > 0) {
@@ -220,7 +224,17 @@ public class EdgeMerger {
 					if(params.getVehicleType() == VehicleType.TRUCK) {
 						LocalDateTime currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(time)), RouterConfig.DEFAULT_TIME_ZONE);
 						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime); 
-						events.stream().filter(e -> e instanceof RoadTruckNoticeEvent).map(e -> new TruckNotification((RoadTruckNoticeEvent)e)).forEach(curDir::addNotification);
+						events.stream()
+								.filter(e -> e instanceof RoadTruckNoticeEvent)
+								.map(e -> new TruckNotification((RoadTruckNoticeEvent)e))
+								.forEach(curDir::addNotification);
+						
+						// find and add lane-based restriction notifications
+						List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+						constraints.stream()
+								.filter(c -> c instanceof LaneBasedRestriction && c.constrains(params))
+								.map(c -> new LaneRequirement((LaneBasedRestriction)c, params, graph.getLineString(edgeId), graph.getReversed(edgeId), preDist))
+								.forEach(curDir::addLaneRequirement);
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
 				}

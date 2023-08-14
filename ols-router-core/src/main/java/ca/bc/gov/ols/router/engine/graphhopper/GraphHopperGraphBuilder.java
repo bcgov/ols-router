@@ -30,7 +30,7 @@ import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
 import ca.bc.gov.ols.router.open511.EventResponse;
-import ca.bc.gov.ols.router.rdm.Restriction;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 

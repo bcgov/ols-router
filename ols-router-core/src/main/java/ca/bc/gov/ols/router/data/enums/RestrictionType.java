@@ -4,13 +4,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum RestrictionType {
-	HORIZONTAL,
-	VERTICAL,
-	WEIGHT,
-	UNKNOWN;
+	HORIZONTAL("width"),
+	VERTICAL("height"),
+	GVW("GVW"),
+	GVW_1AXLE("GVW-1AXLE"),
+	GVW_2AXLE("GVW-2AXLE"),
+	GVW_3AXLE("GVW-3AXLE"),
+	UNKNOWN("unknown");
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionType.class.getCanonicalName());
 	
+	public final String visName;
+	
+	RestrictionType(String visName) {
+		this.visName = visName;
+	}
+
 	/**
 	 * Takes a string value and returns the corresponding RestrictionType object.
 	 * 
@@ -19,7 +28,7 @@ public enum RestrictionType {
 	 */
 	public static RestrictionType convert(String restrictionType) {
 		for(RestrictionType t : values()) {
-			if(t.name().equalsIgnoreCase(restrictionType)) {
+			if(t.name().equalsIgnoreCase(restrictionType) || t.visName.equalsIgnoreCase(restrictionType)) {
 				return t;
 			}
         } 

@@ -76,6 +76,9 @@ public class JsonNavInfoResponseConverter extends AbstractHttpMessageConverter<N
 			if(mp.getSubType() != null) {
 				jw.name("subType").value(mp.getSubType());
 			}
+			if(mp.getSource() != null && !mp.getSource().isEmpty()) {
+				jw.name("source").value(mp.getSource());
+			}
 			if(mp.getDetail() != null) {
 				jw.name("detail").value(mp.getDetail());
 			}

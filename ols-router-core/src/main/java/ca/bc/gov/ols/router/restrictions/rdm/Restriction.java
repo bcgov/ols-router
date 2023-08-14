@@ -1,19 +1,14 @@
-package ca.bc.gov.ols.router.rdm;
-
-import org.locationtech.jts.geom.Point;
+package ca.bc.gov.ols.router.restrictions.rdm;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enums.RestrictionSource;
-import ca.bc.gov.ols.router.data.enums.RestrictionType;
+import ca.bc.gov.ols.router.restrictions.AbstractRestriction;
 
-public class Restriction {
+public class Restriction extends AbstractRestriction {
 	public final int id;
-	public final RestrictionSource source;
-	public final RestrictionType type;
+	public final int laneNumber;
 	public final double permitableValue;
 	public final int segmentId;
-	public final Point location;
-	public final int laneNumber;
+	public final double azimuth;
 	// LaneType laneType;
 	// LaneSubType laneSubType;
 	// String publicComment;
@@ -23,16 +18,16 @@ public class Restriction {
 	}
 	
 	Restriction(RestrictionBuilder rb) {
+		super(rb.source, rb.type, rb.location, rb.locationId);
 		this.id = rb.id;
-		this.source = rb.source;
-		this.type = rb.type;
 		this.permitableValue = rb.permitableValue;
 		this.segmentId = rb.segmentId;
-		this.location = rb.location;
 		this.laneNumber = rb.laneNumber;
+		this.azimuth = rb.azimuth;
 	}
 
-	public boolean restricts(RoutingParameters params) {
+	@Override
+	public boolean prevents(RoutingParameters params) {
 		switch (type) {
 		case HORIZONTAL:
 			if (params.getWidth() != null && params.getWidth() > permitableValue)
@@ -42,20 +37,28 @@ public class Restriction {
 			if (params.getHeight() != null && params.getHeight() > permitableValue)
 				return true;
 			return false;
-		case WEIGHT:
+		case GVW:
 			if (params.getWeight() != null && params.getWeight() > permitableValue)
 				return true;
 			return false;
-		case UNKNOWN:
+		default:
 		}
 		return false;
 	}
 
+	@Override
+	public boolean constrains(RoutingParameters params) {
+		return false;
+	}
+	
+	@Override
+	public String getVisDescriptor() {
+		return "Max " + type.visName + ": " + permitableValue + " (" + source + ")";
+	}
+
+	@Override
 	public String toString() {
-		if(id > 0) {
-			return id + ":" + source + ":" + type + ":" + permitableValue;
-		}
-		return source + ":" + type + ":" + permitableValue;
+		return id + ":" + source + ":" + type + ":" + permitableValue;
 	}
 
 }

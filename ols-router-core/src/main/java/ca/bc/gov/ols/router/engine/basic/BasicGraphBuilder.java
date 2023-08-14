@@ -69,13 +69,13 @@ import ca.bc.gov.ols.router.open511.RecurringSchedule;
 import ca.bc.gov.ols.router.open511.enums.EventStatus;
 import ca.bc.gov.ols.router.open511.enums.EventType;
 import ca.bc.gov.ols.router.open511.enums.RoadState;
-import ca.bc.gov.ols.router.rdm.Restriction;
+import ca.bc.gov.ols.router.restrictions.RestrictionLookupBuilder;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.router.time.DateInterval;
 import ca.bc.gov.ols.router.time.TemporalSet;
 import ca.bc.gov.ols.router.time.TemporalSetIntersection;
 import ca.bc.gov.ols.router.time.TemporalSetUnion;
 import ca.bc.gov.ols.router.time.WeeklyDateRange;
-import ca.bc.gov.ols.router.util.Azimuth;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
@@ -87,9 +87,6 @@ import gnu.trove.procedure.TIntObjectProcedure;
 public class BasicGraphBuilder implements GraphBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraphBuilder.class.getCanonicalName());
 	
-	 // note this tolerance needs to take into account that MOT azimuths are calcucated in lat/lon while we are using albers
-	private static final double AZIMUTH_TOLERANCE = 10; 
-	
 	// itn restrictions don't have Id's so we will make some up
 	private static int nextItnRestrictionId = 1000000;
 	private BasicGraph graph;
@@ -99,7 +96,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	private IntObjectArrayMap<int[]> edgeIdBySegId;
 	private TurnLookup turnLookup;
 	private TIntObjectMap<ArrayList<TurnRestrictionVis>> turnRestrictionsByEdgeId;
-	private RestrictionLookup restrictionLookup;
+	private RestrictionLookupBuilder restrictionLookupBuilder;
 	private EventLookup eventLookup;
 	private TrafficLookupBuilder trafficLookupBuilder;
 	private VisLayers layers;
@@ -114,7 +111,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 		this.config = config;
 		nodeIdByIntId = new TIntIntHashMap(RouterConfig.EXPECTED_EDGES/2, 0.5f, BasicGraph.NO_NODE, BasicGraph.NO_NODE);
 		edgeIdBySegId = new IntObjectArrayMap<int[]>(RouterConfig.EXPECTED_EDGES);
-		restrictionLookup = new RestrictionLookup();
+		restrictionLookupBuilder = new RestrictionLookupBuilder(this);
 		turnRestrictionsByEdgeId = new TIntObjectHashMap<ArrayList<TurnRestrictionVis>>();
 		layers = new VisLayers();
 		ferryEdges = new ArrayList<Integer>();
@@ -150,9 +147,10 @@ public class BasicGraphBuilder implements GraphBuilder {
 					.type(RestrictionType.VERTICAL)
 					.permitableValue(seg.getMaxHeight())
 					.segmentId(seg.getSegmentId())
+					.location(ls.getCentroid())
 					.build();
 			for(int edgeId : edgeIds) {
-				restrictionLookup.addRestriction(edgeId, r);
+				restrictionLookupBuilder.addRestriction(edgeId, r);
 			}
 		}
 
@@ -163,9 +161,10 @@ public class BasicGraphBuilder implements GraphBuilder {
 					.type(RestrictionType.HORIZONTAL)
 					.permitableValue(seg.getMaxWidth())
 					.segmentId(seg.getSegmentId())
+					.location(ls.getCentroid())
 					.build();
 			for(int edgeId : edgeIds) {
-				restrictionLookup.addRestriction(edgeId, r);
+				restrictionLookupBuilder.addRestriction(edgeId, r);
 			}
 		}
 
@@ -173,11 +172,12 @@ public class BasicGraphBuilder implements GraphBuilder {
 			Restriction r = Restriction.builder()
 					.id(nextItnRestrictionId++)
 					.source(RestrictionSource.ITN)
-					.type(RestrictionType.WEIGHT)
+					.type(RestrictionType.GVW)
 					.permitableValue(seg.getFromMaxWeight())
 					.segmentId(seg.getSegmentId())
+					.location(ls.getStartPoint())
 					.build();
-			restrictionLookup.addRestriction(edgeIds[0], r);
+			restrictionLookupBuilder.addRestriction(edgeIds[0], r);
 		}
 
 		if(seg.getToMaxWeight() != null) {
@@ -187,46 +187,21 @@ public class BasicGraphBuilder implements GraphBuilder {
 				Restriction r = Restriction.builder()
 						.id(nextItnRestrictionId++)
 						.source(RestrictionSource.ITN)
-						.type(RestrictionType.WEIGHT)
+						.type(RestrictionType.GVW)
 						.permitableValue(seg.getToMaxWeight())
 						.segmentId(seg.getSegmentId())
+						.location(ls.getEndPoint())
 						.build();
-				restrictionLookup.addRestriction(edgeIds[1], r);
+				restrictionLookupBuilder.addRestriction(edgeIds[1], r);
 			}
 		}
 	
 	}
 	
 	@Override
-	public void addRestriction(Restriction r, double azimuth) {
-		if(r == null) return;
-		int[] edgeIds = edgeIdBySegId.get(r.segmentId);
-		if(edgeIds == null) {
-			logger.warn("RDM Restriction on unknown segmentID: {}", r.segmentId);
-			return;
-		}
-		// negative azimuth means both directions
-		if(azimuth < 0) {
-			// both directions
-			for(int edgeId : edgeIds) {
-				restrictionLookup.addRestriction(edgeId, r);
-			}
-		} else {
-			// determine the direction of the restriction
-			LineString ls = graph.getLineString(edgeIds[0]);
-			double azimuthDiff = Azimuth.compareAzimuth(ls, azimuth);
-			if(azimuthDiff > AZIMUTH_TOLERANCE && azimuthDiff < 180 - AZIMUTH_TOLERANCE) {
-				// azimuth difference is out of tolerance
-				logger.warn("RDM Restriction with out-of tolerance azimuth (diff: {}) on segmentId: {}", String.format("%.0f", azimuthDiff), r.segmentId);
-			} else if(azimuthDiff <= AZIMUTH_TOLERANCE) {
-				// azimuth in same direction as linestring
-				restrictionLookup.addRestriction(edgeIds[0], r);
-			} else if(edgeIds.length == 2) {
-				// azimuth in reverse direction of linestring
-				restrictionLookup.addRestriction(edgeIds[1], r);
-			} else {
-				logger.warn("RDM Restriction on reverse of one-way segmentId: {}", r.segmentId);
-			}
+	public void addRestrictions(List<Restriction> restrictions) {
+		for(Restriction r : restrictions) {
+			restrictionLookupBuilder.addRestriction(r);
 		}
 	}
 
@@ -644,15 +619,22 @@ public class BasicGraphBuilder implements GraphBuilder {
 		graph.build();
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
-		restrictionLookup.compact();
-		restrictionLookup.analyze(graph);
-		graph.setRestrictionLookup(restrictionLookup);
+		//restrictionLookup.analyze(graph);
+		graph.setRestrictionLookup(restrictionLookupBuilder.build());
 		graph.setTrafficLookup(trafficLookupBuilder.build());
 		graph.setLocalDistortionField(localDistortionField);
 		buildTurnRestrictionLayer();
 		layers.buildIndexes();
 		graph.setVisLayers(layers);
 		graph.setScheduleLookup(scheduleLookup);
+		return graph;
+	}
+
+	public int[] getEdgesForSegment(int segmentId) {
+		return edgeIdBySegId.get(segmentId);
+	}
+	
+	public BasicGraph getGraph() {
 		return graph;
 	}
 

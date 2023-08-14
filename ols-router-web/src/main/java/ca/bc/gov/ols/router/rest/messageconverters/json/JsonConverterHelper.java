@@ -6,6 +6,7 @@ package ca.bc.gov.ols.router.rest.messageconverters.json;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
+import ca.bc.gov.ols.router.directions.LaneRequirement;
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.directions.StartDirection;
 import ca.bc.gov.ols.router.engine.basic.Attribute;
@@ -214,6 +216,7 @@ public class JsonConverterHelper extends ConverterHelper {
 			jw.name("point");
 			coordinate(jw, dir.getPoint().getX(), dir.getPoint().getY());
 			notifications(jw, dir.getNotifications());
+			laneRequirements(jw, dir.getLaneRequirements(), response);
 			jw.endObject();
 		}
 		jw.endArray();
@@ -248,6 +251,28 @@ public class JsonConverterHelper extends ConverterHelper {
 			jw.beginObject();
 			jw.name("type").value(note.getType());
 			jw.name("message").value(note.getMessage());
+			jw.endObject();
+		}
+		jw.endArray();		
+	}
+	
+	public static void laneRequirements(JsonWriter jw, List<LaneRequirement> laneRequirements, RouterDirectionsResponse response) throws IOException {
+		if(laneRequirements == null) return;
+		jw.name("laneRequirements");
+		jw.beginArray();
+		for(LaneRequirement lr : laneRequirements) {
+			jw.beginObject();
+			jw.name("message").value(lr.format(response));
+			jw.name("distance").value(lr.getDistance());
+			jw.name("location");
+			geometry(jw, lr.getLocation());
+			jw.name("locationId").value(lr.getLocationId());
+			jw.name("safeLanes").beginArray();
+			boolean[] safeLanes = lr.getSafeLanes();
+			for(int i = 0; i < safeLanes.length; i++) {
+				jw.value(safeLanes[i]);
+			}
+			jw.endArray();
 			jw.endObject();
 		}
 		jw.endArray();		

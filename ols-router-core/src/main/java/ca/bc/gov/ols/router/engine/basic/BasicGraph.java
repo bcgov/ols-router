@@ -28,6 +28,7 @@ import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
+import ca.bc.gov.ols.router.restrictions.RestrictionLookup;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
 import gnu.trove.map.TIntObjectMap;

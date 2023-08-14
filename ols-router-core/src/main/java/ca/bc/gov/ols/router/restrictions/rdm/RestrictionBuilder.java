@@ -1,4 +1,4 @@
-package ca.bc.gov.ols.router.rdm;
+package ca.bc.gov.ols.router.restrictions.rdm;
 
 import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
@@ -16,19 +16,17 @@ public class RestrictionBuilder {
 	int laneNumber = -1;
 	double permitableValue = -1;
 	int segmentId = -1;
+	double azimuth = -1;
 	Point location = null;
+	int locationId;
+
 	// LaneType laneType;
 	// LaneSubType laneSubType;
 	// String publicComment;
 	// featureSource
 	
-	/**
-	 * Call Restriction.builder() to get a RestrictionBuilder
-	 * @param id
-	 * @return
-	 */
+	// Call Restriction.builder() to get a RestrictionBuilder
 	RestrictionBuilder() {
-		
 	}
 	
 	public RestrictionBuilder id(int id) {
@@ -63,6 +61,16 @@ public class RestrictionBuilder {
 
 	public RestrictionBuilder location(Point location) {
 		this.location = location;
+		return this;
+	}
+
+	public RestrictionBuilder locationId(int locationId) {
+		this.locationId = locationId;
+		return this;
+	}
+
+	public RestrictionBuilder azimuth(double azimuth) {
+		this.azimuth = azimuth;
 		return this;
 	}
 
