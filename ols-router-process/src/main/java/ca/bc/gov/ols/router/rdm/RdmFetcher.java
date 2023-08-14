@@ -11,6 +11,9 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -20,11 +23,13 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonWriter;
 
 public class RdmFetcher {
+	private final static Logger logger = LoggerFactory.getLogger(RdmFetcher.class.getCanonicalName());
 	
+	private static String outputDir = "C:/apps/router/data/";
 	//private static final String RDM_API = "https://dev-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
 	private static final String RDM_API = "https://tst-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
-	private static final String OUTPUT_FILE = "C:\\apps\\router\\data\\restrictions_active.json";
-	private static final String OUTPUT_GEOJSON_FILE = "C:\\apps\\router\\data\\restrictions_active.geojson";
+	private static final String OUTPUT_FILE = "restrictions_active.json";
+	private static final String OUTPUT_GEOJSON_FILE = "restrictions_active.geojson";
 	private static final int OFFSET_INCREMENT = 250;
 	private static final String[] PROPERTIES = {"RESTRICTION_ID", "RESTRICTION_TYPE", "PERMITABLE_VALUE", "PUBLIC_COMMENT", "TRAVEL_DIRECTION", 
 			"GROUP_NAME", "LOCATION_ID", "LOCATION_ROAD_NAME", "NETWORK_SEGMENT_ID", "RESTRICTION_AZIMUTH", "NETWORK_VERSION", "LAST_UPDATE_CONTEXT",
@@ -33,6 +38,17 @@ public class RdmFetcher {
 	private int offset = 0;
 	
 	public static void main(String[] args) throws IOException {
+		if(args.length != 1) {
+			logger.error("Output directory parameter is required.");
+			System.exit(-1);
+		}
+		String dir = args[0];
+		File f = new File(dir);
+		if(!f.isDirectory()) {
+			logger.error("Invalid data dir: '{}'", dir);
+			System.exit(-1);
+		}
+		outputDir = dir;
 		RdmFetcher fetcher = new RdmFetcher();
 		fetcher.fetchAll();
 	}
@@ -40,8 +56,8 @@ public class RdmFetcher {
 	private void fetchAll() throws IOException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
 		
-		try(JsonWriter out = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPUT_FILE)), "UTF-8")));
-				JsonWriter geoJson = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(OUTPUT_GEOJSON_FILE)), "UTF-8")))) {
+		try(JsonWriter out = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputDir + OUTPUT_FILE)), "UTF-8")));
+				JsonWriter geoJson = gson.newJsonWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(outputDir + OUTPUT_GEOJSON_FILE)), "UTF-8")))) {
 			out.beginArray();
 			
 			geoJson.beginObject();
