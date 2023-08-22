@@ -47,8 +47,12 @@ public class RestrictionLookupBuilder {
 	
 	public void addRestriction(int edgeId, Restriction r) {
 		if(r == null) return;
-		if(r.laneNumber > 0 && graphBuilder.getGraph().getNumLanes(edgeId) > 1) {
-			laneBasedRestrictions.add(edgeId, r);
+		if(r.laneNumber > 0 ) {
+			if(graphBuilder.getGraph().getNumLanes(edgeId) >= r.laneNumber) {
+				laneBasedRestrictions.add(edgeId, r);
+			} else {
+				logger.warn("Restriction on non-existent lane; restrictionId: {}", r.id);
+			}
 		} else {
 			addRestrictionInternal(edgeId, r);
 		}

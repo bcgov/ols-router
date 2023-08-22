@@ -49,7 +49,7 @@ public class RdmParser {
 	private Restriction parseRestriction(JsonReader jr) throws IOException {
 		jr.beginObject();
 		RestrictionBuilder rb = Restriction.builder();
-		while(jr.hasNext()) {			
+		while(jr.hasNext()) {
 			String name = jr.nextName();
 			switch(name) {
 			case "RESTRICTION_ID":
@@ -59,7 +59,11 @@ public class RdmParser {
 				rb.type(RestrictionType.convert(jr.nextString()));
 				break;
 			case "PERMITABLE_VALUE":
-				rb.permitableValue(jr.nextDouble());
+				if(jr.peek() == JsonToken.NUMBER) {
+					rb.permitableValue(jr.nextDouble());
+				} else {
+					jr.skipValue();
+				}
 				break;
 			case "RESTRICTION_AZIMUTH":
 				if(jr.peek() == JsonToken.NUMBER) {
