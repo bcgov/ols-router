@@ -73,6 +73,8 @@ public class RoutingParameters {
 	private boolean followTruckRouteSet = false;
 	private RestrictionSource restrictionSource = RestrictionSource.ITN;
 	private int snapDistance = 1000;
+	private boolean simplifyDirections = false;
+	private int simplifyThreshold = 250;
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -94,6 +96,7 @@ public class RoutingParameters {
 		globalDistortionField = defaultGlobalDistortionField;
 		truckRouteMultiplier = config.getDefaultTruckRouteMultiplier();
 		snapDistance = config.getDefaultSnapDistance();
+		setSimplifyThreshold(config.getDefaultSimplifyThreshold());
 	}
 
 	private static EnumMap<TrafficImpactor,Double> buildXingCostMap(double[] xingCost) {
@@ -440,6 +443,22 @@ public class RoutingParameters {
 		return restrictionSource;
 	}
 
+	public boolean isSimplifyDirections() {
+		return simplifyDirections;
+	}
+
+	public void setSimplifyDirections(boolean simplifyDirections) {
+		this.simplifyDirections = simplifyDirections;
+	}
+	
+	public int getSimplifyThreshold() {
+		return simplifyThreshold;
+	}
+
+	public void setSimplifyThreshold(int simplifyThreshold) {
+		this.simplifyThreshold = simplifyThreshold;
+	}
+	
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {
 		if(point != null && point.length == 2) {
 			pointPoint = gr.reproject(gf.createPoint(new Coordinate(point[0], point[1])), config.getBaseSrsCode());
@@ -459,4 +478,6 @@ public class RoutingParameters {
 		}
 		return null;
 	}
+
+
 }
