@@ -93,6 +93,10 @@ public class RestrictionBuilder {
 			valid = false;
 			logger.warn("Restriction with no segmentId: RestrictionID: {}", id);
 		}
+		if(laneNumber > 0 && type != RestrictionType.VERTICAL) {
+			logger.warn("Non-vertical lane-based Restriction: RestrictionId: {}", id);
+			laneNumber = 0;
+		}
 		if(valid) {
 			return new Restriction(this);
 		}
