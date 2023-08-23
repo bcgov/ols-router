@@ -270,6 +270,7 @@ public class EdgeMerger {
 		
 		String nstreet;
 		String pstreet;
+		double pdist;
 		double ndist;
 		double ntime;
 		double cdist;
@@ -291,7 +292,8 @@ public class EdgeMerger {
 		List<Direction> newDirections;
 		newDirections = new ArrayList<Direction>();
 		
-		newDirections.add(directions.get(0)); //always going to have the same start
+		newDirections.add(directions.get(0)); //always going to have the same start direction
+		
 		// for each direction. Skip the first since we want to look at prev and next each time, 0 index isn't useful. Skip the last, it is always a "finish!" instruction and never combined, we add it at the end to our new list.
 		for(int directionIdx = 1; directionIdx < directions.size()-1; directionIdx++) {
 			Direction prev; 
@@ -299,50 +301,60 @@ public class EdgeMerger {
 			Direction cur = directions.get(directionIdx);
 			Direction next = directions.get(directionIdx + 1);
 			
-			if( prev instanceof AbstractTravelDirection && cur instanceof AbstractTravelDirection && next instanceof AbstractTravelDirection) {
+			if(prev instanceof AbstractTravelDirection && cur instanceof AbstractTravelDirection && next instanceof AbstractTravelDirection) {
 				pstreet = ((AbstractTravelDirection)prev).getStreetName();
 				nstreet = ((AbstractTravelDirection)next).getStreetName();
+				pdist = ((AbstractTravelDirection)prev).getDistance();
 				cdist = ((AbstractTravelDirection)cur).getDistance();
 				ctime = ((AbstractTravelDirection)cur).getTime();
 				ndist = ((AbstractTravelDirection)next).getDistance();
 				ntime = ((AbstractTravelDirection)next).getTime();
 			
-			}else {
+			} else {
 				newDirections.add(cur); 
 				continue;
 			}
 			
-			//if you are continuing on the same road (next's name = prev's name), and the current segment distance is < X meters, combine them 
-			if(pstreet.equals(nstreet) && cdist < params.getSimplifyThreshold()) {
-				//check types of current and previous, they should both be continue in the case where we want to combine them 
-				if (next.getType() != StreetDirectionType.CONTINUE.name() || cur.getType() != StreetDirectionType.CONTINUE.name()) {
-				    newDirections.add(cur);
-				    continue;
-				}
+			if(pstreet.equals(nstreet) // if you are continuing on the same road (next's name = prev's name)
+					&& cdist < params.getSimplifyThreshold() // and the current segment distance is < X meters
+					&& cur.getType() == StreetDirectionType.CONTINUE.name() // and type of current dir is continue
+					&& next.getType() == StreetDirectionType.CONTINUE.name()) { // and type of next dir is continue
 
-				newDirections.remove(newDirections.size()-1); //remove the previous one as we are merging it
 				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'prev'
 				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'prev'
 
-				//copy over any notifications from 'cur' and 'next' which we are merging into 'prev'
-				if( cur.getNotifications() != null ) {
+				// copy over any notifications from 'cur' and 'next' which we are merging into 'prev'
+				if(cur.getNotifications() != null) {
 					for(Notification n : cur.getNotifications()) {
 						prev.addNotification(n);
 					}
 				}
-				if( next.getNotifications() != null ) {
+				if(next.getNotifications() != null) {
 					for(Notification n : next.getNotifications()) {
 						prev.addNotification(n);
 					}
 				}
 				
-				newDirections.add(prev);
-				directionIdx++;//skip one more index after a merge.
-			}else {
+				// copy over any lane-based notifications from cur/next into prev, adding distance as appropriate
+				if(cur.getLaneRequirements() != null) {
+					for(LaneRequirement lr : cur.getLaneRequirements()) {
+						lr.setDistance(lr.getDistance() + pdist);
+						prev.addLaneRequirement(lr);
+					}
+				}
+				if(next.getLaneRequirements() != null) {
+					for(LaneRequirement lr : next.getLaneRequirements()) {
+						lr.setDistance(lr.getDistance() + pdist + cdist);
+						prev.addLaneRequirement(lr);
+					}
+				}
+				
+				directionIdx++; // skip one more index after a merge.
+			} else {
 				newDirections.add(cur);
 			}
 		}
-		//always have to add the finish instruction at the end.
+		// always have to add the finish instruction at the end.
 		newDirections.add(directions.get(directions.size()-1));
 		
 		//testing for matching time and distance before and after simplify, probably don't want this in production
@@ -364,7 +376,6 @@ public class EdgeMerger {
 //		if(trem > 1 || trem < -1) {
 //			System.out.println("Time Mismatch"+ otime + " <->" + ntime);
 //		}
-		
 		
 		directions = newDirections;
 	}
