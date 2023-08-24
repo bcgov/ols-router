@@ -27,6 +27,8 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.SurfaceType;
@@ -126,7 +128,7 @@ public class FileRouterDataSource implements RouterDataSource {
 			String highwayRoute3 = segmentReader.getString("highway_route_3");
 			if(highwayRoute3 != null) highwayRoute3 = highwayRoute3.intern();
 			
-			String ownership = segmentReader.getString("ownership");			 
+			JsonObject motData = segmentReader.getJson("ministry_of_transport_data");		 
 			
 			boolean isTruckRoute = "Y".equals(segmentReader.getString("truck_route_ind"));
 			XingClass startXingClass = XingClass.convert(segmentReader.getString("start_xing_class"));
@@ -165,7 +167,7 @@ public class FileRouterDataSource implements RouterDataSource {
 					speedLimit, surfaceType, maxHeight, maxWidth, 
 					fromMaxWeight, toMaxWeight,	isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
-					ownership,
+					motData,
 					startXingClass, endXingClass, isDeadEnded); //, laneRestriction, accessRestriction
 //				if(segment.isFerry()) {
 //					// save the ferry segs for last so we can prevent ferry-ferry intersections

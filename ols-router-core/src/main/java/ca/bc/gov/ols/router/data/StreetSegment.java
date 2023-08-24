@@ -6,6 +6,8 @@ package ca.bc.gov.ols.router.data;
 
 import org.locationtech.jts.geom.LineString;
 
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.TravelDirection;
@@ -38,7 +40,7 @@ public class StreetSegment {
 	protected final String highwayRoute1;
 	protected final String highwayRoute2;
 	protected final String highwayRoute3;
-	protected final String ownership;
+	protected final JsonObject motData;
 	protected XingClass startXingClass;
 	protected XingClass endXingClass;
 	protected boolean isDeadEnded;
@@ -56,7 +58,7 @@ public class StreetSegment {
 			Integer fromMaxWeight, Integer toMaxWeight, 
 			boolean isTruckRoute,
 			String highwayRoute1, String highwayRoute2, String highwayRoute3,
-			String ownership,
+			JsonObject motData,
 			XingClass startXingClass, XingClass endXingClass, boolean isDeadEnded
 //			LaneRestriction laneRestriction, AccessRestriction accessRestriction 
 			) {
@@ -84,7 +86,7 @@ public class StreetSegment {
 		this.highwayRoute1 = highwayRoute1;
 		this.highwayRoute2 = highwayRoute2;
 		this.highwayRoute3 = highwayRoute3;
-		this.ownership = ownership;
+		this.motData = motData;
 		this.startXingClass = startXingClass;
 		this.endXingClass = endXingClass;
 		this.isDeadEnded = isDeadEnded;
@@ -196,8 +198,8 @@ public class StreetSegment {
 		return highwayRoute3;
 	}
 
-	public String getOwnership() {
-		return ownership;
+	public JsonObject getMotData() {
+		return motData;
 	}
 
 	public boolean isTruckRoute() {

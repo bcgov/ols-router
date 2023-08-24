@@ -13,6 +13,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -78,7 +80,11 @@ public class BasicGraph {
 			TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
 			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, 
-			boolean isDeadEnded, String ownership) {
+			boolean isDeadEnded, JsonObject motData) {
+		String ownership = null;
+		if(motData != null && motData.get("OWNERSHIP") != null) {
+			ownership = motData.get("OWNERSHIP").getAsString();
+		}
 		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, numLanesLeft, numLanesRight, fromImp, toImp,
 				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded, ownership);
 		int[] edgeIds = new int[(oneWay?1:2)];

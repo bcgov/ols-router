@@ -131,7 +131,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 				seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
 				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), 
-				seg.isDeadEnded(), seg.getOwnership() == null ? null : seg.getOwnership().intern());
+				seg.isDeadEnded(), seg.getMotData());
 		edgeIdBySegId.put(seg.getSegmentId(), edgeIds);
 		if(seg.isFerry()) {
 			for(int edgeId : edgeIds) {

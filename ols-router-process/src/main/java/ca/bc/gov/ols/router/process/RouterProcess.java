@@ -221,14 +221,7 @@ public class RouterProcess {
 			}
 			
 			JsonObject motData = rr.getJson("ministry_of_transport_data");
-			String ownership = null;
-			if(motData != null) {
-				JsonElement value = motData.get("ownership");
-				if(value != null) {
-					ownership = value.getAsString();
-				}
-			}
-			
+						
 			// skip virtual and unRouteable segments
 			if((roadClass != RoadClass.FERRY && isVirtual) || !roadClass.isRouteable()) {
 				droppedSegs++;
@@ -246,7 +239,7 @@ public class RouterProcess {
 					speedLimit,  surfaceType,
 					maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
-					ownership,
+					motData,
 					false, isVirtual,
 					fromLeftTR, fromCentreTR, fromRightTR, toLeftTR, toCentreTR, toRightTR);
 			if(RoadClass.FERRY.equals(roadClass)) {
@@ -428,7 +421,7 @@ public class RouterProcess {
 		        				seg.getFromMaxWeight(),seg.getToMaxWeight(), 
 		        				seg.isTruckRoute(),
 		        				seg.getHighwayRoute1(), seg.getHighwayRoute2(), seg.getHighwayRoute3(),
-		        				seg.getOwnership(),
+		        				seg.getMotData(),
 		        				seg.isDeadEnded(), seg.isVirtual(), 
 		        				null, null, null, null, null, null));
 		        		ferryCount++;
@@ -1006,7 +999,7 @@ public class RouterProcess {
 			} else {
 				row.put("VEHICLE_MAX_WIDTH", Double.isNaN(seg.getMaxWidth()) ? null : seg.getMaxWidth());
 			}
-			row.put("OWNERSHIP", seg.getOwnership());
+			row.put("MINISTRY_OF_TRANSPORT_DATA", seg.getMotData());
 			if(seg.isDeadEnded()) {
 				row.put("DEAD_ENDED_IND", "Y");
 			}

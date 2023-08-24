@@ -10,6 +10,8 @@ import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.SurfaceType;
@@ -38,7 +40,7 @@ public class RpStreetSegment extends StreetSegment {
 			Integer fromMaxWeight, Integer toMaxWeight, 
 			boolean isTruckRoute, 
 			String highwayRoute1, String highwayRoute2, String highwayRoute3,
-			String ownership,
+			JsonObject motData,
 			boolean isDeadEnded, boolean virtual,
 			TurnTimeCode fromLeftTR, TurnTimeCode fromCentreTR, TurnTimeCode fromRightTR, 
 			TurnTimeCode toLeftTR, TurnTimeCode toCentreTR, TurnTimeCode toRightTR) {
@@ -53,7 +55,7 @@ public class RpStreetSegment extends StreetSegment {
 			fromMaxWeight, toMaxWeight,
 			isTruckRoute, 
 			highwayRoute1, highwayRoute2, highwayRoute3,
-			ownership,
+			motData,
 			XingClass.SAME, XingClass.SAME, isDeadEnded);
 		
 		this.virtual = virtual;
