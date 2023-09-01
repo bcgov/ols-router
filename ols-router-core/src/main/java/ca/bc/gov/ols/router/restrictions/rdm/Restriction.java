@@ -41,7 +41,7 @@ public class Restriction extends AbstractRestriction {
 	
 	@Override
 	public String getVisDescriptor() {
-		return "Max " + type.visName + ": " + permitableValue + " (" + source + ")";
+		return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ")";
 	}
 
 	@Override

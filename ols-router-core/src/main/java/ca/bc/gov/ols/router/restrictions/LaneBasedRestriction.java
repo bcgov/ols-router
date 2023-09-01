@@ -72,7 +72,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 		StringBuilder sb = new StringBuilder("Max ");
 		sb.append(type.visName).append(": ");
 		for(int i = 0; i < permitableValue.length; i++) {
-			sb.append("lane ").append(i+1).append(": ").append(permitableValue[i]).append("; ");
+			sb.append("lane ").append(i+1).append(": ").append(permitableValue[i]).append(" ").append(type.unit).append("; ");
 		}
 		sb.append("(").append(source).append(")");
 		return sb.toString();

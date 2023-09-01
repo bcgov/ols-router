@@ -4,20 +4,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum RestrictionType {
-	HORIZONTAL("width"),
-	VERTICAL("height"),
-	GVW("GVW"),
-	GVW_1AXLE("GVW-1AXLE"),
-	GVW_2AXLE("GVW-2AXLE"),
-	GVW_3AXLE("GVW-3AXLE"),
-	UNKNOWN("unknown");
+	HORIZONTAL("width", "m"),
+	VERTICAL("height", "m"),
+	GVW("GVW", "kg"),
+	GVW_1AXLE("GVW-1AXLE", "kg"),
+	GVW_2AXLE("GVW-2AXLE", "kg"),
+	GVW_3AXLE("GVW-3AXLE", "kg"),
+	UNKNOWN("unknown", "");
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionType.class.getCanonicalName());
 	
 	public final String visName;
+	public final String unit;
 	
-	RestrictionType(String visName) {
+	RestrictionType(String visName, String unit) {
 		this.visName = visName;
+		this.unit = unit;
 	}
 
 	/**
