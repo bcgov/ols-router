@@ -220,7 +220,6 @@ public class DijkstraShortestPath {
 					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
 						if(c.prevents(params)) {
-							// TODO deal with Lane-based restrictions
 							continue nextEdge;
 						}
 					}

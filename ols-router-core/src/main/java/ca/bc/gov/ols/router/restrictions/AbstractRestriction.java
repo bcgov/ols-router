@@ -2,6 +2,7 @@ package ca.bc.gov.ols.router.restrictions;
 
 import org.locationtech.jts.geom.Point;
 
+import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
 
@@ -36,6 +37,19 @@ public abstract class AbstractRestriction implements Constraint {
 
 	public int getLocationId() {
 		return locationId;
+	}
+	
+	protected Double getVehicleValue(RoutingParameters params) {
+		switch(type) {
+		case VERTICAL: 
+			return params.getHeight();
+		case HORIZONTAL:
+			return params.getWidth();
+		case GVW:
+			return params.getWeight();
+		default:
+			return null;
+		}
 	}
 
 }

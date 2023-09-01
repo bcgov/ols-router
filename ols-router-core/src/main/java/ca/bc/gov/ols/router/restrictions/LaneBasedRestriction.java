@@ -29,7 +29,8 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	 */
 	@Override
 	public boolean prevents(RoutingParameters params) {
-		double value = getVehicleValue(params);
+		Double value = getVehicleValue(params);
+		if(value == null) return false;
 		for(double pv : permitableValue) {
 			if(value <= pv) {
 				return false;
@@ -64,15 +65,6 @@ public class LaneBasedRestriction extends AbstractRestriction {
 			}
 		}
 		return safeLanes;
-	}
-	
-	private Double getVehicleValue(RoutingParameters params) {
-		switch(type) {
-		case VERTICAL: 
-			return params.getHeight();
-		default:
-			throw new RuntimeException("Invalid RestrictionType for lane-based restriction: " + type);
-		}
 	}
 
 	@Override

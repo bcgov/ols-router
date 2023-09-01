@@ -28,22 +28,10 @@ public class Restriction extends AbstractRestriction {
 
 	@Override
 	public boolean prevents(RoutingParameters params) {
-		switch (type) {
-		case HORIZONTAL:
-			if (params.getWidth() != null && params.getWidth() > permitableValue)
-				return true;
-			return false;
-		case VERTICAL:
-			if (params.getHeight() != null && params.getHeight() > permitableValue)
-				return true;
-			return false;
-		case GVW:
-			if (params.getWeight() != null && params.getWeight() > permitableValue)
-				return true;
-			return false;
-		default:
-		}
-		return false;
+		Double value = getVehicleValue(params);
+		if(value == null) return false;
+		if(value <= permitableValue) return false;
+		return true;
 	}
 
 	@Override
