@@ -45,6 +45,10 @@ public class LaneRequirement {
 		return location;
 	}
 
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+
 	public int getLocationId() {
 		return locationId;
 	}

@@ -61,6 +61,11 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 		super.reproject(gr);
 		for(Direction dir : directions) {
 			dir.setPoint(gr.reproject(dir.getPoint(),getSrsCode()));
+			if(dir.getLaneRequirements() != null) {
+				for(LaneRequirement lr: dir.getLaneRequirements() ) {
+					lr.setLocation(gr.reproject(lr.getLocation(), getSrsCode()));
+				}
+			}
 		}
 	}
 }
