@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.algorithm.Distance;
@@ -59,8 +60,10 @@ import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
+import ca.bc.gov.ols.router.restrictions.Constraint;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
+import ca.bc.gov.ols.util.MapList;
 import ca.bc.gov.ols.util.StopWatch;
 
 public class BasicGraphRoutingEngine implements RoutingEngine {
@@ -386,14 +389,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			if(offset > maxOffset) {
 				offset = maxOffset; 
 			}
-			// Segment Ids
-			if(params.getTypes().contains(NavInfoType.ID)) {
+			// Segment Ids (don't want to duplicate for each edge so only show the forward direction edges)
+			if(params.getTypes().contains(NavInfoType.ID) && !graph.getReversed(edgeId)) {
 				double proportion = 0.4;
-				if(graph.getReversed(edgeId)) {
-					proportion = 0.6;
-				}
 				Coordinate c = lil.extractPoint(lil.getEndIndex()*proportion);
-				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + edgeId, 90));
+				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + graph.getSegmentId(edgeId), 90));
 			}
 			// one-way markers
 			if(params.getTypes().contains(NavInfoType.DIR)) {
@@ -420,27 +420,29 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				double maxHeight = graph.getMaxHeight(edgeId);
-				double maxWidth = graph.getMaxWidth(edgeId);
-				StringBuilder sb = new StringBuilder();
-				if(!Double.isNaN(maxHeight)) {
-					sb.append("Max Height:" + maxHeight + "\n");
+				List<Constraint> constraints = graph.getRestrictionLookup().lookup(null, edgeId);
+				MapList<Point,Constraint> constraintMap = new MapList<>();
+				for(Constraint c : constraints) {
+						if(params.getRestrictionSource() == null || c.getSource() == params.getRestrictionSource()) {
+							constraintMap.add(c.getLocation(), c);
+						}
 				}
-				if(!Double.isNaN(maxWidth)) {
-					sb.append("Max Width:" + maxWidth + "\n");
-				}	
-				String hardList = sb.toString();
-				if(!hardList.isEmpty()) {
-					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
-					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
-				}
-				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
-				if(fromMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
-				}
-				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
-				if(toMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
+				if(!constraintMap.isEmpty()) {
+					for(Entry<Point, List<Constraint>> entry: constraintMap.entrySet()) {
+						String type = "";
+						String source = "";
+						StringBuilder sb = new StringBuilder();
+						for(Constraint c : entry.getValue()) {
+							type = c.getType().toString();
+							source = c.getSource().toString();
+							if(sb.length() > 0) {
+								sb.append("\n");
+							}
+							sb.append(c.getVisDescriptor());
+						}
+						String hardList = sb.toString();
+						geoms.add(new VisFeature(entry.getKey(), NavInfoType.HR, type, source, hardList));
+					}
 				}
 			}
 			// Truck Routes

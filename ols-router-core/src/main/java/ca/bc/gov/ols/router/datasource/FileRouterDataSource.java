@@ -27,6 +27,8 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.SurfaceType;
@@ -107,6 +109,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind"));
 			TravelDirection travelDir = TravelDirection.convert(segmentReader.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(segmentReader.getString("divider_type"));
+			int numLanesLeft = segmentReader.getInt("num_lanes_left");
+			int numLanesRight = segmentReader.getInt("num_lanes_right");
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("start_traffic_impactor"));
 			TrafficImpactor endTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("end_traffic_impactor"));
 			short speedLimit = adjustSpeedLimit((short)segmentReader.getInt("speed_limit"), roadClass);
@@ -123,6 +127,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			if(highwayRoute2 != null) highwayRoute2 = highwayRoute2.intern();
 			String highwayRoute3 = segmentReader.getString("highway_route_3");
 			if(highwayRoute3 != null) highwayRoute3 = highwayRoute3.intern();
+			
+			JsonObject motData = segmentReader.getJson("ministry_of_transport_data");		 
 			
 			boolean isTruckRoute = "Y".equals(segmentReader.getString("truck_route_ind"));
 			XingClass startXingClass = XingClass.convert(segmentReader.getString("start_xing_class"));
@@ -154,11 +160,14 @@ public class FileRouterDataSource implements RouterDataSource {
 			}
 			StreetSegment segment = new StreetSegment(segmentId, centerLine,  
 					startIntersectionId, endIntersectionId, 
-					leftLocality, rightLocality, fullName, roadClass,
-					travelDir, dividerType, startTrafficImpactor, endTrafficImpactor, 
+					leftLocality, rightLocality, fullName, 
+					roadClass, travelDir, dividerType,
+					numLanesLeft, numLanesRight,
+					startTrafficImpactor, endTrafficImpactor, 
 					speedLimit, surfaceType, maxHeight, maxWidth, 
 					fromMaxWeight, toMaxWeight,	isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
+					motData,
 					startXingClass, endXingClass, isDeadEnded); //, laneRestriction, accessRestriction
 //				if(segment.isFerry()) {
 //					// save the ferry segs for last so we can prevent ferry-ferry intersections
@@ -243,11 +252,6 @@ public class FileRouterDataSource implements RouterDataSource {
 		return null;
 	}
 	
-	@Override
-	public RowReader getTurnClassReader() {
-		return getXsvRowReader("turn_classes");
-	}
-
 	protected TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = getStreetNames();
@@ -347,6 +351,16 @@ public class FileRouterDataSource implements RouterDataSource {
 		return getXsvRowReader("turn_restrictions");
 	}
 	
+	@Override
+	public Reader getRestrictionReader() throws IOException {
+		return new InputStreamReader(getInputStream("restrictions_active.json"));
+	}
+
+	@Override
+	public RowReader getTurnClassReader() {
+		return getXsvRowReader("turn_classes");
+	}
+
 	@Override
 	public Reader getOpen511Reader() throws IOException {
 		return new InputStreamReader(getInputStream("active_events.json"));

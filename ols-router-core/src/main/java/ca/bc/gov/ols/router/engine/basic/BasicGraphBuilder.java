@@ -4,11 +4,6 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
-
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -28,14 +23,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.onebusaway.gtfs.impl.GtfsDaoImpl;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -47,6 +34,13 @@ import org.locationtech.jts.index.strtree.ItemBoundable;
 import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.linearref.LengthIndexedLine;
+import org.onebusaway.gtfs.impl.GtfsDaoImpl;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
@@ -61,6 +55,8 @@ import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.TruckNoticeType;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
@@ -73,6 +69,8 @@ import ca.bc.gov.ols.router.open511.RecurringSchedule;
 import ca.bc.gov.ols.router.open511.enums.EventStatus;
 import ca.bc.gov.ols.router.open511.enums.EventType;
 import ca.bc.gov.ols.router.open511.enums.RoadState;
+import ca.bc.gov.ols.router.restrictions.RestrictionLookupBuilder;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.router.time.DateInterval;
 import ca.bc.gov.ols.router.time.TemporalSet;
 import ca.bc.gov.ols.router.time.TemporalSetIntersection;
@@ -81,25 +79,31 @@ import ca.bc.gov.ols.router.time.WeeklyDateRange;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
 
 public class BasicGraphBuilder implements GraphBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraphBuilder.class.getCanonicalName());
 	
+	// itn restrictions don't have Id's so we will make some up
+	private static int nextItnRestrictionId = 1000000;
 	private BasicGraph graph;
 	private RouterConfig config;
 	private GeometryReprojector reprojector;
 	private TIntIntHashMap nodeIdByIntId;
 	private IntObjectArrayMap<int[]> edgeIdBySegId;
 	private TurnLookup turnLookup;
-	private TIntObjectMap<ArrayList<TurnRestrictionVis>> restrictionsByEdgeId;
+	private TIntObjectMap<ArrayList<TurnRestrictionVis>> turnRestrictionsByEdgeId;
+	private RestrictionLookupBuilder restrictionLookupBuilder;
 	private EventLookup eventLookup;
 	private TrafficLookupBuilder trafficLookupBuilder;
 	private VisLayers layers;
 	private List<Integer> ferryEdges;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<RoadTruckNoticeEvent> truckNoticeIdMap = new TIntObjectHashMap<RoadTruckNoticeEvent>();
-	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();
-	
+	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField = new TIntObjectHashMap<EnumMap<VehicleType,Double>>();	
 	
 	public BasicGraphBuilder(RouterConfig config, GeometryReprojector reprojector) {
 		graph = new BasicGraph(RouterConfig.EXPECTED_EDGES);
@@ -107,7 +111,8 @@ public class BasicGraphBuilder implements GraphBuilder {
 		this.config = config;
 		nodeIdByIntId = new TIntIntHashMap(RouterConfig.EXPECTED_EDGES/2, 0.5f, BasicGraph.NO_NODE, BasicGraph.NO_NODE);
 		edgeIdBySegId = new IntObjectArrayMap<int[]>(RouterConfig.EXPECTED_EDGES);
-		restrictionsByEdgeId = new TIntObjectHashMap<ArrayList<TurnRestrictionVis>>();		
+		restrictionLookupBuilder = new RestrictionLookupBuilder(this);
+		turnRestrictionsByEdgeId = new TIntObjectHashMap<ArrayList<TurnRestrictionVis>>();
 		layers = new VisLayers();
 		ferryEdges = new ArrayList<Integer>();
 	}
@@ -121,15 +126,82 @@ public class BasicGraphBuilder implements GraphBuilder {
 		int toNodeId = getNodeId(toIntId, ls.getEndPoint());
 		boolean oneWay = seg.getTravelDirection() != TravelDirection.BIDIRECTIONAL;
 		int[] edgeIds = graph.addEdge(fromNodeId, toNodeId, seg.getSegmentId(), ls, oneWay, seg.getSpeedLimit(), 
-				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(), 
-				seg.getRoadClass(), seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
+				seg.getLeftLocality().intern(), seg.getRightLocality().intern(), seg.getName().intern(),
+				seg.getRoadClass(), seg.getNumLanesLeft(), seg.getNumLanesRight(),
+				seg.getStartTrafficImpactor(), seg.getEndTrafficImpactor(),
 				seg.getMaxHeight(), seg.getMaxWidth(), seg.getFromMaxWeight(), seg.getToMaxWeight(),
-				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), seg.isDeadEnded());
+				seg.isTruckRoute(), seg.getStartXingClass(), seg.getEndXingClass(), 
+				seg.isDeadEnded(), seg.getMotData());
 		edgeIdBySegId.put(seg.getSegmentId(), edgeIds);
 		if(seg.isFerry()) {
 			for(int edgeId : edgeIds) {
 				ferryEdges.add(edgeId);
 			}
+		}
+		
+		// add ITN restrictions
+		if(!Double.isNaN(seg.getMaxHeight())) {
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.VERTICAL)
+					.permitableValue(seg.getMaxHeight())
+					.segmentId(seg.getSegmentId())
+					.location(ls.getCentroid())
+					.build();
+			for(int edgeId : edgeIds) {
+				restrictionLookupBuilder.addRestriction(edgeId, r);
+			}
+		}
+
+		if(!Double.isNaN(seg.getMaxWidth())) {
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.HORIZONTAL)
+					.permitableValue(seg.getMaxWidth())
+					.segmentId(seg.getSegmentId())
+					.location(ls.getCentroid())
+					.build();
+			for(int edgeId : edgeIds) {
+				restrictionLookupBuilder.addRestriction(edgeId, r);
+			}
+		}
+
+		if(seg.getFromMaxWeight() != null) {
+			Restriction r = Restriction.builder()
+					.id(nextItnRestrictionId++)
+					.source(RestrictionSource.ITN)
+					.type(RestrictionType.GVW)
+					.permitableValue(seg.getFromMaxWeight())
+					.segmentId(seg.getSegmentId())
+					.location(ls.getStartPoint())
+					.build();
+			restrictionLookupBuilder.addRestriction(edgeIds[0], r);
+		}
+
+		if(seg.getToMaxWeight() != null) {
+			if(edgeIds.length != 2) {
+				logger.warn("ITN ToMaxWeight Restriction on one way segment: {}", seg.getSegmentId());
+			} else {
+				Restriction r = Restriction.builder()
+						.id(nextItnRestrictionId++)
+						.source(RestrictionSource.ITN)
+						.type(RestrictionType.GVW)
+						.permitableValue(seg.getToMaxWeight())
+						.segmentId(seg.getSegmentId())
+						.location(ls.getEndPoint())
+						.build();
+				restrictionLookupBuilder.addRestriction(edgeIds[1], r);
+			}
+		}
+	
+	}
+	
+	@Override
+	public void addRestrictions(List<Restriction> restrictions) {
+		for(Restriction r : restrictions) {
+			restrictionLookupBuilder.addRestriction(r);
 		}
 	}
 
@@ -144,10 +216,10 @@ public class BasicGraphBuilder implements GraphBuilder {
 		turnLookup.addRestriction(newIds, tr.getRestriction(), tr.getVehicleTypes());
 		
 		if(tr.getRestriction() != null) {			
-			ArrayList<TurnRestrictionVis> restrictionList = restrictionsByEdgeId.get(newIds[0]);
+			ArrayList<TurnRestrictionVis> restrictionList = turnRestrictionsByEdgeId.get(newIds[0]);
 			if(restrictionList == null) {
 				restrictionList = new ArrayList<TurnRestrictionVis>(3);
-				restrictionsByEdgeId.put(newIds[0], restrictionList);
+				turnRestrictionsByEdgeId.put(newIds[0], restrictionList);
 			}
 			TurnRestrictionVis trv = new TurnRestrictionVis(graph, newIds, tr.getRestriction()); 
 			restrictionList.add(trv);
@@ -230,7 +302,7 @@ public class BasicGraphBuilder implements GraphBuilder {
 	@Override
 	public void addEvents(EventResponse eventResponse) {
 		if(eventLookup == null) {
-			eventLookup = new EventLookup(graph);
+			eventLookup = new EventLookup();
 			graph.build();
 		}
 		for(Event evt : eventResponse.getEvents()) {
@@ -547,6 +619,8 @@ public class BasicGraphBuilder implements GraphBuilder {
 		graph.build();
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
+		//restrictionLookup.analyze(graph);
+		graph.setRestrictionLookup(restrictionLookupBuilder.build());
 		graph.setTrafficLookup(trafficLookupBuilder.build());
 		graph.setLocalDistortionField(localDistortionField);
 		buildTurnRestrictionLayer();
@@ -556,8 +630,16 @@ public class BasicGraphBuilder implements GraphBuilder {
 		return graph;
 	}
 
+	public int[] getEdgesForSegment(int segmentId) {
+		return edgeIdBySegId.get(segmentId);
+	}
+	
+	public BasicGraph getGraph() {
+		return graph;
+	}
+
 	private void buildTurnRestrictionLayer() {
-		restrictionsByEdgeId.forEachEntry(new TIntObjectProcedure<List<TurnRestrictionVis>>() {
+		turnRestrictionsByEdgeId.forEachEntry(new TIntObjectProcedure<List<TurnRestrictionVis>>() {
 			@Override
 			public boolean execute(int edgeId, List<TurnRestrictionVis> restrictions) {
 				String detail = restrictionListToString(restrictions);

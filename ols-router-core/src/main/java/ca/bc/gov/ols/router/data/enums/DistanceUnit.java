@@ -14,7 +14,7 @@ public enum DistanceUnit {
 	MILE(0.000621371192, "mi", "miles"),
 	FOOT(3.28084, "ft", "feet");
 
-	private static HashMap<String,DistanceUnit> nameMap = null;
+	private static HashMap<String,DistanceUnit> nameMap = buildNameMap();
 	
 	private String abbr;
 	private String plural;
@@ -35,9 +35,6 @@ public enum DistanceUnit {
 	 * @return the DistanceUnit corresponding to the given string representation.
 	 */
 	public static DistanceUnit convert(String distanceUnit) {
-		if(nameMap == null) {
-			buildNameMap();
-		}
 		DistanceUnit unit = nameMap.get(distanceUnit.toLowerCase());
 		if(unit == null) {
 			throw new IllegalArgumentException("Invalid DistanceUnit value: '"
@@ -126,8 +123,8 @@ public enum DistanceUnit {
 		return sb.toString();		
 	}
 	
-	private static void buildNameMap() {
-		nameMap = new HashMap<String,DistanceUnit>();
+	private static HashMap<String, DistanceUnit> buildNameMap() {
+		HashMap<String,DistanceUnit> nameMap = new HashMap<String,DistanceUnit>();
 		for(DistanceUnit du : values()) {
 			nameMap.put(du.name().toLowerCase(), du);
 			nameMap.put(du.abbr.toLowerCase(), du);
@@ -136,6 +133,7 @@ public enum DistanceUnit {
 				nameMap.put(alt.toLowerCase(), du);
 			}
 		}
+		return nameMap;
 	}
 	
 }

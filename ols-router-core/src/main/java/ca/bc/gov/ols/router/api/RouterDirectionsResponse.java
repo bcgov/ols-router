@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.LineString;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
+import ca.bc.gov.ols.router.directions.LaneRequirement;
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.router.notifications.Notification;
@@ -36,8 +37,14 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 		this.directions = directions;
 		this.notifications = notifications;
 		for(Direction dir : directions) {
-			if(dir instanceof AbstractTravelDirection)
+			if(dir instanceof AbstractTravelDirection) {
 				((AbstractTravelDirection)dir).setDistance(DistanceUnit.METRE.convertTo(((AbstractTravelDirection)dir).getDistance(), params.getDistanceUnit()));
+			}
+			if(dir.getLaneRequirements() != null) {
+				for(LaneRequirement lr : dir.getLaneRequirements()) {
+					lr.setDistance(DistanceUnit.METRE.convertTo(lr.getDistance(), params.getDistanceUnit()));
+				}
+			}
 		}
 	}
 
@@ -54,6 +61,11 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 		super.reproject(gr);
 		for(Direction dir : directions) {
 			dir.setPoint(gr.reproject(dir.getPoint(),getSrsCode()));
+			if(dir.getLaneRequirements() != null) {
+				for(LaneRequirement lr: dir.getLaneRequirements() ) {
+					lr.setLocation(gr.reproject(lr.getLocation(), getSrsCode()));
+				}
+			}
 		}
 	}
 }

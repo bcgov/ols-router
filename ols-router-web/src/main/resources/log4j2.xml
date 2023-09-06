@@ -6,7 +6,7 @@
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="ca.bc.gov.ols.router" level="${sys:log4j2.logLevel:-debug}" additivity="false">
+    <Logger name="ca.bc.gov.ols" level="${sys:log4j2.logLevel:-debug}" additivity="false">
       <AppenderRef ref="Console"/>
     </Logger>
     <Root level="error">

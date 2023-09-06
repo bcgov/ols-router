@@ -15,6 +15,7 @@ import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 
 public class NavInfoParameters {
 
@@ -22,6 +23,7 @@ public class NavInfoParameters {
 	private double[] bbox;
 	private Envelope envelope;
 	private Instant departure = Instant.now();
+	private RestrictionSource restrictionSource = null;
 	private Set<NavInfoType> types = EnumSet.allOf(NavInfoType.class);
 	
 	public int getOutputSRS() {
@@ -50,6 +52,14 @@ public class NavInfoParameters {
 		}
 	}
 
+	public RestrictionSource getRestrictionSource() {
+		return restrictionSource;
+	}
+	
+	public void setRestrictionSource(RestrictionSource restrictionSource) {
+		this.restrictionSource = restrictionSource;
+	}
+	
 	public Set<NavInfoType> getTypes() {
 		return types;
 	}

@@ -19,11 +19,9 @@ import ca.bc.gov.ols.router.data.RoadEvent;
 
 public class EventLookup {
 
-	private BasicGraph graph;
 	private TIntObjectHashMap<ArrayList<RoadEvent>> eventMap;
 	
-	public EventLookup(BasicGraph graph) {
-		this.graph = graph;
+	public EventLookup() {
 		eventMap = new TIntObjectHashMap<ArrayList<RoadEvent>>();
 	}
 	
