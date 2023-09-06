@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 public enum RestrictionType {
 	HORIZONTAL("width", "m"),
 	VERTICAL("height", "m"),
-	GVW("GVW", "kg"),
+	GVW("GVW", "kg"), // Gross Vehicle Weight
 	GVW_1AXLE("GVW-1AXLE", "kg"),
 	GVW_2AXLE("GVW-2AXLE", "kg"),
 	GVW_3AXLE("GVW-3AXLE", "kg"),

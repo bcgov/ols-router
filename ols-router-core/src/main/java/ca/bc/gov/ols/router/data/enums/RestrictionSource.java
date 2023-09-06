@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum RestrictionSource {
-	ITN,
-	RDM;
+	ITN, // Integrated Transport Network - the road network provided by GeoBC
+	RDM; // Restriction Data Manager - restriction API provided by MOTI
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionSource.class.getCanonicalName());
 	
