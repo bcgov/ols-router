@@ -6,7 +6,8 @@ import java.util.function.BiFunction;
 public enum Attribute {
 	isFerry((g,i) -> g.getScheduleLookup().getFerryInfo(i) != null),
 	isTruckRoute((g,i) -> g.isTruckRoute(i)),
-	locality((g,i) -> g.getLocality(i));
+	locality((g,i) -> g.getLocality(i)),
+	ownership((g,i) -> g.getOwnership(i));
 
 	private BiFunction<BasicGraph,Integer,Object> method;
 	

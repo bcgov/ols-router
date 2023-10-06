@@ -92,25 +92,11 @@
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>
-    <dependency>
-	  <groupId>org.apache.commons</groupId>
-	  <artifactId>commons-text</artifactId>
-	  <version>1.10.0</version>
-	</dependency>
-	<dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts-core</artifactId>
-      <version>1.14.0</version>
-    </dependency>
 	<dependency>
       <groupId>javax.annotation</groupId>
       <artifactId>javax.annotation-api</artifactId>
       <version>1.3.2</version>
     </dependency>
-	<dependency>
-      <groupId>net.sf.trove4j</groupId>
-      <artifactId>trove4j</artifactId>
-    </dependency>        
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>

@@ -29,7 +29,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	 */
 	@Override
 	public boolean prevents(RoutingParameters params) {
-		Double value = getVehicleValue(params);
+		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		for(double pv : permitableValue) {
 			if(value <= pv) {
@@ -44,7 +44,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	 */
 	@Override
 	public boolean constrains(RoutingParameters params) {
-		Double value = getVehicleValue(params);
+		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		for(double pv : permitableValue) {
 			if(value > pv) {
@@ -56,7 +56,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	
 	public boolean[] getSafeLanes(RoutingParameters params) {
 		boolean[] safeLanes = new boolean[permitableValue.length];
-		double value = getVehicleValue(params);
+		double value = params.getRestrictionValue(type);
 		for(int i = 0; i < permitableValue.length; i++) {
 			if(value <= permitableValue[i]) {
 				safeLanes[i] = true;

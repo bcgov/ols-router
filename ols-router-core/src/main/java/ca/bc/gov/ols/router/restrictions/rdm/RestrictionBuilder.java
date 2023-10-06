@@ -12,7 +12,7 @@ public class RestrictionBuilder {
 	
 	int id = -1;
 	RestrictionSource source = null;
-	RestrictionType type = RestrictionType.UNKNOWN;
+	RestrictionType type = null;
 	int laneNumber = -1;
 	double permitableValue = -1;
 	int segmentId = -1;

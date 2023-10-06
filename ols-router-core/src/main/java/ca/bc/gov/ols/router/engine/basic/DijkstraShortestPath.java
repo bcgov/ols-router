@@ -216,7 +216,7 @@ public class DijkstraShortestPath {
 //				}
 				
 				// filter the edge based on restrictions
-				if(params.getHeight() != null || params.getWeight() != null || params.getWidth() != null) {
+				if(!params.getRestrictionValues().isEmpty()) {
 					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
 						if(c.prevents(params)) {

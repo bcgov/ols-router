@@ -39,17 +39,4 @@ public abstract class AbstractRestriction implements Constraint {
 		return locationId;
 	}
 	
-	protected Double getVehicleValue(RoutingParameters params) {
-		switch(type) {
-		case VERTICAL: 
-			return params.getHeight();
-		case HORIZONTAL:
-			return params.getWidth();
-		case GVW:
-			return params.getWeight();
-		default:
-			return null;
-		}
-	}
-
 }

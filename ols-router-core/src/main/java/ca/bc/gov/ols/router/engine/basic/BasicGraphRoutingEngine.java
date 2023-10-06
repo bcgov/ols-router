@@ -433,7 +433,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 						String source = "";
 						StringBuilder sb = new StringBuilder();
 						for(Constraint c : entry.getValue()) {
-							type = c.getType().toString();
+							type = c.getType().name;
 							source = c.getSource().toString();
 							if(sb.length() > 0) {
 								sb.append("\n");

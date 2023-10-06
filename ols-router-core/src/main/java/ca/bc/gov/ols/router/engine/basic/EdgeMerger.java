@@ -25,6 +25,7 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.RoadTruckNoticeEvent;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
@@ -253,8 +254,10 @@ public class EdgeMerger {
 			directions.add(new FinishDirection(gf.createPoint(coords.get(coords.size()-1))));
 			
 			// TODO make maximum standard vehicle size into config parameters
-			if((params.getHeight() != null && params.getHeight() > 4.15)
-					|| (params.getWidth() != null && params.getWidth() > 2.6)
+			if((params.getRestrictionValue(RestrictionType.VERTICAL) != null 
+						&& params.getRestrictionValue(RestrictionType.VERTICAL) > 4.15)
+					|| (params.getRestrictionValue(RestrictionType.HORIZONTAL) != null 
+						&& params.getRestrictionValue(RestrictionType.HORIZONTAL) > 2.6)
 					|| (params.getLength() != null && params.getLength() > 12.5)) {
 				notifications.add(new OversizeNotification());
 			}

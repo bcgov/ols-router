@@ -28,7 +28,7 @@ public class Restriction extends AbstractRestriction {
 
 	@Override
 	public boolean prevents(RoutingParameters params) {
-		Double value = getVehicleValue(params);
+		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		if(value <= permitableValue) return false;
 		return true;
