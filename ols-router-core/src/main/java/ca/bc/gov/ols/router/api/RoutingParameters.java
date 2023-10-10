@@ -463,7 +463,10 @@ public class RoutingParameters {
 	
 	/**
 	 * Parses incoming restriction values into a map.
-	 * Expected input format is &restrictionValues=<RestrictionType>:<value>,<RestrictionType>:<value>
+	 * Expected input format is: 
+	 * <pre>{@code
+	 * &restrictionValues=<RestrictionType>:<value>,<RestrictionType>:<value>
+	 * }</pre>
 	 * eg. VERTICAL:4.2,WEIGHT-GVW:15000
 	 * @param values the string representation of the values
 	 */
