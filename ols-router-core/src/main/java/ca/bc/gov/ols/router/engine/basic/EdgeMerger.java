@@ -125,7 +125,8 @@ public class EdgeMerger {
 					boolean changed = false;
 					for(Attribute attr : partitionAttributes) {
 						Object val = attr.get(graph, edgeId);
-						if(!Objects.equals(val, partitionValues.get(attr))) {
+						// always include the first edge
+						if(edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
 							changed = true;
 							partitionValues.put(attr, val);
 						}
