@@ -58,7 +58,6 @@ public class RoutingParameters {
 	private static Map<VehicleType,Map<TurnDirection, Double>> defaultTurnCostMap;
 	private Map<TurnDirection, Double> turnCostMap;
 	private GlobalDistortionField globalDistortionField;
-	private static GlobalDistortionField defaultGlobalDistortionField;
 	private String routeDescription;
 	private int maxPairs = Integer.MAX_VALUE;
 	private boolean roundTrip = false;
@@ -79,7 +78,6 @@ public class RoutingParameters {
 		}
 		double[] turnCost = RouterConfig.getInstance().getDefaultTurnCost();
 		defaultTurnCostMap = buildVehicleTypeTurnCostMap(turnCost);
-		defaultGlobalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField());
 	}
 	
 	public RoutingParameters() {
@@ -88,7 +86,6 @@ public class RoutingParameters {
 		xingCostMap = defaultXingCostMap;
 		xingCostMultiplier = defaultXingCostMultiplier;
 		turnCostMap = defaultTurnCostMap.get(vehicleType);
-		globalDistortionField = defaultGlobalDistortionField;
 		truckRouteMultiplier = config.getDefaultTruckRouteMultiplier();
 	}
 
@@ -330,6 +327,9 @@ public class RoutingParameters {
 	}
 	
 	public GlobalDistortionField getGlobalDistortionField() {
+		if(globalDistortionField == null) {
+			globalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField(getVehicleType()));
+		}
 		return globalDistortionField;
 	}
 	

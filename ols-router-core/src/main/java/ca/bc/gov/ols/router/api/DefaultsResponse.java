@@ -4,6 +4,7 @@ import java.util.Set;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.engine.basic.GlobalDistortionField;
 
 public class DefaultsResponse {
@@ -18,7 +19,7 @@ public class DefaultsResponse {
 		return RouteOption.fromList(config.getDefaultEnableOptions());
 	}
 	
-	public GlobalDistortionField getGlobalDistortionField() {
-		return new GlobalDistortionField(config.getDefaultGlobalDistortionField());
+	public GlobalDistortionField getGlobalDistortionField(VehicleType type) {
+		return new GlobalDistortionField(config.getDefaultGlobalDistortionField(type));
 	}
 }
