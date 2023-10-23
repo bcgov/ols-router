@@ -24,6 +24,7 @@ import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.api.DefaultsResponse;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 @Component
 public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<DefaultsResponse> {
@@ -71,18 +72,33 @@ public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<
 
 		jw.name("globalDistortionField");
 		jw.beginObject();
-		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField().getNonTruckField().entrySet()) {
+		
+		jw.name("CAR");
+		jw.beginObject();
+		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.CAR).getNonTruckField().entrySet()) {
+			if(entry.getKey().isRouteable()) {
+				jw.name(entry.getKey().toString());
+				jw.value(entry.getValue());
+			}
+		}
+		jw.endObject(); // globalDistortionField.CAR
+
+		jw.name("TRUCK");
+		jw.beginObject();
+		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.TRUCK).getNonTruckField().entrySet()) {
 			if(entry.getKey().isRouteable()) {
 				jw.name(entry.getKey().toString());	
 				jw.value(entry.getValue());
 			}
 		}
-		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField().getTruckField().entrySet()) {
+		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.TRUCK).getTruckField().entrySet()) {
 			if(entry.getKey().isRouteable()) {
 				jw.name(entry.getKey().toString() + ".truck");
 				jw.value(entry.getValue());
 			}
 		}
+		jw.endObject(); // globalDistortionField.TRUCK
+		
 		jw.endObject(); // globalDistortionField
 		
 		jw.name("xingCost");

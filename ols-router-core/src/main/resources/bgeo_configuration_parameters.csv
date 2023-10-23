@@ -16,6 +16,7 @@ ROUTER,defaultEnableOptions,"tc,xc,tr"
 ROUTER,defaultXingCost,"5,7,10,1.5"
 ROUTER,defaultTurnCost,"3,1,5,2"
 ROUTER,defaultTruckRouteMultiplier,"9"
-ROUTER,defaultGlobalDistortionField,""
+ROUTER,defaultGlobalDistortionField.TRUCK,""
+ROUTER,defaultGlobalDistortionField.CAR,""
 ROUTER,defaultSnapDistance,1000
 ROUTER,defaultSimplifyThreshold,250
