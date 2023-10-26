@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -219,7 +220,7 @@ public class DijkstraShortestPath {
 				if(!params.getRestrictionValues().isEmpty()) {
 					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
-						if(c.prevents(params)) {
+						if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 							continue nextEdge;
 						}
 					}

@@ -26,8 +26,8 @@ public abstract class ConverterHelper {
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd H:m:s");
 
-	static final DecimalFormat DEGREE_FORMAT = new DecimalFormat("###.#####");
-	static final DecimalFormat METRE_FORMAT = new DecimalFormat("###.##");
+	public static final DecimalFormat DEGREE_FORMAT = new DecimalFormat("###.#####");
+	public static final DecimalFormat METRE_FORMAT = new DecimalFormat("###.##");
 	
 	protected RouterConfig config;
 	protected GeometryReprojector gr;

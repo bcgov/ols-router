@@ -112,7 +112,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcRoute(gf);
-			RouterRouteResponse response = new RouterRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids());
+			RouterRouteResponse response = new RouterRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getRestrictions());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
@@ -131,7 +131,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDirections(gf);
-			RouterDirectionsResponse response = new RouterDirectionsResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications());
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getRestrictions(), em.getDirections(), em.getNotifications());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
@@ -154,7 +154,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcRoute(gf);
-			response = new RouterOptimalRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), visitOrder);
+			response = new RouterOptimalRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getRestrictions(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalRouteResponse(params, graph.getDates());
 		} catch(Throwable t) {
@@ -180,7 +180,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcDirections(gf);
 			response = new RouterOptimalDirectionsResponse(params, graph.getDates(), em.getDist(),em.getTime(), 
-					em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications(), visitOrder);
+					em.getRoute(), em.getPartitions(), em.getTlids(), em.getRestrictions(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(IllegalArgumentException iae) {
 			response = new RouterOptimalDirectionsResponse(params, graph.getDates());
 		} catch(Throwable t) {

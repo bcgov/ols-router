@@ -1,5 +1,9 @@
 package ca.bc.gov.ols.router.restrictions;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
@@ -12,7 +16,8 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	public final double[] permitableValue;
 	public final double dist;
 
-	LaneBasedRestriction(final int[] id, final RestrictionSource source, final RestrictionType type, final double[] permitableValue, final Point location, final int locationId, double dist) {
+	LaneBasedRestriction(final int[] id, final RestrictionSource source, final RestrictionType type, 
+			final double[] permitableValue, final Point location, final int locationId, double dist) {
 		super(source, type, location, locationId);
 		this.id = id;
 		this.permitableValue = permitableValue;
@@ -22,6 +27,11 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	@Override
 	public RestrictionSource getSource() {
 		return source;
+	}
+	
+	@Override
+	public List<Integer> getIds() {
+		return Arrays.stream(id).boxed().collect(Collectors.toList());
 	}
 	
 	/**
@@ -74,7 +84,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 		for(int i = 0; i < permitableValue.length; i++) {
 			sb.append("lane ").append(i+1).append(": ").append(permitableValue[i]).append(" ").append(type.unit).append("; ");
 		}
-		sb.append("(").append(source).append(")");
+		sb.append("(").append(source).append(":").append(Arrays.toString(id)).append(")");
 		return sb.toString();
 	}
 

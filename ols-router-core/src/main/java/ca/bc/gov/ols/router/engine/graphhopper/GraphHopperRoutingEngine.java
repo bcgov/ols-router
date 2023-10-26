@@ -143,7 +143,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterRouteResponse(params, dates, 
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null);
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, null);
 		}
 		return response;
 	}
@@ -167,7 +167,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		} else {
 			response = new RouterDirectionsResponse(params, dates,  
 					DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
+					ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, null,
 					directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList());
 		}
 		return response;
@@ -237,7 +237,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalRouteResponse(params, dates,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, visitOrder);
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, null, visitOrder);
 			}
 		} catch(Throwable t) {
 			response = new RouterOptimalRouteResponse(params, dates);
@@ -267,7 +267,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 			} else {
 				response = new RouterOptimalDirectionsResponse(params, dates,  
 						DistanceUnit.METRE.convertTo(ghResponse.getDistance(), params.getDistanceUnit()), 
-						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null,
+						ghResponse.getTime()/1000, pointListToLineString(ghResponse.getPoints()), null, null, null,
 						directionsFromInstructionList(ghResponse.getInstructions(), params), Collections.emptyList(), visitOrder);
 			}
 		} catch(Throwable t) {

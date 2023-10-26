@@ -32,8 +32,8 @@ public class RouterDirectionsResponse extends RouterRouteResponse {
 	}
 	
 	public RouterDirectionsResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time, LineString path, 
-			List<Partition> partitions, List<Integer> tlids, List<Direction> directions, Collection<Notification> notifications) {
-		super(params, dates, distance, time, path, partitions, tlids);
+			List<Partition> partitions, List<Integer> tlids, List<Integer> restrictions, List<Direction> directions, Collection<Notification> notifications) {
+		super(params, dates, distance, time, path, partitions, tlids, restrictions);
 		this.directions = directions;
 		this.notifications = notifications;
 		for(Direction dir : directions) {

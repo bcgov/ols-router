@@ -6,12 +6,16 @@ package ca.bc.gov.ols.router.api;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -74,6 +78,8 @@ public class RoutingParameters {
 	private boolean simplifyDirections = false;
 	private int simplifyThreshold = 250;
 	private Map<RestrictionType,Double> restrictionValues = new HashMap<RestrictionType,Double>();
+	private boolean listRestrictions = false;
+	private Set<Integer> excludeRestrictions = Collections.emptySet();
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -492,6 +498,22 @@ public class RoutingParameters {
 		if(!errorMessage.isEmpty()) {
 			throw new IllegalArgumentException(errorMessage.toString());
 		}
+	}
+
+	public boolean isListRestrictions() {
+		return listRestrictions;
+	}
+	
+	public void setListRestrictions(boolean listRestrictions) {
+		this.listRestrictions = listRestrictions;
+	}
+	
+	public Set<Integer> getExcludeRestrictions() {
+		return excludeRestrictions;
+	}
+	
+	public void setExcludeRestrictions(int[] excludeRestrictions) {
+		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
 	}
 	
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {

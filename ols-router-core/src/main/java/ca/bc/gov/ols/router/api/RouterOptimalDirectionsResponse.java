@@ -30,8 +30,8 @@ public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse im
 	}
 	
 	public RouterOptimalDirectionsResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time, LineString path, 
-			List<Partition> partitions, List<Integer> tlids, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
-		super(params, dates, distance, time, path, partitions, tlids, directions, notifications);
+			List<Partition> partitions, List<Integer> tlids, List<Integer> restrictions, List<Direction> directions, Collection<Notification> notifications, int[] visitOrder) {
+		super(params, dates, distance, time, path, partitions, tlids, restrictions, directions, notifications);
 		this.visitOrder = visitOrder;
 	}
 

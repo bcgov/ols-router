@@ -19,16 +19,18 @@ public class RouterRouteResponse extends RouterDistanceResponse {
 	private LineString path;
 	private List<Partition> partitions;
 	private List<Integer> tlids;
-
+	private List<Integer> restrictions;
+	
 	public RouterRouteResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
 		super(params, dates);
 	}
 
-	public RouterRouteResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time, LineString path, List<Partition> partitions, List<Integer> tlids) {
+	public RouterRouteResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates, double distance, double time, LineString path, List<Partition> partitions, List<Integer> tlids, List<Integer> restrictions) {
 		super(params, dates, distance, time);
 		this.path = path;
 		this.partitions = partitions;
 		this.tlids = tlids;
+		this.restrictions = restrictions;
 	}
 
 	public LineString getPath() {
@@ -41,6 +43,10 @@ public class RouterRouteResponse extends RouterDistanceResponse {
 	
 	public List<Integer> getTlids() {
 		return tlids;
+	}
+	
+	public List<Integer> getRestrictions() {
+		return restrictions;
 	}
 
 	@Override

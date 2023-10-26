@@ -63,7 +63,9 @@ public class EdgeMerger {
 	private List<Integer> tlids;
 	private Set<Notification> notifications;
 	private List<Partition> partitions;
+	private List<Integer> restrictions;
 	private EnumMap<Attribute,Object> partitionValues = null;
+	private double partitionDist = 0;
 	
 	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
 		this.edgeLists = edgeLists;
@@ -85,6 +87,9 @@ public class EdgeMerger {
 		if(partitionAttributes != null) {
 			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
 			partitions = new ArrayList<Partition>();
+		}
+		if(params.isListRestrictions()) {
+			this.restrictions = new ArrayList<Integer>();
 		}
 		
 		// for each edgeList (ie. each leg of the route)
@@ -132,7 +137,8 @@ public class EdgeMerger {
 						}
 					}
 					if(changed) {
-						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionAttributes, graph, edgeId));
+						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionDist, partitionAttributes, graph, edgeId));
+						partitionDist = 0;
 					}
 				}
 				
@@ -204,6 +210,7 @@ public class EdgeMerger {
 				dist += edgeDist;
 				time += edgeTime;
 				edgeTime = edgeTime - waitTime;
+				partitionDist += edgeDist;
 				
 				if(dist == Double.MAX_VALUE) {
 					dist = -1;
@@ -239,6 +246,13 @@ public class EdgeMerger {
 								.forEach(curDir::addLaneRequirement);
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
+				}
+				
+				if(params.isListRestrictions()) {
+					List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					for(Constraint c : constraints) {
+						restrictions.addAll(c.getIds());
+					}
 				}
 			}
 		
@@ -411,7 +425,11 @@ public class EdgeMerger {
 	public List<Partition> getPartitions() {
 		return partitions;
 	}
-	
+
+	public List<Integer> getRestrictions() {
+		return restrictions;
+	}
+
 	public List<Integer> getTlids() {
 		return tlids;
 	}
@@ -427,7 +445,7 @@ public class EdgeMerger {
 
 	public void calcDirections(GeometryFactory gf) {
 		calcRoute = true;
-		calcDirections  = true;
+		calcDirections = true;
 		mergeEdges(gf);
 		if(params.isSimplifyDirections() == true) {
 			simplifyDirections();

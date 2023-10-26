@@ -1,5 +1,9 @@
 package ca.bc.gov.ols.router.restrictions.rdm;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.restrictions.AbstractRestriction;
 
@@ -25,6 +29,11 @@ public class Restriction extends AbstractRestriction {
 		this.laneNumber = rb.laneNumber;
 		this.azimuth = rb.azimuth;
 	}
+	
+	@Override
+	public List<Integer> getIds() {
+		return List.of(id);
+	}
 
 	@Override
 	public boolean prevents(RoutingParameters params) {
@@ -41,7 +50,7 @@ public class Restriction extends AbstractRestriction {
 	
 	@Override
 	public String getVisDescriptor() {
-		return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ")";
+		return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ":" + id + ")";
 	}
 
 	@Override
