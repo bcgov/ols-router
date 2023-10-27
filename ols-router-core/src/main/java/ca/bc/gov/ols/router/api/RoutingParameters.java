@@ -61,6 +61,7 @@ public class RoutingParameters {
 	private double xingCostMultiplier = 1;
 	private static Map<VehicleType,Map<TurnDirection, Double>> defaultTurnCostMap;
 	private Map<TurnDirection, Double> turnCostMap;
+	private String gdfString;
 	private GlobalDistortionField globalDistortionField;
 	private String routeDescription;
 	private int maxPairs = Integer.MAX_VALUE;
@@ -336,12 +337,13 @@ public class RoutingParameters {
 	public GlobalDistortionField getGlobalDistortionField() {
 		if(globalDistortionField == null) {
 			globalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField(getVehicleType()));
+			globalDistortionField.applyString(gdfString);
 		}
 		return globalDistortionField;
 	}
 	
 	public void setGdf(String gdfString) {
-		globalDistortionField = new GlobalDistortionField(gdfString);
+		this.gdfString = gdfString; 
 	}
 	
 	public String getRouteDescription() {

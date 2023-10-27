@@ -18,9 +18,27 @@ public class GlobalDistortionField {
 	public GlobalDistortionField() {
 		init();
 	}
+	
+	public GlobalDistortionField(GlobalDistortionField source) {
+		this.truckRouteField = source.truckRouteField.clone();
+		this.baseField = source.baseField.clone();
+	}
 
 	public GlobalDistortionField(String gdfString) {
 		init();
+		applyString(gdfString);
+	}
+
+	private void init() {
+		truckRouteField = new EnumMap<RoadClass,Double>(RoadClass.class);
+		baseField = new EnumMap<RoadClass,Double>(RoadClass.class);
+		for(RoadClass rc : RoadClass.values()) {
+			truckRouteField.put(rc, 1.0);
+			baseField.put(rc, 1.0);
+		}
+	}
+	
+	public void applyString(String gdfString) {
 		if(gdfString == null || gdfString.isEmpty()) return;
 		String[] entries = gdfString.split("\\,");
 		for(String entry : entries) {
@@ -39,16 +57,7 @@ public class GlobalDistortionField {
 			} catch(Exception e) {
 				logger.warn("Invalid Global Distortion entry ignored: {}", entry);
 			}
-		}
-	}
-
-	private void init() {
-		truckRouteField = new EnumMap<RoadClass,Double>(RoadClass.class);
-		baseField = new EnumMap<RoadClass,Double>(RoadClass.class);
-		for(RoadClass rc : RoadClass.values()) {
-			truckRouteField.put(rc, 1.0);
-			baseField.put(rc, 1.0);
-		}
+		}		
 	}
 	
 	public double lookup(RoadClass roadClass, boolean isTruckRoute) {
