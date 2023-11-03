@@ -9,11 +9,10 @@ import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 public class Partition {
 	private int index;
 	private EnumMap<Attribute,Object> values;
-	private double dist = 0;
+	private double distance = 0;
 	
- 	public Partition(int index, double dist, EnumSet<Attribute> attributes, BasicGraph graph, int edgeId) {
+ 	public Partition(int index, EnumSet<Attribute> attributes, BasicGraph graph, int edgeId) {
 		this.index = index;
-		this.dist = dist;
 		values = new EnumMap<Attribute,Object>(Attribute.class);
 		for(Attribute attr : attributes) {
 			values.put(attr, attr.get(graph, edgeId));
@@ -29,6 +28,14 @@ public class Partition {
 	}
 	
 	public double getDistance() {
-		return dist;
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+	
+	public void addDistance(double distance) {
+		this.distance += distance;
 	}
 }

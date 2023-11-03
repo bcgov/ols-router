@@ -65,7 +65,6 @@ public class EdgeMerger {
 	private List<Partition> partitions;
 	private List<Integer> restrictions;
 	private EnumMap<Attribute,Object> partitionValues = null;
-	private double partitionDist = 0;
 	
 	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
 		this.edgeLists = edgeLists;
@@ -137,8 +136,7 @@ public class EdgeMerger {
 						}
 					}
 					if(changed) {
-						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionDist, partitionAttributes, graph, edgeId));
-						partitionDist = 0;
+						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionAttributes, graph, edgeId));
 					}
 				}
 				
@@ -210,7 +208,9 @@ public class EdgeMerger {
 				dist += edgeDist;
 				time += edgeTime;
 				edgeTime = edgeTime - waitTime;
-				partitionDist += edgeDist;
+				if(partitions.size() > 0) {
+					partitions.get(partitions.size()-1).addDistance(edgeDist);
+				}
 				
 				if(dist == Double.MAX_VALUE) {
 					dist = -1;
@@ -255,7 +255,7 @@ public class EdgeMerger {
 					}
 				}
 			}
-		
+
 			if(calcDirections) {
 				if(edgeListIdx != edgeLists.length-1) {
 					directions.add(new StopoverDirection(gf.createPoint(coords.get(coords.size()-1)), edgeListIdx+1));
