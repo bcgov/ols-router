@@ -69,7 +69,7 @@ public class RoutingParameters {
 	private int zoneCount = 1;
 	private int zoneSize = 0;
 	private boolean inbound = false;
-	private EnumSet<Attribute> partitionAttributes;
+	private EnumSet<Attribute> partitionAttributes = EnumSet.noneOf(Attribute.class);
 	private EnumSet<RouteOption> enabledOptions;
 	private boolean setEnableCalled = false;
 	private boolean turnCostsSet = false;

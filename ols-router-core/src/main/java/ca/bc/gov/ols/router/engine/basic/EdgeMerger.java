@@ -83,7 +83,7 @@ public class EdgeMerger {
 		if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
 			tlids = new ArrayList<Integer>();
 		}
-		if(partitionAttributes != null) {
+		if(!partitionAttributes.isEmpty()) {
 			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
 			partitions = new ArrayList<Partition>();
 		}
@@ -125,7 +125,7 @@ public class EdgeMerger {
 					firstOffset = 0;
 				}
 				
-				if(partitionAttributes != null) {
+				if(!partitionAttributes.isEmpty()) {
 					boolean changed = false;
 					for(Attribute attr : partitionAttributes) {
 						Object val = attr.get(graph, edgeId);
@@ -208,7 +208,7 @@ public class EdgeMerger {
 				dist += edgeDist;
 				time += edgeTime;
 				edgeTime = edgeTime - waitTime;
-				if(partitions.size() > 0) {
+				if(partitions != null && partitions.size() > 0) {
 					partitions.get(partitions.size()-1).addDistance(edgeDist);
 				}
 				
@@ -416,10 +416,6 @@ public class EdgeMerger {
 
 	public Set<Notification> getNotifications() {
 		return notifications;
-	}
-
-	public void setPartition(EnumSet<Attribute> partitionAttributes) {
-		this.partitionAttributes = partitionAttributes;
 	}
 
 	public List<Partition> getPartitions() {
