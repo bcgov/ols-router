@@ -58,12 +58,19 @@
 		<plugins>
 			
 		    <plugin>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-maven-plugin</artifactId>
-			<configuration>
-			    <mainClass>com.baeldung.demo.DemoApplication</mainClass>
-			    <layout>JAR</layout>
-			</configuration>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.baeldung.demo.DemoApplication</mainClass>
+					<layout>JAR</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 		    </plugin>
 			
 			<plugin>
@@ -73,13 +80,6 @@
 					<groups>Prod</groups>
 					<excludedGroups>Dev</excludedGroups>
 				</configuration>
-				<executions>
-				    <execution>
-				        <goals>
-				            <goal>repackage</goal>
-				        </goals>
-				    </execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
