@@ -60,6 +60,9 @@ public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<
 		JsonWriter jw = new JsonWriter(out);
 		jw.beginObject();
 		
+		jw.name("version");
+		jw.value(RouterConfig.VERSION);
+
 		jw.name("defaultTruckRouteMultiplier");
 		jw.value(config.getDefaultTruckRouteMultiplier());
 		

@@ -4,10 +4,13 @@
  */
 package ca.bc.gov.ols.router.config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import org.locationtech.jts.geom.GeometryFactory;
@@ -20,7 +23,7 @@ import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class RouterConfig {
-	public static final String VERSION = "2.2.0";
+	public static final String VERSION;
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
@@ -53,6 +56,16 @@ public class RouterConfig {
 	private int defaultSnapDistance = 1000;
 	private int defaultSimplifyThreshold = 250;
 		
+	static {
+		try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("app.properties")) {
+            Properties props = new Properties();
+            props.load(input);
+            VERSION = props.getProperty("app.version");
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+	
 	public RouterConfig() {
 		INSTANCE = this;
 	}
