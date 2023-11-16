@@ -20,7 +20,7 @@ import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class RouterConfig {
-	public static final String VERSION = "2.1.6";
+	public static final String VERSION = "2.1.8";
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
