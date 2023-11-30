@@ -60,7 +60,7 @@ public class JsonConverterHelper extends ConverterHelper {
 	
 	protected void writeFields(ApiResponse response) throws IOException {
 		jw.name("routeDescription").value(response.getRouteDescription());
-		jw.name("searchTimestamp").value(DATE_TIME_FORMATTER.format(response.getTimeStamp()));
+		jw.name("searchTimestamp").value(String.valueOf(response.getTimeStamp()));
 		jw.name("executionTime").value(response.getExecutionTime());
 		if(response instanceof RouterOptimizedResponse) {
 			jw.name("routingExecutionTime").value(((RouterOptimizedResponse)response).getRoutingExecutionTime());
