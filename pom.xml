@@ -73,6 +73,7 @@
 		<cassandraContactPoint>hummingbird.animals</cassandraContactPoint>
 		<cassandraLocalDatacenter>datacenter1</cassandraLocalDatacenter>
 		<environment>devel</environment>
+		<springboot.version>3.1.1</springboot.version>
 		<com.graphhopper.version>0.5.0</com.graphhopper.version>
 	</properties>
 
