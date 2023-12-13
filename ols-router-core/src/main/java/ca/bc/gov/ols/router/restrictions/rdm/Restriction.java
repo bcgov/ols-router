@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.restrictions.AbstractRestriction;
 
 public class Restriction extends AbstractRestriction {
@@ -39,7 +40,11 @@ public class Restriction extends AbstractRestriction {
 	public boolean prevents(RoutingParameters params) {
 		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
-		if(value <= permitableValue) return false;
+		if(type.hasValue) {
+			if(value <= permitableValue) return false;
+		} else {
+			if(value == 0) return false;
+		}
 		return true;
 	}
 
@@ -50,7 +55,10 @@ public class Restriction extends AbstractRestriction {
 	
 	@Override
 	public String getVisDescriptor() {
-		return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ":" + id + ")";
+		if(type.hasValue) {
+			return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ":" + id + ")";
+		}
+		return type.visName;
 	}
 
 	@Override

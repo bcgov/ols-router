@@ -13,23 +13,25 @@ public class RestrictionType {
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionType.class.getCanonicalName());
 	
 	private static final HashMap<String, RestrictionType> typeMap = new HashMap<String, RestrictionType>();
-	public static final RestrictionType HORIZONTAL = new RestrictionType("HORIZONTAL", "Width", "m");
-	public static final RestrictionType VERTICAL = new RestrictionType("VERTICAL", "Height", "m");
-	public static final RestrictionType WEIGHT_GVW = new RestrictionType("WEIGHT-GVW", "Gross Vehicle Weight", "kg"); // Gross Vehicle Weight
-	public static final RestrictionType WEIGHT_1AXLE = new RestrictionType("WEIGHT-1AXLE", "Single Axle Weight", "kg"); // weight on a single axle
-	public static final RestrictionType WEIGHT_2AXLE = new RestrictionType("WEIGHT-2AXLE", "Tandem Axle Weight", "kg"); // weight on a tandem-axle
-	public static final RestrictionType WEIGHT_3AXLE = new RestrictionType("WEIGHT-3AXLE", "Tridem Axle Weight", "kg"); // weight on a tridem-axle
-	public static final RestrictionType NCV = new RestrictionType("NCV", "No Commercial Vehicle", "");
-	public static final RestrictionType NSI = new RestrictionType("NSI", "No Self Issue", "");
+	public static final RestrictionType HORIZONTAL = new RestrictionType("HORIZONTAL", "Width", "m", true);
+	public static final RestrictionType VERTICAL = new RestrictionType("VERTICAL", "Height", "m", true);
+	public static final RestrictionType WEIGHT_GVW = new RestrictionType("WEIGHT-GVW", "Gross Vehicle Weight", "kg", true); // Gross Vehicle Weight
+	public static final RestrictionType WEIGHT_1AXLE = new RestrictionType("WEIGHT-1AXLE", "Single Axle Weight", "kg", true); // weight on a single axle
+	public static final RestrictionType WEIGHT_2AXLE = new RestrictionType("WEIGHT-2AXLE", "Tandem Axle Weight", "kg", true); // weight on a tandem-axle
+	public static final RestrictionType WEIGHT_3AXLE = new RestrictionType("WEIGHT-3AXLE", "Tridem Axle Weight", "kg", true); // weight on a tridem-axle
+	public static final RestrictionType NCV = new RestrictionType("NCV", "No Commercial Vehicle", "", false);
+	public static final RestrictionType NSI = new RestrictionType("NSI", "No Self Issue", "", false);
 	
 	public final String name;
 	public final String visName;
 	public final String unit;
+	public final boolean hasValue;
 	
-	private RestrictionType(String name, String visName, String unit) {
+	private RestrictionType(String name, String visName, String unit, boolean hasValue) {
 		this.name = name;
 		this.visName = visName;
 		this.unit = unit;
+		this.hasValue = hasValue;
 		typeMap.put(name, this);
 	}
 
@@ -55,7 +57,7 @@ public class RestrictionType {
 	public static RestrictionType convert(String restrictionType) {
 		RestrictionType t = typeMap.get(restrictionType);
 		if(t == null) {
-			t = new RestrictionType(restrictionType, restrictionType, "");
+			t = new RestrictionType(restrictionType, restrictionType, "", true);
 			logger.warn("Unknown RestrictionType value: '{}'.", restrictionType);
         } 
 		return t;

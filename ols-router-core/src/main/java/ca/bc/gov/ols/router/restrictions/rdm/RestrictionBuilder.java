@@ -85,7 +85,7 @@ public class RestrictionBuilder {
 			valid = false;
 			logger.warn("Restriction has no source: RestrictionID: {}", id);
 		}
-		if(permitableValue <= 0) {
+		if(type.hasValue && permitableValue <= 0) {
 			valid = false;
 			logger.warn("Restriction permittable Value <= 0: RestrictionID: {}", id);
 		}
