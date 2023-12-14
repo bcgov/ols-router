@@ -6,19 +6,21 @@ package ca.bc.gov.ols.router.process;
 
 import java.util.EnumMap;
 
-import ca.bc.gov.ols.enums.DividerType;
-import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.router.data.StreetSegment;
-import ca.bc.gov.ols.router.data.enums.End;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
-import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
-import ca.bc.gov.ols.router.data.enums.XingClass;
-
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+
+import com.google.gson.JsonObject;
+
+import ca.bc.gov.ols.enums.DividerType;
+import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.enums.TravelDirection;
+import ca.bc.gov.ols.router.data.StreetSegment;
+import ca.bc.gov.ols.router.data.enums.End;
+import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
+import ca.bc.gov.ols.router.data.enums.XingClass;
 
 public class RpStreetSegment extends StreetSegment {
 
@@ -31,25 +33,29 @@ public class RpStreetSegment extends StreetSegment {
 			int startIntersectionId, int endIntersectionId, 
 			String leftLocality, String rightLocality, String name, RoadClass roadClass,
 			TravelDirection travelDirection, DividerType dividerType, 
+			int numLanesLeft, int numLanesRight,
 			TrafficImpactor startTrafficImpactor, TrafficImpactor endTrafficImpactor, 
 			short speedLimit, SurfaceType surfaceType, 
 			double maxHeight, double maxWidth, 
 			Integer fromMaxWeight, Integer toMaxWeight, 
 			boolean isTruckRoute, 
 			String highwayRoute1, String highwayRoute2, String highwayRoute3,
-			boolean isDeadEnded, boolean virtual, 
+			JsonObject motData,
+			boolean isDeadEnded, boolean virtual,
 			TurnTimeCode fromLeftTR, TurnTimeCode fromCentreTR, TurnTimeCode fromRightTR, 
 			TurnTimeCode toLeftTR, TurnTimeCode toCentreTR, TurnTimeCode toRightTR) {
 		super(segmentId, centerLine, 
 			startIntersectionId, endIntersectionId, 
 			leftLocality, rightLocality, name, roadClass,
 			travelDirection, dividerType, 
+			numLanesLeft, numLanesRight,
 			startTrafficImpactor, endTrafficImpactor, 
 			speedLimit, surfaceType,
 			maxHeight, maxWidth, 
 			fromMaxWeight, toMaxWeight,
 			isTruckRoute, 
 			highwayRoute1, highwayRoute2, highwayRoute3,
+			motData,
 			XingClass.SAME, XingClass.SAME, isDeadEnded);
 		
 		this.virtual = virtual;

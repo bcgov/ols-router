@@ -25,12 +25,14 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.RoadTruckNoticeEvent;
+import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.CardinalDirection;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.FerryDirection;
 import ca.bc.gov.ols.router.directions.FinishDirection;
+import ca.bc.gov.ols.router.directions.LaneRequirement;
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.directions.StartDirection;
 import ca.bc.gov.ols.router.directions.StopoverDirection;
@@ -41,6 +43,8 @@ import ca.bc.gov.ols.router.notifications.FerryWaitNotification;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.router.notifications.OversizeNotification;
 import ca.bc.gov.ols.router.notifications.TruckNotification;
+import ca.bc.gov.ols.router.restrictions.Constraint;
+import ca.bc.gov.ols.router.restrictions.LaneBasedRestriction;
 
 public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
@@ -55,6 +59,7 @@ public class EdgeMerger {
 	private double time = 0;
 	private LineString route;
 	private List<Direction> directions;
+	private List<Integer> tlids;
 	private Set<Notification> notifications;
 	private List<Partition> partitions;
 	private EnumMap<Attribute,Object> partitionValues = null;
@@ -72,6 +77,9 @@ public class EdgeMerger {
 		if(calcDirections) {
 			directions = new ArrayList<Direction>();
 			notifications = new HashSet<Notification>();
+		}
+		if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
+			tlids = new ArrayList<Integer>();
 		}
 		if(partitionAttributes != null) {
 			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
@@ -175,6 +183,9 @@ public class EdgeMerger {
 						directions.add(curDir);
 					}
 				}
+				if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
+					tlids.add(graph.getSegmentId(edgeId));
+				}
 				
 				int waitTime = edges.waitTime(edgeIdx);
 				double edgeDist;
@@ -199,6 +210,7 @@ public class EdgeMerger {
 				}
 
 				if(calcDirections) {
+					double preDist = curDir.getDistance();
 					curDir.addDistance(edgeDist);
 					curDir.addTime(edgeTime);
 					if(waitTime > 0) {
@@ -212,7 +224,17 @@ public class EdgeMerger {
 					if(params.getVehicleType() == VehicleType.TRUCK) {
 						LocalDateTime currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(time)), RouterConfig.DEFAULT_TIME_ZONE);
 						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime); 
-						events.stream().filter(e -> e instanceof RoadTruckNoticeEvent).map(e -> new TruckNotification((RoadTruckNoticeEvent)e)).forEach(curDir::addNotification);
+						events.stream()
+								.filter(e -> e instanceof RoadTruckNoticeEvent)
+								.map(e -> new TruckNotification((RoadTruckNoticeEvent)e))
+								.forEach(curDir::addNotification);
+						
+						// find and add lane-based restriction notifications
+						List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+						constraints.stream()
+								.filter(c -> c instanceof LaneBasedRestriction && c.constrains(params))
+								.map(c -> new LaneRequirement((LaneBasedRestriction)c, params, graph.getLineString(edgeId), graph.getReversed(edgeId), preDist))
+								.forEach(curDir::addLaneRequirement);
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
 				}
@@ -243,6 +265,120 @@ public class EdgeMerger {
 		}
 		
 	}
+	
+	private void simplifyDirections() {
+		
+		String nstreet;
+		String pstreet;
+		double pdist;
+		double ndist;
+		double ntime;
+		double cdist;
+		double ctime;
+		
+		//testing - get original instruction totals, used in check afterward to compare to simplified ones
+//		double odist = 0;
+//		double otime = 0;
+//		for(int directionIdx = 0; directionIdx < directions.size()-1; directionIdx++) {
+//			Direction c = directions.get(directionIdx);
+//			odist = odist + ((AbstractTravelDirection)c).getDistance();
+//			otime = otime + ((AbstractTravelDirection)c).getTime();
+//			
+//			//System.out.println("Distanceorig:" + ((AbstractTravelDirection)c).getDistance());
+//		}
+		
+		
+		
+		List<Direction> newDirections;
+		newDirections = new ArrayList<Direction>();
+		
+		newDirections.add(directions.get(0)); //always going to have the same start direction
+		
+		// for each direction. Skip the first since we want to look at prev and next each time, 0 index isn't useful. Skip the last, it is always a "finish!" instruction and never combined, we add it at the end to our new list.
+		for(int directionIdx = 1; directionIdx < directions.size()-1; directionIdx++) {
+			Direction prev; 
+			prev = newDirections.get(newDirections.size()-1);
+			Direction cur = directions.get(directionIdx);
+			Direction next = directions.get(directionIdx + 1);
+			
+			if(prev instanceof AbstractTravelDirection && cur instanceof AbstractTravelDirection && next instanceof AbstractTravelDirection) {
+				pstreet = ((AbstractTravelDirection)prev).getStreetName();
+				nstreet = ((AbstractTravelDirection)next).getStreetName();
+				pdist = ((AbstractTravelDirection)prev).getDistance();
+				cdist = ((AbstractTravelDirection)cur).getDistance();
+				ctime = ((AbstractTravelDirection)cur).getTime();
+				ndist = ((AbstractTravelDirection)next).getDistance();
+				ntime = ((AbstractTravelDirection)next).getTime();
+			
+			} else {
+				newDirections.add(cur); 
+				continue;
+			}
+			
+			if(pstreet.equals(nstreet) // if you are continuing on the same road (next's name = prev's name)
+					&& cdist < params.getSimplifyThreshold() // and the current segment distance is < X meters
+					&& cur.getType() == StreetDirectionType.CONTINUE.name() // and type of current dir is continue
+					&& next.getType() == StreetDirectionType.CONTINUE.name()) { // and type of next dir is continue
+
+				((AbstractTravelDirection)prev).addTime(ntime + ctime);//add the time to 'prev'
+				((AbstractTravelDirection)prev).addDistance(ndist + cdist);//add the distance to 'prev'
+
+				// copy over any notifications from 'cur' and 'next' which we are merging into 'prev'
+				if(cur.getNotifications() != null) {
+					for(Notification n : cur.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
+				if(next.getNotifications() != null) {
+					for(Notification n : next.getNotifications()) {
+						prev.addNotification(n);
+					}
+				}
+				
+				// copy over any lane-based notifications from cur/next into prev, adding distance as appropriate
+				if(cur.getLaneRequirements() != null) {
+					for(LaneRequirement lr : cur.getLaneRequirements()) {
+						lr.setDistance(lr.getDistance() + pdist);
+						prev.addLaneRequirement(lr);
+					}
+				}
+				if(next.getLaneRequirements() != null) {
+					for(LaneRequirement lr : next.getLaneRequirements()) {
+						lr.setDistance(lr.getDistance() + pdist + cdist);
+						prev.addLaneRequirement(lr);
+					}
+				}
+				
+				directionIdx++; // skip one more index after a merge.
+			} else {
+				newDirections.add(cur);
+			}
+		}
+		// always have to add the finish instruction at the end.
+		newDirections.add(directions.get(directions.size()-1));
+		
+		//testing for matching time and distance before and after simplify, probably don't want this in production
+//		ndist = 0;
+//		ntime = 0;
+//		for(int directionIdx = 0; directionIdx < newDirections.size()-1; directionIdx++) {
+//			Direction cur = newDirections.get(directionIdx);
+//			ndist = ndist + ((AbstractTravelDirection)cur).getDistance();
+//			ntime = ntime + ((AbstractTravelDirection)cur).getTime();
+//			
+//			//System.out.println("Distance1:" + ((AbstractTravelDirection)cur).getDistance());
+//		}
+//		
+//		double drem = odist - ndist;
+//		double trem = otime - ntime;
+//		if(drem > 1 || drem < -1) {
+//			System.out.println("Distance Mismatch" + odist + " <->" + ndist);
+//		}
+//		if(trem > 1 || trem < -1) {
+//			System.out.println("Time Mismatch"+ otime + " <->" + ntime);
+//		}
+		
+		directions = newDirections;
+	}
 
 	public double getDist() {
 		return dist;
@@ -271,6 +407,10 @@ public class EdgeMerger {
 	public List<Partition> getPartitions() {
 		return partitions;
 	}
+	
+	public List<Integer> getTlids() {
+		return tlids;
+	}
 
 	public void calcDistance() {
 		mergeEdges(null);
@@ -285,6 +425,9 @@ public class EdgeMerger {
 		calcRoute = true;
 		calcDirections  = true;
 		mergeEdges(gf);
+		if(params.isSimplifyDirections() == true) {
+			simplifyDirections();
+		}
 	}
 
 }

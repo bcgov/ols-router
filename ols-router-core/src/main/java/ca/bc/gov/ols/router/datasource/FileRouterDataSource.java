@@ -4,9 +4,6 @@
  */
 package ca.bc.gov.ols.router.datasource;
 
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,33 +12,43 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
+import com.google.gson.JsonObject;
 
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.util.UrlCsvInputSource;
 import ca.bc.gov.ols.rowreader.CsvRowReader;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.RowReader;
 import ca.bc.gov.ols.rowreader.TsvRowReader;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 public class FileRouterDataSource implements RouterDataSource {
 	private final static Logger logger = LoggerFactory.getLogger(FileRouterDataSource.class.getCanonicalName());
@@ -53,6 +60,8 @@ public class FileRouterDataSource implements RouterDataSource {
 	protected RowReader segmentReader;
 	private int segmentCount = 0;
 	protected RowReader turnRestrictionReader;
+	private Map<String,Map<String,String>> allDates = new HashMap<String,Map<String,String>>();
+
 	//private List<StreetSegment> ferrySegs;
 	//private int nextFerrySeg = -1;
 	//private TIntObjectHashMap<List<StreetSegment>> ferrySegsByIntId;
@@ -100,6 +109,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind"));
 			TravelDirection travelDir = TravelDirection.convert(segmentReader.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(segmentReader.getString("divider_type"));
+			int numLanesLeft = segmentReader.getInt("num_lanes_left");
+			int numLanesRight = segmentReader.getInt("num_lanes_right");
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("start_traffic_impactor"));
 			TrafficImpactor endTrafficImpactor = TrafficImpactor.convert(segmentReader.getString("end_traffic_impactor"));
 			short speedLimit = adjustSpeedLimit((short)segmentReader.getInt("speed_limit"), roadClass);
@@ -116,6 +127,8 @@ public class FileRouterDataSource implements RouterDataSource {
 			if(highwayRoute2 != null) highwayRoute2 = highwayRoute2.intern();
 			String highwayRoute3 = segmentReader.getString("highway_route_3");
 			if(highwayRoute3 != null) highwayRoute3 = highwayRoute3.intern();
+			
+			JsonObject motData = segmentReader.getJson("ministry_of_transport_data");		 
 			
 			boolean isTruckRoute = "Y".equals(segmentReader.getString("truck_route_ind"));
 			XingClass startXingClass = XingClass.convert(segmentReader.getString("start_xing_class"));
@@ -147,11 +160,14 @@ public class FileRouterDataSource implements RouterDataSource {
 			}
 			StreetSegment segment = new StreetSegment(segmentId, centerLine,  
 					startIntersectionId, endIntersectionId, 
-					leftLocality, rightLocality, fullName, roadClass,
-					travelDir, dividerType, startTrafficImpactor, endTrafficImpactor, 
+					leftLocality, rightLocality, fullName, 
+					roadClass, travelDir, dividerType,
+					numLanesLeft, numLanesRight,
+					startTrafficImpactor, endTrafficImpactor, 
 					speedLimit, surfaceType, maxHeight, maxWidth, 
 					fromMaxWeight, toMaxWeight,	isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
+					motData,
 					startXingClass, endXingClass, isDeadEnded); //, laneRestriction, accessRestriction
 //				if(segment.isFerry()) {
 //					// save the ferry segs for last so we can prevent ferry-ferry intersections
@@ -236,11 +252,6 @@ public class FileRouterDataSource implements RouterDataSource {
 		return null;
 	}
 	
-	@Override
-	public RowReader getTurnClassReader() {
-		return getXsvRowReader("turn_classes");
-	}
-
 	protected TIntObjectHashMap<String> loadStreetNames() {
 		// build a map from the StreetNameId to the Name String
 		RowReader reader = getStreetNames();
@@ -341,6 +352,16 @@ public class FileRouterDataSource implements RouterDataSource {
 	}
 	
 	@Override
+	public Reader getRestrictionReader() throws IOException {
+		return new InputStreamReader(getInputStream("restrictions_active.json"));
+	}
+
+	@Override
+	public RowReader getTurnClassReader() {
+		return getXsvRowReader("turn_classes");
+	}
+
+	@Override
 	public Reader getOpen511Reader() throws IOException {
 		return new InputStreamReader(getInputStream("active_events.json"));
 	}
@@ -384,7 +405,9 @@ public class FileRouterDataSource implements RouterDataSource {
 	private RowReader getJsonRowReader(String name) {
 		try {
 			InputStream is = getInputStream(name + ".json");
-			return new JsonRowReader(is, geometryFactory);
+			JsonRowReader jrr = new JsonRowReader(is, geometryFactory);
+			allDates.put(name, jrr.getDates());
+			return jrr;
 		} catch(IOException ioe) {
 			logger.error("Error opening stream for {} file.", name, ioe);
 			throw new RuntimeException(ioe);
@@ -415,6 +438,46 @@ public class FileRouterDataSource implements RouterDataSource {
 		}
 		URL fileUrl = new URL(fileUrlString);
 		return fileUrl.openStream();		
+	}
+
+	@Override
+	public Map<DateType, ZonedDateTime> getDates() {
+		Map<DateType, ZonedDateTime> dates = new EnumMap<DateType, ZonedDateTime>(DateType.class);
+		boolean ok = true;
+		for(Entry<String, Map<String, String>> dateSet : allDates.entrySet()) {
+			String file = dateSet.getKey();
+			Set<Entry<String, String>> dateEntries = dateSet.getValue().entrySet();
+			if(dateEntries.isEmpty()) {
+				ok = false;
+				logger.error("No dates from file '" + file + "'.");
+			}
+			for(Entry<String, String> dateEntry : dateEntries) {
+				String source = dateEntry.getKey();
+				DateType sourceType = null;
+				String dateStr = dateEntry.getValue();
+				ZonedDateTime date = null;
+				try {
+					date = ZonedDateTime.parse(dateStr);
+				} catch(DateTimeParseException pe) {
+					logger.error("Invalid Date '" + dateStr + "' for source '" + source +"' from file '" + file + "'.");
+				}
+				try {
+					sourceType = DateType.valueOf(source);
+				} catch(IllegalArgumentException iae) {
+					logger.error("Unexpected Date source '" + source +"' from file '" + file + "'.");
+				}
+				if(dates.get(sourceType) == null) {
+					dates.put(sourceType, date);
+				} else if(!dates.get(sourceType).equals(date)) {
+					ok = false;
+					logger.error("Date from file '" + file + "' for source '" + source + "' is not consistent with other files' dates for the same source.");
+				}
+			}
+		}
+		if(ok) {
+			return dates;
+		}
+		return null;
 	}
 
 }

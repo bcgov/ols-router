@@ -7,14 +7,14 @@ package ca.bc.gov.ols.router.rest;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import ca.bc.gov.ols.router.rest.converters.BooleanConverter;
@@ -31,61 +31,43 @@ import ca.bc.gov.ols.router.rest.messageconverters.kml.KmlErrorMessageConverter;
 import ca.bc.gov.ols.router.rest.messageconverters.kml.KmlResponseConverter;
 
 @Configuration
-@ComponentScan("ca.bc.gov.app.router.rest")
-@EnableWebMvc
 public class WebConfig implements WebMvcConfigurer {
-		
+
+	@Autowired
+	private HtmlErrorMessageConverter htmlErrorMessageConverter;
+	
+	@Autowired
+	private KmlErrorMessageConverter kmlErrorMessageConverter;
+	
+	@Autowired
+	private HtmlResponseConverter htmlResponseConverter;
+
+	@Autowired
+	private JsonResponseConverter jsonResponseConverter;
+
+	@Autowired
+	private JsonpResponseConverter jsonpResponseConverter;
+
+	@Autowired
+	private KmlResponseConverter kmlResponseConverter;
+	
+	@Autowired
+	private JsonNavInfoResponseConverter jsonNavInfoResponseConverter;
+
+	@Autowired
+	private JsonDefaultsResponseConverter jsonDefaultsResponseConverter;
+
 	@Override
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		converters.add(htmlErrorMessageConverter());
-		converters.add(kmlErrorMessageConverter());
-		converters.add(htmlResponseConverter());
-		converters.add(jsonResponseConverter());
-		converters.add(jsonpResponseConverter());
-		converters.add(kmlResponseConverter());
-		converters.add(jsonNavInfoResponseConverter());
-		converters.add(jsonDefaultsResponseConverter());
+		converters.add(htmlErrorMessageConverter);
+		converters.add(kmlErrorMessageConverter);
+		converters.add(htmlResponseConverter);
+		converters.add(jsonResponseConverter);
+		converters.add(jsonpResponseConverter);
+		converters.add(kmlResponseConverter);
+		converters.add(jsonNavInfoResponseConverter);
+		converters.add(jsonDefaultsResponseConverter);
 	}	
-	
-	@Bean
-	public HtmlErrorMessageConverter htmlErrorMessageConverter() {
-		return new HtmlErrorMessageConverter();
-	}
-	
-	@Bean
-	public KmlErrorMessageConverter kmlErrorMessageConverter() {
-		return new KmlErrorMessageConverter();
-	}
-	
-	@Bean
-	public HtmlResponseConverter htmlResponseConverter() {
-		return new HtmlResponseConverter();
-	}
-
-	@Bean
-	public JsonResponseConverter jsonResponseConverter() {
-		return new JsonResponseConverter();
-	}
-
-	@Bean
-	public JsonpResponseConverter jsonpResponseConverter() {
-		return new JsonpResponseConverter();
-	}
-
-	@Bean
-	public KmlResponseConverter kmlResponseConverter() {
-		return new KmlResponseConverter();
-	}
-
-	@Bean
-	public JsonNavInfoResponseConverter jsonNavInfoResponseConverter() {
-		return new JsonNavInfoResponseConverter();
-	}
-
-	@Bean
-	public JsonDefaultsResponseConverter jsonDefaultsResponseConverter() {
-		return new JsonDefaultsResponseConverter();
-	}
 
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
@@ -114,5 +96,9 @@ public class WebConfig implements WebMvcConfigurer {
 				.mediaType("kml", new MediaType("application", "vnd.google-earth.kml+xml",
 						Charset.forName("UTF-8")));
 	}
-	
+
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		configurer.setUseSuffixPatternMatch(true);
+	}
 }

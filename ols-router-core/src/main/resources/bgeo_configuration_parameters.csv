@@ -7,8 +7,8 @@ ROUTER,moreInfoUrl,"http://www.data.gov.bc.ca/dbc/geographic/locate/geocoding.pa
 ROUTER,glossaryBaseUrl,"http://www.data.gov.bc.ca/dbc/geographic/locate/physical_address_geo/glossary_of_terms.page?WT.svl=LeftNav"
 ROUTER,privacyStatement,"http://www2.gov.bc.ca/gov/content/home/privacy"
 ROUTER,baseSrsCode,"3005"
-ROUTER,dataSource.className,"ca.bc.gov.ols.router.FileRouterDataSource"
-ROUTER,dataSource.baseFileUrl,"file:///C:/apps/bgeo/data/"
+ROUTER,dataSource.className,"ca.bc.gov.ols.router.datasource.FileRouterDataSource"
+ROUTER,dataSource.baseFileUrl,"file:///C:/apps/router/data/"
 ROUTER,maxPairs,"1000"
 ROUTER,maxRoutePoints,"100"
 ROUTER,maxOptimalRoutePoints,"100"
@@ -18,3 +18,5 @@ ROUTER,defaultTurnCost,"3,1,5,2"
 ROUTER,defaultTruckRouteMultiplier,"9"
 ROUTER,defaultGlobalDistortionField.TRUCK,""
 ROUTER,defaultGlobalDistortionField.CAR,""
+ROUTER,defaultSnapDistance,1000
+ROUTER,defaultSimplifyThreshold,250

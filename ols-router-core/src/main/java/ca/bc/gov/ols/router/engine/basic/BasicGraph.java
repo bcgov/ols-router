@@ -5,11 +5,15 @@
 package ca.bc.gov.ols.router.engine.basic;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonObject;
 
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.geom.Envelope;
@@ -21,10 +25,13 @@ import org.locationtech.jts.index.strtree.ItemDistance;
 import org.locationtech.jts.index.strtree.STRtree;
 
 import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
+import ca.bc.gov.ols.router.restrictions.RestrictionLookup;
+import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
 import gnu.trove.map.TIntObjectMap;
 
@@ -33,20 +40,22 @@ public class BasicGraph {
 	
 	public static final int NO_EDGE = -1;
 	public static final int NO_NODE = -1;
-	public static final double MAX_SNAP_DISTANCE = 1000;
 	
 	private int nextNodeId = 0;
 	private int nextEdgeId = 0;
 	
+	private RouterConfig config;
 	private IntObjectArrayMap<Node> nodes;
 	private IntObjectArrayMap<Edge> edges;
 	private STRtree spatialIndex;
 	private TurnLookup turnCostLookup;
 	private EventLookup eventLookup;
+	private RestrictionLookup restrictionLookup;
 	private TrafficLookup trafficLookup;
 	private ScheduleLookup scheduleLookup;
 	TIntObjectMap<EnumMap<VehicleType,Double>> localDistortionField;
 	private VisLayers visLayers;
+	private Map<DateType, ZonedDateTime> dates;
 
 	public BasicGraph(int initialEdgeCapacity) {
 		nodes = new IntObjectArrayMap<Node>(initialEdgeCapacity/2);
@@ -64,14 +73,20 @@ public class BasicGraph {
 		return nodeId;
 	}
 	
-	public int[] addEdge(int fromNodeId, int toNodeId, LineString ls, 
+	public int[] addEdge(int fromNodeId, int toNodeId, int segmentId, LineString ls, 
 			boolean oneWay, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, int numLanesLeft, int numLanesRight,
+			TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
-			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
-		EdgeData data = new EdgeData(ls, speedLimit, leftLocality, rightLocality, name, roadClass, fromImp, toImp,
-				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded);
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, 
+			boolean isDeadEnded, JsonObject motData) {
+		String ownership = null;
+		if(motData != null && motData.get("OWNERSHIP") != null) {
+			ownership = motData.get("OWNERSHIP").getAsString();
+		}
+		EdgeData data = new EdgeData(segmentId, ls, speedLimit, leftLocality, rightLocality, name, roadClass, numLanesLeft, numLanesRight, fromImp, toImp,
+				maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute, fromXingClass, toXingClass, isDeadEnded, ownership);
 		int[] edgeIds = new int[(oneWay?1:2)];
 		edgeIds[0] = createEdge(fromNodeId, toNodeId, data, false);
 		if(!oneWay) {
@@ -109,7 +124,7 @@ public class BasicGraph {
 		}		
 	}
 	
-	public int findClosestEdge(Point point) {
+	public int findClosestEdge(Point point, int snapDistance) {
 		int closestEdgeId = (Integer)spatialIndex.nearestNeighbour(point.getEnvelopeInternal(), NO_EDGE, new ItemDistance() {
 			@Override
 			public double distance(ItemBoundable item1, ItemBoundable item2) {
@@ -130,7 +145,7 @@ public class BasicGraph {
 				return geom1.distance(geom2);
 			}
 		});
-		if(point.distance(getLineString(closestEdgeId)) > MAX_SNAP_DISTANCE) {
+		if(point.distance(getLineString(closestEdgeId)) > snapDistance) {
 			return NO_EDGE;
 		}
 		return closestEdgeId;
@@ -156,7 +171,15 @@ public class BasicGraph {
 	public void setEventLookup(EventLookup eventLookup) {
 		this.eventLookup = eventLookup;
 	}
+	
+	public void setRestrictionLookup(RestrictionLookup restrictionLookup) {
+		this.restrictionLookup = restrictionLookup;
+	}
 
+	public RestrictionLookup getRestrictionLookup() {
+		return restrictionLookup;
+	}
+	
 	public void setTrafficLookup(TrafficLookup trafficLookup) {
 		this.trafficLookup = trafficLookup;
 	}
@@ -180,7 +203,11 @@ public class BasicGraph {
 	public void setVisLayers(VisLayers visLayers) {
 		this.visLayers = visLayers;
 	}
-	
+
+	public int getSegmentId(int edgeId) {
+		return edges.get(edgeId).data.segmentId;
+	}
+
 	public double getLength(int edgeId) {
 		return edges.get(edgeId).data.length;
 	}
@@ -244,9 +271,17 @@ public class BasicGraph {
 	public String getLocality(int edgeId) {
 		Edge edge = edges.get(edgeId);
 		if(edge.reversed) {
-			return edges.get(edgeId).data.leftLocality;
+			return edge.data.leftLocality;
 		}
 		return edge.data.rightLocality;
+	}
+
+	public int getNumLanes(int edgeId) {
+		Edge edge = edges.get(edgeId);
+		if(edge.reversed) {
+			return edge.data.numLanesLeft;
+		}
+		return edge.data.numLanesRight;
 	}
 
 	public TrafficImpactor getFromImpactor(int edgeId) {
@@ -265,29 +300,29 @@ public class BasicGraph {
 		return edge.data.toImp;
 	}
 
-	public double getMaxHeight(int edgeId) {
-		return edges.get(edgeId).data.maxHeight;
-	}
-
-	public double getMaxWidth(int edgeId) {
-		return edges.get(edgeId).data.maxWidth;
-	}
-
-	public Integer getFromMaxWeight(int edgeId) {
-		Edge edge = edges.get(edgeId);
-		if(edge.reversed) {
-			return edges.get(edgeId).data.toMaxWeight;
-		}
-		return edges.get(edgeId).data.fromMaxWeight;
-	}
-
-	public Integer getToMaxWeight(int edgeId) {
-		Edge edge = edges.get(edgeId);
-		if(edge.reversed) {
-			return edges.get(edgeId).data.fromMaxWeight;
-		}
-		return edges.get(edgeId).data.toMaxWeight;
-	}
+//	public double getMaxHeight(int edgeId) {
+//		return edges.get(edgeId).data.maxHeight;
+//	}
+//
+//	public double getMaxWidth(int edgeId) {
+//		return edges.get(edgeId).data.maxWidth;
+//	}
+//
+//	public Integer getFromMaxWeight(int edgeId) {
+//		Edge edge = edges.get(edgeId);
+//		if(edge.reversed) {
+//			return edges.get(edgeId).data.toMaxWeight;
+//		}
+//		return edges.get(edgeId).data.fromMaxWeight;
+//	}
+//
+//	public Integer getToMaxWeight(int edgeId) {
+//		Edge edge = edges.get(edgeId);
+//		if(edge.reversed) {
+//			return edges.get(edgeId).data.fromMaxWeight;
+//		}
+//		return edges.get(edgeId).data.toMaxWeight;
+//	}
 
 	public boolean isTruckRoute(int edgeId) {
 		return edges.get(edgeId).data.isTruckRoute;
@@ -345,6 +380,19 @@ public class BasicGraph {
 		return edges.get(edgeId).data.roadClass;
 	}
 
+	public String getOwnership(int edgeId) {
+		return edges.get(edgeId).data.ownership;
+	}
+	
+
+	public void setDates(Map<DateType, ZonedDateTime> dates) {
+		this.dates = dates;
+	}
+	
+	public Map<DateType, ZonedDateTime> getDates() {
+		return dates;
+	}
+
 }
 
 class Node {
@@ -358,6 +406,7 @@ class Node {
 }
 
 class EdgeData {
+	final int segmentId; 
 	final LineString ls;
 	final double length;
 	final float fromAngle;
@@ -367,22 +416,27 @@ class EdgeData {
 	final String rightLocality;
 	final String name;
 	final RoadClass roadClass;
+	final int numLanesLeft;
+	final int numLanesRight;
 	final TrafficImpactor fromImp;
 	final TrafficImpactor toImp;
-	final double maxHeight;
-	final double maxWidth;
-	final Integer fromMaxWeight;
-	final Integer toMaxWeight;
+//	final double maxHeight;
+//	final double maxWidth;
+//	final Integer fromMaxWeight;
+//	final Integer toMaxWeight;
 	final boolean isTruckRoute;
 	final XingClass fromXingClass;
 	final XingClass toXingClass;
 	final boolean isDeadEnded;
+	final String ownership;
 	
-	public EdgeData(LineString ls, short speedLimit, 
+	public EdgeData(int segmentId, LineString ls, short speedLimit, 
 			String leftLocality, String rightLocality, String name, 
-			RoadClass roadClass, TrafficImpactor fromImp, TrafficImpactor toImp,
+			RoadClass roadClass, int numLanesLeft, int numLanesRight, 
+			TrafficImpactor fromImp, TrafficImpactor toImp,
 			double maxHeight, double maxWidth, Integer fromMaxWeight, Integer toMaxWeight,
-			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded) {
+			boolean isTruckRoute, XingClass fromXingClass, XingClass toXingClass, boolean isDeadEnded, String ownership) {
+		this.segmentId = segmentId;
 		this.ls = ls;
 		this.length = ls.getLength();
 		this.fromAngle = (float) Angle.angle(ls.getCoordinateN(0), ls.getCoordinateN(1));
@@ -393,16 +447,19 @@ class EdgeData {
 		this.rightLocality = rightLocality;
 		this.name = name;
 		this.roadClass = roadClass;
+		this.numLanesLeft = numLanesLeft;
+		this.numLanesRight = numLanesRight;
 		this.fromImp = fromImp;
 		this.toImp = toImp;
-		this.maxHeight = maxHeight;     
-		this.maxWidth = maxWidth;      
-		this.fromMaxWeight = fromMaxWeight;    
-		this.toMaxWeight = toMaxWeight;    
+//		this.maxHeight = maxHeight;     
+//		this.maxWidth = maxWidth;      
+//		this.fromMaxWeight = fromMaxWeight;    
+//		this.toMaxWeight = toMaxWeight;    
 		this.isTruckRoute = isTruckRoute;
 		this.fromXingClass = fromXingClass;
 		this.toXingClass = toXingClass;
 		this.isDeadEnded = isDeadEnded;
+		this.ownership = ownership;
 	}
 }
 

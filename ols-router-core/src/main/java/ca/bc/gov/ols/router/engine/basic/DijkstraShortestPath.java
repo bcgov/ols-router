@@ -28,6 +28,8 @@ import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
+import ca.bc.gov.ols.router.restrictions.Constraint;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.util.LineStringSplitter;
 
 public class DijkstraShortestPath {
@@ -186,21 +188,22 @@ public class DijkstraShortestPath {
 
 			int nodeId = walker.getNodeId();
 			int fromEdgeId = walker.getEdgeId();
+			nextEdge:
 			for(int edgeId = graph.nextEdge(nodeId, BasicGraph.NO_EDGE); edgeId != BasicGraph.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
 				// if we've already been to this non-end, non-internal edge, or it is part of a loop
 				List<Integer> endEdges = endEdgesById.get(edgeId);
 				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) || isLoop(edgeId, walker))) {
 					// skip it
-					continue;
+					continue nextEdge;
 				}
 				// filter the edge based on constraints
 				// the following comparisons take advantage of the fact that comparisons with NaN always return false  
-				if(params.getHeight() != null && params.getHeight() > graph.getMaxHeight(edgeId)) {
-					continue;
-				}
-				if(params.getWidth() != null && params.getWidth() > graph.getMaxWidth(edgeId)) {
-					continue;
-				}
+//				if(params.getHeight() != null && params.getHeight() > graph.getMaxHeight(edgeId)) {
+//					continue;
+//				}
+//				if(params.getWidth() != null && params.getWidth() > graph.getMaxWidth(edgeId)) {
+//					continue;
+//				}
 				// TODO make the maximum standard vehicle length of 12.5 a config parameter
 				// TODO make the minimum angle of 30 degrees a config parameter
 				//if(params.getLength() != null && params.getLength() > 12.5
@@ -208,8 +211,18 @@ public class DijkstraShortestPath {
 				//	continue;
 				//}
 				
-				if(params.getWeight() != null && graph.getFromMaxWeight(edgeId) != null && params.getWeight() > graph.getFromMaxWeight(edgeId)) {
-					continue;
+//				if(params.getWeight() != null && graph.getFromMaxWeight(edgeId) != null && params.getWeight() > graph.getFromMaxWeight(edgeId)) {
+//					continue;
+//				}
+				
+				// filter the edge based on restrictions
+				if(params.getHeight() != null || params.getWeight() != null || params.getWidth() != null) {
+					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					for(Constraint c : constraints) {
+						if(c.prevents(params)) {
+							continue nextEdge;
+						}
+					}
 				}
 				
 				// TODO Handle alternate time zones
@@ -230,7 +243,7 @@ public class DijkstraShortestPath {
 						}
 						if(waitTime < 0) {
 							// this segment is inaccessible due to an event
-							continue;
+							continue nextEdge;
 						}
 						// TODO handle other types of events (slow-downs due to partial lane closures, etc.)
 					}
@@ -240,7 +253,7 @@ public class DijkstraShortestPath {
 						if(waitAndTravelTime[1] > 0) {
 							waitTime = waitAndTravelTime[0]; 
 							overrideTravelSeconds = waitAndTravelTime[1];
-							logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
+							//logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
 						}
 					}
 				}
@@ -261,7 +274,7 @@ public class DijkstraShortestPath {
 				if(edgeId == graph.getOtherEdgeId(fromEdgeId)) {
 					// this is a U-turn
 					//turnDir = TurnDirection.UTURN;
-					continue;
+					continue nextEdge;
 				}
 
 				// use the turnDirection to calculate the turn cost, if turncosts are on

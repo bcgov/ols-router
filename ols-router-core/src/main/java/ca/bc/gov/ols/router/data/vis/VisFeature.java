@@ -12,6 +12,7 @@ public class VisFeature {
 	private Geometry geom;
 	private final NavInfoType type;
 	private final String subType;
+	private final String source;
 	private final String detail;
 	private final int angle;
 	
@@ -19,6 +20,7 @@ public class VisFeature {
 		this.geom = geom;
 		this.type = type;
 		this.subType = "";
+		this.source = "";
 		this.detail = "";
 		this.angle = 0;
 	}
@@ -27,6 +29,25 @@ public class VisFeature {
 		this.geom = geom;
 		this.type = type;
 		this.subType = null;
+		this.source = "";
+		this.detail = detail;
+		this.angle = 0;
+	}
+
+	public VisFeature(Geometry geom, NavInfoType type, String subType, String detail) {
+		this.geom = geom;
+		this.type = type;
+		this.subType = subType;
+		this.source = "";
+		this.detail = detail;
+		this.angle = 0;
+	}
+
+	public VisFeature(Geometry geom, NavInfoType type, String subType, String source, String detail) {
+		this.geom = geom;
+		this.type = type;
+		this.subType = subType;
+		this.source = source;
 		this.detail = detail;
 		this.angle = 0;
 	}
@@ -35,6 +56,7 @@ public class VisFeature {
 		this.geom = geom;
 		this.type = type;
 		this.subType = subType;
+		this.source = "";
 		this.detail = detail;
 		this.angle = angle;
 	}
@@ -55,6 +77,10 @@ public class VisFeature {
 		return subType;
 	}
 
+	public String getSource() {
+		return source;
+	}
+	
 	public String getDetail() {
 		return detail;
 	}

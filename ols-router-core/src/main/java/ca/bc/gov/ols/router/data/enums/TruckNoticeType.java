@@ -9,7 +9,7 @@ public enum TruckNoticeType {
 	BORDER,
 	FERRY;
 	
-	private static final Logger logger = LoggerFactory.getLogger(SurfaceType.class.getCanonicalName());
+	private static final Logger logger = LoggerFactory.getLogger(TruckNoticeType.class.getCanonicalName());
 	
 	/**
 	 * Takes a string value and returns the corresponding TruckNoticeType object.

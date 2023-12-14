@@ -20,17 +20,17 @@ import ca.bc.gov.ols.config.ConfigurationStore;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class RouterConfig {
-	public static final String VERSION = "2.1.8";
+	public static final String VERSION = "2.2.1";
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
+	public static final String MOT_OWNERSHIP = "Ministry Of Transportation";
 	public static final int EXPECTED_EDGES = 400000;
 	protected static final String APP_ID = "ROUTER";
 	public static final ZoneId DEFAULT_TIME_ZONE = ZoneId.of("Canada/Pacific");
 	private static final Logger logger = LoggerFactory.getLogger(RouterConfig.class.getCanonicalName());
 	
 	private static RouterConfig INSTANCE;
-	
 	protected ConfigurationStore configStore;
 	protected int baseSrsCode = -1;
 	protected String dataSourceClassName;
@@ -50,6 +50,8 @@ public class RouterConfig {
 	protected double[] defaultTurnCost = {3,1,5,2};
 	protected Map<VehicleType,String> defaultGlobalDistortionField = new HashMap<VehicleType,String>();
 	private double defaultTruckRouteMultiplier = 9;
+	private int defaultSnapDistance = 1000;
+	private int defaultSimplifyThreshold = 250;
 		
 	public RouterConfig() {
 		INSTANCE = this;
@@ -61,6 +63,7 @@ public class RouterConfig {
 
 		Stream<ConfigurationParameter> configParams = configStore.getConfigParams();
 		configParams.forEach(configParam -> {
+			if(!configParam.getAppId().equals("ROUTER")) return;
 			String name = configParam.getConfigParamName();
 			String value = configParam.getConfigParamValue();
 			try {
@@ -118,6 +121,12 @@ public class RouterConfig {
 					break;
 				case "defaultTruckRouteMultiplier":
 					defaultTruckRouteMultiplier = Double.parseDouble(value);
+					break;
+				case "defaultSnapDistance":
+					defaultSnapDistance = Integer.parseInt(value); 
+					break;
+				case "defaultSimplifyThreshold":
+					defaultSimplifyThreshold = Integer.parseInt(value); 
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -212,6 +221,13 @@ public class RouterConfig {
 		return defaultTruckRouteMultiplier;
 	}
 
-	
+	public int getDefaultSnapDistance() {
+		return defaultSnapDistance;
+	}
+
+	public int getDefaultSimplifyThreshold() {
+		return defaultSimplifyThreshold;
+	}
+
 
 }

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.locationtech.jts.algorithm.Angle;
 import org.locationtech.jts.algorithm.Distance;
@@ -40,6 +41,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.RoutingEngine;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.api.IsochroneResponse;
@@ -55,12 +57,13 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
+import ca.bc.gov.ols.router.restrictions.Constraint;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
+import ca.bc.gov.ols.util.MapList;
 import ca.bc.gov.ols.util.StopWatch;
 
 public class BasicGraphRoutingEngine implements RoutingEngine {
@@ -90,15 +93,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDistance();
-			RouterDistanceResponse response = new RouterDistanceResponse(params, em.getDist(), em.getTime());
+			RouterDistanceResponse response = new RouterDistanceResponse(params, graph.getDates(), em.getDist(), em.getTime());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDistanceResponse(params);
+			return new RouterDistanceResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDistanceResponse(params);
+			return new RouterDistanceResponse(params, graph.getDates());
 		}
 	}
 	
@@ -109,15 +112,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcRoute(gf);
-			RouterRouteResponse response = new RouterRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions());
+			RouterRouteResponse response = new RouterRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterRouteResponse(params);
+			return new RouterRouteResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterRouteResponse(params);
+			return new RouterRouteResponse(params, graph.getDates());
 		}
 	}
 
@@ -128,15 +131,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			sw.start();
 			EdgeMerger em = doRoute(params);
 			em.calcDirections(gf);
-			RouterDirectionsResponse response = new RouterDirectionsResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications());
+			RouterDirectionsResponse response = new RouterDirectionsResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDirectionsResponse(params);
+			return new RouterDirectionsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDirectionsResponse(params);
+			return new RouterDirectionsResponse(params, graph.getDates());
 		}
 	}
 
@@ -151,12 +154,12 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcRoute(gf);
-			response = new RouterOptimalRouteResponse(params, em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), visitOrder);
+			response = new RouterOptimalRouteResponse(params, graph.getDates(), em.getDist(), em.getTime(), em.getRoute(), em.getPartitions(), em.getTlids(), visitOrder);
 		} catch(IllegalArgumentException iae) {
-			response = new RouterOptimalRouteResponse(params);
+			response = new RouterOptimalRouteResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalRouteResponse(params);
+			response = new RouterOptimalRouteResponse(params, graph.getDates());
 		}
 		sw.stop();
 		response.setExecutionTime(sw.getElapsedTime());
@@ -176,13 +179,13 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			EdgeMerger em = doOptimizedRoute(params, routingTimer, optimizationTimer, visitOrder);
 			em.calcDirections(gf);
-			response = new RouterOptimalDirectionsResponse(params, em.getDist(),em.getTime(), 
-					em.getRoute(), em.getPartitions(), em.getDirections(), em.getNotifications(), visitOrder);
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates(), em.getDist(),em.getTime(), 
+					em.getRoute(), em.getPartitions(), em.getTlids(), em.getDirections(), em.getNotifications(), visitOrder);
 		} catch(IllegalArgumentException iae) {
-			response = new RouterOptimalDirectionsResponse(params);
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			response = new RouterOptimalDirectionsResponse(params);
+			response = new RouterOptimalDirectionsResponse(params, graph.getDates());
 		}			
 		sw.stop();
 		response.setExecutionTime(sw.getElapsedTime());
@@ -193,7 +196,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private EdgeMerger doRoute(RoutingParameters params) {
 		List<Point> points = params.getFullPoints();
-		SplitEdge[] edgeSplits = getEdges(points, params.isCorrectSide(), false);
+		SplitEdge[] edgeSplits = getEdges(points, params.getSnapDistance(), params.isCorrectSide(), false);
 		return doCoreRoute(params, edgeSplits);
 	}
 
@@ -221,11 +224,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		try {
 			StopWatch sw = new StopWatch();
 			sw.start();
-			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params);
+			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
-			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.isCorrectSide(), true);
-			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.isCorrectSide(), true);
+			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
+			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.getSnapDistance(), params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
 				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
 				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
@@ -243,10 +246,10 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			response.setExecutionTime(sw.getElapsedTime());
 			return response;
 		} catch(IllegalArgumentException iae) {
-			return new RouterDistanceBetweenPairsResponse(params);
+			return new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 		} catch(Throwable t) {
 			logger.warn("Exception thrown: ", t);
-			return new RouterDistanceBetweenPairsResponse(params);
+			return new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 		}
 	}
 
@@ -264,7 +267,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.isCorrectSide(), false);
+		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
@@ -332,11 +335,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return optimizedEdgeSplits;
 	}
 	
-	private SplitEdge[] getEdges(List<Point> points, boolean correctSide, boolean allowNullEdges) {
+	private SplitEdge[] getEdges(List<Point> points, int snapDistance, boolean correctSide, boolean allowNullEdges) {
 		SplitEdge[] edgeSplits = new SplitEdge[points.size()];
 		int i = 0;
 		for(Point p : points) {
-			int edgeId = graph.findClosestEdge(p);
+			int edgeId = graph.findClosestEdge(p, snapDistance);
 			int[] edgeIds = null;
 			if(edgeId == BasicGraph.NO_EDGE) {
 				//throw new RuntimeException("ERROR: point not near any edge");
@@ -386,14 +389,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			if(offset > maxOffset) {
 				offset = maxOffset; 
 			}
-			// Segment Ids
-			if(params.getTypes().contains(NavInfoType.ID)) {
+			// Segment Ids (don't want to duplicate for each edge so only show the forward direction edges)
+			if(params.getTypes().contains(NavInfoType.ID) && !graph.getReversed(edgeId)) {
 				double proportion = 0.4;
-				if(graph.getReversed(edgeId)) {
-					proportion = 0.6;
-				}
 				Coordinate c = lil.extractPoint(lil.getEndIndex()*proportion);
-				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + edgeId, 90));
+				geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.ID, null, "" + graph.getSegmentId(edgeId), 90));
 			}
 			// one-way markers
 			if(params.getTypes().contains(NavInfoType.DIR)) {
@@ -420,27 +420,29 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				double maxHeight = graph.getMaxHeight(edgeId);
-				double maxWidth = graph.getMaxWidth(edgeId);
-				StringBuilder sb = new StringBuilder();
-				if(!Double.isNaN(maxHeight)) {
-					sb.append("Max Height:" + maxHeight + "\n");
+				List<Constraint> constraints = graph.getRestrictionLookup().lookup(null, edgeId);
+				MapList<Point,Constraint> constraintMap = new MapList<>();
+				for(Constraint c : constraints) {
+						if(params.getRestrictionSource() == null || c.getSource() == params.getRestrictionSource()) {
+							constraintMap.add(c.getLocation(), c);
+						}
 				}
-				if(!Double.isNaN(maxWidth)) {
-					sb.append("Max Width:" + maxWidth + "\n");
-				}	
-				String hardList = sb.toString();
-				if(!hardList.isEmpty()) {
-					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
-					geoms.add(new VisFeature(gf.createPoint(c), NavInfoType.HR, hardList));
-				}
-				Integer fromMaxWeight = graph.getFromMaxWeight(edgeId);
-				if(fromMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getStartPoint(), NavInfoType.HR, "Max Weight:" + fromMaxWeight));
-				}
-				Integer toMaxWeight = graph.getToMaxWeight(edgeId);
-				if(toMaxWeight != null) {
-					geoms.add(new VisFeature(ls.getEndPoint(), NavInfoType.HR, "Max Weight:" + toMaxWeight));
+				if(!constraintMap.isEmpty()) {
+					for(Entry<Point, List<Constraint>> entry: constraintMap.entrySet()) {
+						String type = "";
+						String source = "";
+						StringBuilder sb = new StringBuilder();
+						for(Constraint c : entry.getValue()) {
+							type = c.getType().toString();
+							source = c.getSource().toString();
+							if(sb.length() > 0) {
+								sb.append("\n");
+							}
+							sb.append(c.getVisDescriptor());
+						}
+						String hardList = sb.toString();
+						geoms.add(new VisFeature(entry.getKey(), NavInfoType.HR, type, source, hardList));
+					}
 				}
 			}
 			// Truck Routes

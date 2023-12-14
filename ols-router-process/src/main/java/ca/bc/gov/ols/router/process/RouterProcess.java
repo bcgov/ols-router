@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Coordinate;
@@ -22,19 +21,19 @@ import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.ols.config.ConfigurationStore;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import ca.bc.gov.ols.enums.DividerType;
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.enums.SurfaceType;
+import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.enums.TravelDirection;
-import ca.bc.gov.ols.router.RouterFactory;
 import ca.bc.gov.ols.router.config.RouterConfig;
-import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.DayCode;
-import ca.bc.gov.ols.router.data.enums.SurfaceType;
-import ca.bc.gov.ols.router.data.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.TurnRestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnTimeCode;
@@ -74,8 +73,13 @@ public class RouterProcess {
 	//private XsvRowWriter trWriter;
 	
 	private static String dataDir = "C:/apps/router/data/";
+	private static final String STREET_NAMES_FILE = "street_load_street_names.json";
+	private static final String STREET_NAMES_ON_SEG_FILE = "street_load_street_name_on_seg_xref.json";
+	private static final String LOCALITIES_FILE = "street_load_localities.json";
+	private static final String STREETS_FILE = "street_load_street_segments.json";
 	private RowWriter logWriter;
 	private EnumMap<RoadClass,Double> trafficMultiplierMap = buildTrafficMultiplierMap();
+	private Map<String, String> dates;
 	
 	public static void main(String[] args) throws IOException {
 		if(args.length != 1) {
@@ -95,26 +99,23 @@ public class RouterProcess {
 	}
 
 	public RouterProcess() {
-		Properties bootstrapConfig = RouterFactory.getBootstrapConfigFromEnvironment();
-		ConfigurationStore configStore = RouterConfigurationStoreFactory.getConfigurationStore(bootstrapConfig);
-		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, Integer.parseInt(configStore.getConfigParam("baseSrsCode").get()));
-		configStore.close();
+		geometryFactory = new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL); // SRS doesn't matter for what we are doing here 
 	}
 
-	public void process() {
+	public void process() throws IOException {
 		openLogWriter();
 		
 //		File trFile = new File(dataDir + "turn_restrictions_uturn_new.csv");
 //		List<String> trSchema = Arrays.asList("EDGE_NODE_SET");
 //		trWriter = new XsvRowWriter(trFile, ',', trSchema, false);
 
-		TIntObjectHashMap<String> streetNameById = loadStreetNames();
-		TIntIntHashMap streetNameIdBySegmentId = loadStreetNameOnSegs();
+		TIntObjectHashMap<String> streetNameById = loadStreetNames(dataDir + STREET_NAMES_FILE);
+		TIntIntHashMap streetNameIdBySegmentId = loadStreetNameOnSegs(dataDir + STREET_NAMES_ON_SEG_FILE);
 
 		// load localities into a lookup table
 		logger.info("Loading Localities");
 		TIntObjectHashMap<String> localityIdMap = new TIntObjectHashMap<String>();
-		RowReader rr = new JsonRowReader(dataDir + "street_load_localities.json", geometryFactory);
+		RowReader rr = new JsonRowReader(dataDir + LOCALITIES_FILE, geometryFactory);
 		int locCount = 0;
 		while(rr.next()) {
 			locCount++;
@@ -138,8 +139,9 @@ public class RouterProcess {
 		logger.info("Loading Street Segments");
 		List<RpStreetSegment> segments = new ArrayList<RpStreetSegment>(100000);
 		TIntObjectHashMap<RpStreetSegment> ferrySegments = new TIntObjectHashMap<RpStreetSegment>();
-		rr = new JsonRowReader(dataDir + "street_load_street_segments.json", geometryFactory);
+		rr = new JsonRowReader(dataDir + STREETS_FILE, geometryFactory);
 		int segCount = 0;
+
 		while(rr.next()) {
 			segCount++;
 			int segmentId = rr.getInt("street_segment_id");
@@ -153,6 +155,8 @@ public class RouterProcess {
 			TravelDirection travelDir = TravelDirection.convert(
 					rr.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(rr.getString("divider_type"));
+			int numLanesLeft = rr.getInt("num_lanes_left");
+			int numLanesRight = rr.getInt("num_lanes_right");
 			TrafficImpactor startTrafficImpactor = TrafficImpactor.convert(rr.getString("start_traffic_impactor"));
 			TrafficImpactor endTrafficImpactor = TrafficImpactor.convert(rr.getString("end_traffic_impactor"));
 			short speedLimit = (short)rr.getInt("speed_limit");
@@ -216,22 +220,26 @@ public class RouterProcess {
 				toRightTR = TurnTimeCode.convert(rr.getString("to_right_turn_restriction"));
 			}
 			
+			JsonObject motData = rr.getJson("ministry_of_transport_data");
+						
 			// skip virtual and unRouteable segments
 			if((roadClass != RoadClass.FERRY && isVirtual) || !roadClass.isRouteable()) {
 				droppedSegs++;
 				continue;
 			}
-			
+						
 			String name = streetNameById.get(streetNameIdBySegmentId.get(segmentId));
 			
 			RpStreetSegment segment = new RpStreetSegment(segmentId, centerLine,
 					startIntersectionId, endIntersectionId, 
 					leftLocality, rightLocality, name,
-					roadClass, travelDir,
-					dividerType, startTrafficImpactor, endTrafficImpactor, 
+					roadClass, travelDir, dividerType,
+					numLanesLeft, numLanesRight,
+					startTrafficImpactor, endTrafficImpactor, 
 					speedLimit,  surfaceType,
 					maxHeight, maxWidth, fromMaxWeight, toMaxWeight, isTruckRoute,
 					highwayRoute1, highwayRoute2, highwayRoute3,
+					motData,
 					false, isVirtual,
 					fromLeftTR, fromCentreTR, fromRightTR, toLeftTR, toCentreTR, toRightTR);
 			if(RoadClass.FERRY.equals(roadClass)) {
@@ -406,12 +414,14 @@ public class RouterProcess {
 		        		segments.add(new RpStreetSegment(seg.getSegmentId(), newLine, fr.startEnd.getIntersectionId(),
 		        				fr.endEnd.getIntersectionId(), "Ferry", "Ferry", seg.getName(), seg.getRoadClass(),
 		        				seg.getTravelDirection(), seg.getDividerType(),
+		        				seg.getNumLanesLeft(), seg.getNumLanesRight(),
 		        				fr.startEnd.getTrafficImpactor(), fr.endEnd.getTrafficImpactor(),
 		        				seg.getSpeedLimit(), seg.getSurfaceType(), 
 		        				seg.getMaxHeight(), seg.getMaxWidth(), 
 		        				seg.getFromMaxWeight(),seg.getToMaxWeight(), 
 		        				seg.isTruckRoute(),
 		        				seg.getHighwayRoute1(), seg.getHighwayRoute2(), seg.getHighwayRoute3(),
+		        				seg.getMotData(),
 		        				seg.isDeadEnded(), seg.isVirtual(), 
 		        				null, null, null, null, null, null));
 		        		ferryCount++;
@@ -826,9 +836,10 @@ public class RouterProcess {
 
 	}
 
-	private TIntObjectHashMap<String> loadStreetNames() {
+	private TIntObjectHashMap<String> loadStreetNames(String filename) {
 		// build a map from the StreetNameId to the Name String
-		RowReader reader = new JsonRowReader(dataDir + "street_load_street_names.json", geometryFactory);
+		JsonRowReader reader = new JsonRowReader(filename, geometryFactory);
+		dates = reader.getDates();
 		TIntObjectHashMap<String> nameIdMap = new TIntObjectHashMap<String>(60000);
 		int count = 0;
 		while(reader.next()) {
@@ -861,9 +872,9 @@ public class RouterProcess {
 		return nameIdMap;
 	}
 
-	private TIntIntHashMap loadStreetNameOnSegs() {
+	private TIntIntHashMap loadStreetNameOnSegs(String filename) {
 		// build a map from the StreetSegmentId to primary StreetNameId
-		RowReader reader = new JsonRowReader(dataDir + "street_load_street_name_on_seg_xref.json", geometryFactory);
+		RowReader reader = new JsonRowReader(filename, geometryFactory);
 		TIntIntHashMap nameIdBySegmentIdMap = new TIntIntHashMap(300000);
 		int count = 0;
 		// loop over array of features
@@ -940,27 +951,28 @@ public class RouterProcess {
 	}
 	
 	private void readTurnRestrictions(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions, String filename) {
-		RowReader turnRestrictionReader = new CsvRowReader(filename, geometryFactory);
-		while(turnRestrictionReader.next()) {
-			String idSeq = turnRestrictionReader.getString("EDGE_NODE_SET");
-			Integer cost = turnRestrictionReader.getInteger("TRAVERSAL_COST");
-			if(cost == null) {
-				cost = -1;
+		try(RowReader turnRestrictionReader = new CsvRowReader(filename, geometryFactory)) {
+			while(turnRestrictionReader.next()) {
+				String idSeq = turnRestrictionReader.getString("EDGE_NODE_SET");
+				Integer cost = turnRestrictionReader.getInteger("TRAVERSAL_COST");
+				if(cost == null) {
+					cost = -1;
+				}
+				String dayCodeStr = turnRestrictionReader.getString("DAY_CODE");
+				String timeRangeStr = turnRestrictionReader.getString("TIME_RANGES");
+				WeeklyTimeRange restriction = WeeklyTimeRange.create(dayCodeStr, timeRangeStr);
+				TurnRestrictionType type = TurnRestrictionType.convert(turnRestrictionReader.getString("TYPE"));
+				Set<VehicleType> vehicleTypes = VehicleType.fromList(turnRestrictionReader.getString("VEHICLE_TYPES"));
+				String description = turnRestrictionReader.getString("DESCRIPTION");
+				String source = turnRestrictionReader.getString("SOURCE_CODE");
+				addTurnRestriction(turnRestrictions, new TurnRestriction(idSeq, restriction, type, vehicleTypes, source, description));
 			}
-			String dayCodeStr = turnRestrictionReader.getString("DAY_CODE");
-			String timeRangeStr = turnRestrictionReader.getString("TIME_RANGES");
-			WeeklyTimeRange restriction = WeeklyTimeRange.create(dayCodeStr, timeRangeStr);
-			TurnRestrictionType type = TurnRestrictionType.convert(turnRestrictionReader.getString("TYPE"));
-			Set<VehicleType> vehicleTypes = VehicleType.fromList(turnRestrictionReader.getString("VEHICLE_TYPES"));
-			String description = turnRestrictionReader.getString("DESCRIPTION");
-			String source = turnRestrictionReader.getString("SOURCE_CODE");
-			addTurnRestriction(turnRestrictions, new TurnRestriction(idSeq, restriction, type, vehicleTypes, source, description));
 		}
 	}
 	
 	private void writeSegments(List<RpStreetSegment> segments) {
 		File streetsFile = new File(dataDir + "street_load_street_segments_router.json");
-		RowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments");
+		JsonRowWriter streetWriter = new JsonRowWriter(streetsFile, "bgeo_street_segments", dates);
 		int segCount = 0;
 		for(RpStreetSegment seg : segments) {
 			Map<String,Object> row = new THashMap<String,Object>();
@@ -972,6 +984,8 @@ public class RouterProcess {
 			row.put("ROAD_CLASS", seg.getRoadClass());
 			row.put("TRAVEL_DIRECTION", seg.getTravelDirection());
 			row.put("DIVIDER_TYPE", seg.getDividerType().toString());
+			row.put("NUM_LANES_LEFT", seg.getNumLanesLeft());
+			row.put("NUM_LANES_RIGHT", seg.getNumLanesRight());
 			row.put("START_TRAFFIC_IMPACTOR", seg.getStartTrafficImpactor());
 			row.put("END_TRAFFIC_IMPACTOR", seg.getEndTrafficImpactor());
 			row.put("SPEED_LIMIT", (int)seg.getSpeedLimit());
@@ -985,6 +999,7 @@ public class RouterProcess {
 			} else {
 				row.put("VEHICLE_MAX_WIDTH", Double.isNaN(seg.getMaxWidth()) ? null : seg.getMaxWidth());
 			}
+			row.put("MINISTRY_OF_TRANSPORT_DATA", seg.getMotData());
 			if(seg.isDeadEnded()) {
 				row.put("DEAD_ENDED_IND", "Y");
 			}
@@ -1127,7 +1142,7 @@ public class RouterProcess {
 		row.put("geom", se.getSegment().getCenterLine());
 		logWriter.writeRow(row);
 	}
-
+	
 }
 
 class FerryRoute {

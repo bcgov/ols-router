@@ -41,7 +41,7 @@ import ca.bc.gov.ols.router.open511.enums.EventStatus;
 import ca.bc.gov.ols.router.open511.enums.EventSubtype;
 import ca.bc.gov.ols.router.open511.enums.EventType;
 import ca.bc.gov.ols.router.open511.enums.ImpactedSystem;
-import ca.bc.gov.ols.router.open511.enums.RestrictionType;
+import ca.bc.gov.ols.router.open511.enums.Open511RestrictionType;
 import ca.bc.gov.ols.router.open511.enums.RoadState;
 import ca.bc.gov.ols.router.open511.enums.ScheduleException;
 
@@ -274,7 +274,7 @@ public class Open511Parser {
 				String name = jr.nextName();
 				switch(name) {
 				case "restriction_type":
-					restriction.setRestrictionType(RestrictionType.valueOf(jr.nextString()));
+					restriction.setRestrictionType(Open511RestrictionType.valueOf(jr.nextString()));
 					break;
 				case "value":
 					restriction.setValue(jr.nextDouble());
