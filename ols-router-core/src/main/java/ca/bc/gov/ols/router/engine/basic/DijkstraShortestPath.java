@@ -55,8 +55,8 @@ public class DijkstraShortestPath {
 		if(params.isEnabled(RouteOption.LOCAL_DISTORTION_FIELD)) {
 			multiplier *= graph.getLocalDistortion(edgeId, params.getVehicleType());
 		}
-		if(params.isEnabled(RouteOption.GLOBAL_DISTORTION_FIELD) && params.getVehicleType() == VehicleType.TRUCK) {
-			multiplier *= params.getGlobalDistortionField().lookup(graph.getRoadClass(edgeId), graph.isTruckRoute(edgeId));
+		if(params.isEnabled(RouteOption.GLOBAL_DISTORTION_FIELD)) {
+			multiplier *= params.getGlobalDistortionField().lookup(graph.getRoadClass(edgeId), params.getVehicleType() == VehicleType.TRUCK && graph.isTruckRoute(edgeId));
 		}
 		return multiplier;
 	}
