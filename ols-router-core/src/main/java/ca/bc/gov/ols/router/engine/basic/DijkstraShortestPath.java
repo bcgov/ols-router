@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -55,8 +56,8 @@ public class DijkstraShortestPath {
 		if(params.isEnabled(RouteOption.LOCAL_DISTORTION_FIELD)) {
 			multiplier *= graph.getLocalDistortion(edgeId, params.getVehicleType());
 		}
-		if(params.isEnabled(RouteOption.GLOBAL_DISTORTION_FIELD) && params.getVehicleType() == VehicleType.TRUCK) {
-			multiplier *= params.getGlobalDistortionField().lookup(graph.getRoadClass(edgeId), graph.isTruckRoute(edgeId));
+		if(params.isEnabled(RouteOption.GLOBAL_DISTORTION_FIELD)) {
+			multiplier *= params.getGlobalDistortionField().lookup(graph.getRoadClass(edgeId), params.getVehicleType() == VehicleType.TRUCK && graph.isTruckRoute(edgeId));
 		}
 		return multiplier;
 	}
@@ -216,10 +217,10 @@ public class DijkstraShortestPath {
 //				}
 				
 				// filter the edge based on restrictions
-				if(params.getHeight() != null || params.getWeight() != null || params.getWidth() != null) {
+				if(!params.getRestrictionValues().isEmpty()) {
 					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
-						if(c.prevents(params)) {
+						if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 							continue nextEdge;
 						}
 					}

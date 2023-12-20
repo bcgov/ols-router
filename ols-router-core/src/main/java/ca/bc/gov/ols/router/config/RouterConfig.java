@@ -4,8 +4,13 @@
  */
 package ca.bc.gov.ols.router.config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import org.locationtech.jts.geom.GeometryFactory;
@@ -15,9 +20,10 @@ import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.config.ConfigurationParameter;
 import ca.bc.gov.ols.config.ConfigurationStore;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class RouterConfig {
-	public static final String VERSION = "2.2.0";
+	public static final String VERSION;
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
@@ -45,11 +51,21 @@ public class RouterConfig {
 	protected String defaultEnableOptions = "tc,xc,tr";
 	protected double[] defaultXingCost = {5,7,10,1.5};
 	protected double[] defaultTurnCost = {3,1,5,2};
-	protected String defaultGlobalDistortionField = "";
+	protected Map<VehicleType,String> defaultGlobalDistortionField = new HashMap<VehicleType,String>();
 	private double defaultTruckRouteMultiplier = 9;
 	private int defaultSnapDistance = 1000;
 	private int defaultSimplifyThreshold = 250;
 		
+	static {
+		try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("app.properties")) {
+            Properties props = new Properties();
+            props.load(input);
+            VERSION = props.getProperty("app.version");
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+	
 	public RouterConfig() {
 		INSTANCE = this;
 	}
@@ -110,8 +126,11 @@ public class RouterConfig {
 				case "defaultTurnCost":
 					defaultTurnCost = Arrays.asList(value.split(",")).stream().mapToDouble(Double::parseDouble).toArray();
 					break;
-				case "defaultGlobalDistortionField":
-					defaultGlobalDistortionField = value;
+				case "defaultGlobalDistortionField.TRUCK":
+					defaultGlobalDistortionField.put(VehicleType.TRUCK, value);
+					break;
+				case "defaultGlobalDistortionField.CAR":
+					defaultGlobalDistortionField.put(VehicleType.CAR, value);
 					break;
 				case "defaultTruckRouteMultiplier":
 					defaultTruckRouteMultiplier = Double.parseDouble(value);
@@ -207,8 +226,8 @@ public class RouterConfig {
 		return defaultTurnCost;
 	}
 
-	public String getDefaultGlobalDistortionField() {
-		return defaultGlobalDistortionField;
+	public String getDefaultGlobalDistortionField(VehicleType type) {
+		return defaultGlobalDistortionField.get(type);
 	}
 
 	public double getDefaultTruckRouteMultiplier() {

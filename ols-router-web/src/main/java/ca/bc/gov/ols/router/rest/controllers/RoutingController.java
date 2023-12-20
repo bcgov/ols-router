@@ -46,7 +46,18 @@ public class RoutingController {
 	
 	@Autowired
 	private Router router;
-	
+
+	@RequestMapping(value = "/", method = {RequestMethod.GET})
+	public RouterDistanceResponse routerDefault() {
+		RoutingParameters params = new RoutingParameters();
+		params.setPoints(new double[] {-123.36487770080568, 48.42547002823357, -123.37015628814699, 48.41812208203614});
+		RouterConfig config = router.getConfig();
+		params.resolve(config,
+				new GeometryFactory(new PrecisionModel(), params.getOutputSRS()),
+				new GeotoolsGeometryReprojector());
+		return router.distance(params);
+	}
+
 	@RequestMapping(value = "/ping", method = {RequestMethod.GET})
 	public ResponseEntity<String> ping() {
 		RoutingParameters params = new RoutingParameters();
@@ -59,7 +70,7 @@ public class RoutingController {
 		if(response.getDistanceStr().equals("")) {
 			return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(null);
 		}
-		return ResponseEntity.ok(null);
+		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
 	@RequestMapping(value = {"/distance","/{vehicleType}/distance"}, method = {RequestMethod.GET, RequestMethod.POST})

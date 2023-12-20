@@ -149,11 +149,9 @@ public class RouterProcess {
 			int endIntersectionId = rr.getInt("end_intersection_id");
 			String leftLocality = localityIdMap.get(rr.getInt("left_locality_id"));
 			String rightLocality = localityIdMap.get(rr.getInt("right_locality_id"));
-			RoadClass roadClass = RoadClass.convert(
-					rr.getString("road_class"));
-			boolean isVirtual = "Y".equals(rr.getString("virtual_ind")); 
-			TravelDirection travelDir = TravelDirection.convert(
-					rr.getString("travel_direction"));
+			RoadClass roadClass = RoadClass.convert(rr.getString("road_class"));
+			boolean isVirtual = Boolean.TRUE.equals(rr.getBoolean("virtual_ind")); 
+			TravelDirection travelDir = TravelDirection.convert(rr.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(rr.getString("divider_type"));
 			int numLanesLeft = rr.getInt("num_lanes_left");
 			int numLanesRight = rr.getInt("num_lanes_right");
@@ -194,7 +192,7 @@ public class RouterProcess {
 			Integer fromMaxWeight = rr.getInteger("from_vehicle_max_weight");
 			Integer toMaxWeight = rr.getInteger("to_vehicle_max_weight");
 
-			boolean isTruckRoute = "Y".equals(rr.getString("truck_route_ind"));
+			boolean isTruckRoute = Boolean.TRUE.equals(rr.getBoolean("truck_route_ind"));
 			
 			String highwayRoute1 = rr.getString("highway_route_1");
 			if(highwayRoute1 != null) highwayRoute1 = highwayRoute1.intern();
@@ -847,17 +845,15 @@ public class RouterProcess {
 			int id = reader.getInt("street_name_id");
 			String nameBody = reader.getString("name_body");
 			String streetType = reader.getString("street_type");
-			String streetTypeIsPrefix = reader.getString("street_type_is_prefix_ind");
+			boolean typeIsPrefix = Boolean.TRUE.equals(reader.getBoolean("street_type_is_prefix_ind"));
 			String streetDir = reader.getString("street_dir");
-			String streetDirIsPrefix = reader.getString("street_dir_is_prefix_ind");
+			boolean dirIsPrefix = Boolean.TRUE.equals(reader.getBoolean("street_dir_is_prefix_ind"));
 			String streetQualifier = reader.getString("street_qualifier");
 			
 			String fullName = null;
 			if(nameBody == null || nameBody.isEmpty()) {
 				fullName = "Unnamed Street";
 			} else {
-				boolean typeIsPrefix = "Y".equals(streetTypeIsPrefix);
-				boolean dirIsPrefix = "Y".equals(streetDirIsPrefix);
 				fullName = (streetDir != null && dirIsPrefix ? streetDir + " " : "")
 						+ (streetType != null && typeIsPrefix ? streetType + " " : "")
 						+ nameBody
@@ -882,9 +878,9 @@ public class RouterProcess {
 			count++;
 			int segmentId = reader.getInt("street_segment_id");
 			int nameId = reader.getInt("street_name_id");
-			String isPrimary = reader.getString("is_primary_ind");
+			boolean isPrimary = Boolean.TRUE.equals(reader.getBoolean("is_primary_ind"));
 			
-			if(nameId >= 0 && segmentId >= 0 && "Y".equals(isPrimary)) {
+			if(nameId >= 0 && segmentId >= 0 && isPrimary) {
 				nameIdBySegmentIdMap.put(segmentId, nameId);
 			}
 		}
@@ -989,23 +985,19 @@ public class RouterProcess {
 			row.put("START_TRAFFIC_IMPACTOR", seg.getStartTrafficImpactor());
 			row.put("END_TRAFFIC_IMPACTOR", seg.getEndTrafficImpactor());
 			row.put("SPEED_LIMIT", (int)seg.getSpeedLimit());
-			row.put("VIRTUAL_IND", seg.isVirtual() ? "Y" : "N");
+			row.put("VIRTUAL_IND", seg.isVirtual());
 			row.put("SURFACE_TYPE", seg.getSurfaceType());
 			row.put("VEHICLE_MAX_HEIGHT", Double.isNaN(seg.getMaxHeight()) ? null : seg.getMaxHeight());
 			row.put("FROM_VEHICLE_MAX_WEIGHT", seg.getFromMaxWeight());
 			row.put("TO_VEHICLE_MAX_WEIGHT", seg.getToMaxWeight());
-			if(seg.getSegmentId() == 460188 || seg.getSegmentId() == 460195) {
-				row.put("VEHICLE_MAX_WIDTH", 10);
-			} else {
-				row.put("VEHICLE_MAX_WIDTH", Double.isNaN(seg.getMaxWidth()) ? null : seg.getMaxWidth());
-			}
+			row.put("VEHICLE_MAX_WIDTH", Double.isNaN(seg.getMaxWidth()) ? null : seg.getMaxWidth());
 			row.put("MINISTRY_OF_TRANSPORT_DATA", seg.getMotData());
 			if(seg.isDeadEnded()) {
-				row.put("DEAD_ENDED_IND", "Y");
+				row.put("DEAD_ENDED_IND", true);
 			}
 			row.put("START_XING_CLASS", seg.getStartXingClass());
 			row.put("END_XING_CLASS", seg.getEndXingClass());
-			row.put("TRUCK_ROUTE_IND", seg.isTruckRoute() ? "Y" : "N");
+			row.put("TRUCK_ROUTE_IND", seg.isTruckRoute());
 			row.put("geom", seg.getCenterLine());
 			streetWriter.writeRow(row);
 			segCount++;

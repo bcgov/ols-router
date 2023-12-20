@@ -1,5 +1,9 @@
 package ca.bc.gov.ols.router.restrictions;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
@@ -12,7 +16,8 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	public final double[] permitableValue;
 	public final double dist;
 
-	LaneBasedRestriction(final int[] id, final RestrictionSource source, final RestrictionType type, final double[] permitableValue, final Point location, final int locationId, double dist) {
+	LaneBasedRestriction(final int[] id, final RestrictionSource source, final RestrictionType type, 
+			final double[] permitableValue, final Point location, final int locationId, double dist) {
 		super(source, type, location, locationId);
 		this.id = id;
 		this.permitableValue = permitableValue;
@@ -24,12 +29,17 @@ public class LaneBasedRestriction extends AbstractRestriction {
 		return source;
 	}
 	
+	@Override
+	public List<Integer> getIds() {
+		return Arrays.stream(id).boxed().collect(Collectors.toList());
+	}
+	
 	/**
 	 * As long as the vehicle's (height) value is less than the maximum allowable in at least one lane, travel is not prevented.
 	 */
 	@Override
 	public boolean prevents(RoutingParameters params) {
-		Double value = getVehicleValue(params);
+		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		for(double pv : permitableValue) {
 			if(value <= pv) {
@@ -44,7 +54,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	 */
 	@Override
 	public boolean constrains(RoutingParameters params) {
-		Double value = getVehicleValue(params);
+		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		for(double pv : permitableValue) {
 			if(value > pv) {
@@ -56,7 +66,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 	
 	public boolean[] getSafeLanes(RoutingParameters params) {
 		boolean[] safeLanes = new boolean[permitableValue.length];
-		double value = getVehicleValue(params);
+		double value = params.getRestrictionValue(type);
 		for(int i = 0; i < permitableValue.length; i++) {
 			if(value <= permitableValue[i]) {
 				safeLanes[i] = true;
@@ -74,7 +84,7 @@ public class LaneBasedRestriction extends AbstractRestriction {
 		for(int i = 0; i < permitableValue.length; i++) {
 			sb.append("lane ").append(i+1).append(": ").append(permitableValue[i]).append(" ").append(type.unit).append("; ");
 		}
-		sb.append("(").append(source).append(")");
+		sb.append("(").append(source).append(":").append(Arrays.toString(id)).append(")");
 		return sb.toString();
 	}
 

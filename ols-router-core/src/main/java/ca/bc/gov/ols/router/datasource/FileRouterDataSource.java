@@ -106,7 +106,7 @@ public class FileRouterDataSource implements RouterDataSource {
 			String leftLocality = segmentReader.getString("left_locality");
 			String rightLocality = segmentReader.getString("right_locality");
 			RoadClass roadClass = RoadClass.convert(segmentReader.getString("road_class"));
-			boolean isVirtual = "Y".equals(segmentReader.getString("virtual_ind"));
+			boolean isVirtual = Boolean.TRUE.equals(segmentReader.getBoolean("virtual_ind"));
 			TravelDirection travelDir = TravelDirection.convert(segmentReader.getString("travel_direction"));
 			DividerType dividerType = DividerType.convert(segmentReader.getString("divider_type"));
 			int numLanesLeft = segmentReader.getInt("num_lanes_left");
@@ -130,10 +130,10 @@ public class FileRouterDataSource implements RouterDataSource {
 			
 			JsonObject motData = segmentReader.getJson("ministry_of_transport_data");		 
 			
-			boolean isTruckRoute = "Y".equals(segmentReader.getString("truck_route_ind"));
+			boolean isTruckRoute = Boolean.TRUE.equals(segmentReader.getBoolean("truck_route_ind"));
 			XingClass startXingClass = XingClass.convert(segmentReader.getString("start_xing_class"));
 			XingClass endXingClass = XingClass.convert(segmentReader.getString("end_xing_class"));
-			boolean isDeadEnded = "Y".equals(segmentReader.getString("dead_ended_ind"));
+			boolean isDeadEnded = Boolean.TRUE.equals(segmentReader.getBoolean("dead_ended_ind"));
 				
 //			LaneRestriction laneRestriction = LaneRestriction.convert(segmentReader.getString("lane_restriction"));
 //			AccessRestriction accessRestriction = AccessRestriction.convert(segmentReader.getString("access_restriction_ind"));
@@ -262,22 +262,20 @@ public class FileRouterDataSource implements RouterDataSource {
 			int id = reader.getInt("street_name_id");
 			String nameBody = reader.getString("name_body");
 			String streetType = reader.getString("street_type");
-			String streetTypeIsPrefix = reader.getString("street_type_is_prefix_ind");
+			boolean streetTypeIsPrefix = Boolean.TRUE.equals(reader.getBoolean("street_type_is_prefix_ind"));
 			String streetDir = reader.getString("street_direction");
-			String streetDirIsPrefix = reader.getString("street_direction_is_prefix_ind");
+			boolean streetDirIsPrefix = Boolean.TRUE.equals(reader.getBoolean("street_direction_is_prefix_ind"));
 			String streetQualifier = reader.getString("street_qualifier");
 			
 			String fullName = null;
 			if(nameBody == null || nameBody.isEmpty()) {
 				fullName = "Unnamed Street";
 			} else {
-				boolean typeIsPrefix = "Y".equals(streetTypeIsPrefix);
-				boolean dirIsPrefix = "Y".equals(streetDirIsPrefix);
-				fullName = (streetDir != null && dirIsPrefix ? streetDir + " " : "")
-						+ (streetType != null && typeIsPrefix ? streetType + " " : "")
+				fullName = (streetDir != null && streetDirIsPrefix ? streetDir + " " : "")
+						+ (streetType != null && streetTypeIsPrefix ? streetType + " " : "")
 						+ nameBody
-						+ (streetType != null && !typeIsPrefix ? " " + streetType : "")
-						+ (streetDir != null && !dirIsPrefix ? " " + streetDir : "")
+						+ (streetType != null && !streetTypeIsPrefix ? " " + streetType : "")
+						+ (streetDir != null && !streetDirIsPrefix ? " " + streetDir : "")
 						+ (streetQualifier != null ? " " + streetQualifier : "");
 			}
 			nameIdMap.put(id, fullName);
@@ -297,9 +295,9 @@ public class FileRouterDataSource implements RouterDataSource {
 			count++;
 			int segmentId = reader.getInt("street_segment_id");
 			int nameId = reader.getInt("street_name_id");
-			String isPrimary = reader.getString("is_primary_ind");
+			boolean isPrimary = Boolean.TRUE.equals(reader.getBoolean("is_primary_ind"));
 			
-			if(nameId >= 0 && segmentId >= 0 && "Y".equals(isPrimary)) {
+			if(nameId >= 0 && segmentId >= 0 && isPrimary) {
 				nameIdBySegmentIdMap.put(segmentId, nameId);
 			}
 		}

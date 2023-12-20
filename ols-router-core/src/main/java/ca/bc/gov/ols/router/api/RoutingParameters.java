@@ -6,11 +6,16 @@ package ca.bc.gov.ols.router.api;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -20,6 +25,7 @@ import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
@@ -46,10 +52,7 @@ public class RoutingParameters {
 	private Instant departure = Instant.now();
 	private boolean correctSide = false;
 	private VehicleType vehicleType = VehicleType.CAR;
-	private Double height;
-	private Double width;
 	private Double length;
-	private Double weight;
 	private boolean followTruckRoute = false;
 	private double truckRouteMultiplier = 9;
 	private static Map<TrafficImpactor,Double> defaultXingCostMap;
@@ -58,15 +61,15 @@ public class RoutingParameters {
 	private double xingCostMultiplier = 1;
 	private static Map<VehicleType,Map<TurnDirection, Double>> defaultTurnCostMap;
 	private Map<TurnDirection, Double> turnCostMap;
+	private String gdfString;
 	private GlobalDistortionField globalDistortionField;
-	private static GlobalDistortionField defaultGlobalDistortionField;
 	private String routeDescription;
 	private int maxPairs = Integer.MAX_VALUE;
 	private boolean roundTrip = false;
 	private int zoneCount = 1;
 	private int zoneSize = 0;
 	private boolean inbound = false;
-	private EnumSet<Attribute> partitionAttributes;
+	private EnumSet<Attribute> partitionAttributes = EnumSet.noneOf(Attribute.class);
 	private EnumSet<RouteOption> enabledOptions;
 	private boolean setEnableCalled = false;
 	private boolean turnCostsSet = false;
@@ -75,6 +78,9 @@ public class RoutingParameters {
 	private int snapDistance = 1000;
 	private boolean simplifyDirections = false;
 	private int simplifyThreshold = 250;
+	private Map<RestrictionType,Double> restrictionValues = new HashMap<RestrictionType,Double>();
+	private boolean listRestrictions = false;
+	private Set<Integer> excludeRestrictions = Collections.emptySet();
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -84,7 +90,6 @@ public class RoutingParameters {
 		}
 		double[] turnCost = RouterConfig.getInstance().getDefaultTurnCost();
 		defaultTurnCostMap = buildVehicleTypeTurnCostMap(turnCost);
-		defaultGlobalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField());
 	}
 	
 	public RoutingParameters() {
@@ -93,7 +98,6 @@ public class RoutingParameters {
 		xingCostMap = defaultXingCostMap;
 		xingCostMultiplier = defaultXingCostMultiplier;
 		turnCostMap = defaultTurnCostMap.get(vehicleType);
-		globalDistortionField = defaultGlobalDistortionField;
 		truckRouteMultiplier = config.getDefaultTruckRouteMultiplier();
 		snapDistance = config.getDefaultSnapDistance();
 		setSimplifyThreshold(config.getDefaultSimplifyThreshold());
@@ -265,20 +269,16 @@ public class RoutingParameters {
 		}
 	}
 
-	public Double getHeight() {
-		return height;
-	}
-
 	public void setHeight(Double height) {
-		this.height = height;
-	}
-
-	public Double getWidth() {
-		return width;
+		if(this.restrictionValues.get(RestrictionType.VERTICAL) == null) {
+			this.restrictionValues.put(RestrictionType.VERTICAL, height);
+		}
 	}
 
 	public void setWidth(Double width) {
-		this.width = width;
+		if(this.restrictionValues.get(RestrictionType.HORIZONTAL) == null) {
+			this.restrictionValues.put(RestrictionType.HORIZONTAL, width);
+		}
 	}
 
 	public Double getLength() {
@@ -289,12 +289,10 @@ public class RoutingParameters {
 		this.length = length;
 	}
 
-	public Double getWeight() {
-		return weight;
-	}
-
 	public void setWeight(Double weight) {
-		this.weight = weight;
+		if(this.restrictionValues.get(RestrictionType.WEIGHT_GVW) == null) {
+			this.restrictionValues.put(RestrictionType.WEIGHT_GVW, weight);
+		}
 	}
 
 	public boolean isFollowTruckRoute() {
@@ -337,11 +335,15 @@ public class RoutingParameters {
 	}
 	
 	public GlobalDistortionField getGlobalDistortionField() {
+		if(globalDistortionField == null) {
+			globalDistortionField = new GlobalDistortionField(RouterConfig.getInstance().getDefaultGlobalDistortionField(getVehicleType()));
+			globalDistortionField.applyString(gdfString);
+		}
 		return globalDistortionField;
 	}
 	
 	public void setGdf(String gdfString) {
-		globalDistortionField = new GlobalDistortionField(gdfString);
+		this.gdfString = gdfString; 
 	}
 	
 	public String getRouteDescription() {
@@ -457,6 +459,63 @@ public class RoutingParameters {
 
 	public void setSimplifyThreshold(int simplifyThreshold) {
 		this.simplifyThreshold = simplifyThreshold;
+	}
+	
+	public Map<RestrictionType,Double> getRestrictionValues() {
+		return restrictionValues;
+	}
+	
+	public Double getRestrictionValue(RestrictionType type) {
+		return restrictionValues.get(type);
+	}
+	
+	/**
+	 * Parses incoming restriction values into a map.
+	 * Expected input format is: 
+	 * <pre>{@code
+	 * &restrictionValues=<RestrictionType>:<value>,<RestrictionType>:<value>
+	 * }</pre>
+	 * eg. VERTICAL:4.2,WEIGHT-GVW:15000
+	 * @param values the string representation of the values
+	 */
+	public void setRestrictionValues(String values) {
+		StringBuilder errorMessage = new StringBuilder();
+		String[] pairs = values.split(",");
+		for(String pair : pairs) {
+			String[] keyValue = pair.split(":");
+			if(keyValue.length == 2) {
+				RestrictionType type = RestrictionType.get(keyValue[0]);
+				if(type != null) {
+					try {
+						Double value = Double.parseDouble(keyValue[1]);
+						restrictionValues.put(type, value);
+					} catch(Exception e) {
+						errorMessage.append("Invalid restriction value: '" + keyValue[1] + "';");
+					}
+				}
+			} else {
+				errorMessage.append("Malformed restriction value pair (should have a single colon separator): '" + keyValue + "';");
+			}
+		}
+		if(!errorMessage.isEmpty()) {
+			throw new IllegalArgumentException(errorMessage.toString());
+		}
+	}
+
+	public boolean isListRestrictions() {
+		return listRestrictions;
+	}
+	
+	public void setListRestrictions(boolean listRestrictions) {
+		this.listRestrictions = listRestrictions;
+	}
+	
+	public Set<Integer> getExcludeRestrictions() {
+		return excludeRestrictions;
+	}
+	
+	public void setExcludeRestrictions(int[] excludeRestrictions) {
+		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
 	}
 	
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {

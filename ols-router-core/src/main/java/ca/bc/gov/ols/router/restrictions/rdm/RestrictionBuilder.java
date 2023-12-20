@@ -12,7 +12,7 @@ public class RestrictionBuilder {
 	
 	int id = -1;
 	RestrictionSource source = null;
-	RestrictionType type = RestrictionType.UNKNOWN;
+	RestrictionType type = null;
 	int laneNumber = -1;
 	double permitableValue = -1;
 	int segmentId = -1;
@@ -85,7 +85,7 @@ public class RestrictionBuilder {
 			valid = false;
 			logger.warn("Restriction has no source: RestrictionID: {}", id);
 		}
-		if(permitableValue <= 0) {
+		if(type.hasValue && permitableValue <= 0) {
 			valid = false;
 			logger.warn("Restriction permittable Value <= 0: RestrictionID: {}", id);
 		}

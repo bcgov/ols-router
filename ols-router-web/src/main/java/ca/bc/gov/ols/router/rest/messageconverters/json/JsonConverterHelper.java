@@ -21,6 +21,7 @@ import ca.bc.gov.ols.router.api.RouterDistanceResponse;
 import ca.bc.gov.ols.router.api.RouterOptimizedResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
@@ -59,7 +60,7 @@ public class JsonConverterHelper extends ConverterHelper {
 	
 	protected void writeFields(ApiResponse response) throws IOException {
 		jw.name("routeDescription").value(response.getRouteDescription());
-		jw.name("searchTimestamp").value(DATE_TIME_FORMATTER.format(response.getTimeStamp()));
+		jw.name("searchTimestamp").value(String.valueOf(response.getTimeStamp()));
 		jw.name("executionTime").value(response.getExecutionTime());
 		if(response instanceof RouterOptimizedResponse) {
 			jw.name("routingExecutionTime").value(((RouterOptimizedResponse)response).getRoutingExecutionTime());
@@ -156,6 +157,7 @@ public class JsonConverterHelper extends ConverterHelper {
 			for(Partition p : parts) {
 				jw.beginObject();
 				jw.name("index").value(p.getIndex());
+				jw.name("distance").jsonValue(response.getDistanceUnit().formatForDisplay(DistanceUnit.METRE.convertTo(p.getDistance(), response.getDistanceUnit())));
 				for(Entry<Attribute, Object> entry : p.getValues().entrySet()) {
 					jw.name(entry.getKey().toString());
 					Object val = entry.getValue();
@@ -171,8 +173,17 @@ public class JsonConverterHelper extends ConverterHelper {
 			}
 			jw.endArray();
 		}
-		jw.name("route");
+		List<Integer> restrictions = response.getRestrictions();
+		if(restrictions != null && !restrictions.isEmpty()) {
+			jw.name("restrictions");
+			jw.beginArray();
+			for(Integer r : restrictions) {
+				jw.value(r);
+			}
+			jw.endArray();
+		}
 		
+		jw.name("route");
 		jw.beginArray();
 		if(response.getPath() != null) {
 			CoordinateSequence coords = response.getPath().getCoordinateSequence();

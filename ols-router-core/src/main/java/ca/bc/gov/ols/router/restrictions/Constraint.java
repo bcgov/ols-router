@@ -1,5 +1,7 @@
 package ca.bc.gov.ols.router.restrictions;
 
+import java.util.List;
+
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
@@ -29,4 +31,6 @@ public interface Constraint {
 	RestrictionType getType();
 
 	String getVisDescriptor();
+	
+	List<Integer> getIds();
 }

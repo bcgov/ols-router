@@ -25,6 +25,7 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.RoadTruckNoticeEvent;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
@@ -62,6 +63,7 @@ public class EdgeMerger {
 	private List<Integer> tlids;
 	private Set<Notification> notifications;
 	private List<Partition> partitions;
+	private List<Integer> restrictions;
 	private EnumMap<Attribute,Object> partitionValues = null;
 	
 	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
@@ -81,9 +83,12 @@ public class EdgeMerger {
 		if(params.getEnabledOptions().contains(RouteOption.TRANSPORT_LINE_ID)) {
 			tlids = new ArrayList<Integer>();
 		}
-		if(partitionAttributes != null) {
+		if(!partitionAttributes.isEmpty()) {
 			this.partitionValues = new EnumMap<Attribute,Object>(Attribute.class);
 			partitions = new ArrayList<Partition>();
+		}
+		if(params.isListRestrictions()) {
+			this.restrictions = new ArrayList<Integer>();
 		}
 		
 		// for each edgeList (ie. each leg of the route)
@@ -120,11 +125,12 @@ public class EdgeMerger {
 					firstOffset = 0;
 				}
 				
-				if(partitionAttributes != null) {
+				if(!partitionAttributes.isEmpty()) {
 					boolean changed = false;
 					for(Attribute attr : partitionAttributes) {
 						Object val = attr.get(graph, edgeId);
-						if(!Objects.equals(val, partitionValues.get(attr))) {
+						// always include the first edge
+						if(edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
 							changed = true;
 							partitionValues.put(attr, val);
 						}
@@ -202,6 +208,9 @@ public class EdgeMerger {
 				dist += edgeDist;
 				time += edgeTime;
 				edgeTime = edgeTime - waitTime;
+				if(partitions != null && partitions.size() > 0) {
+					partitions.get(partitions.size()-1).addDistance(edgeDist);
+				}
 				
 				if(dist == Double.MAX_VALUE) {
 					dist = -1;
@@ -238,8 +247,15 @@ public class EdgeMerger {
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
 				}
+				
+				if(params.isListRestrictions()) {
+					List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					for(Constraint c : constraints) {
+						restrictions.addAll(c.getIds());
+					}
+				}
 			}
-		
+
 			if(calcDirections) {
 				if(edgeListIdx != edgeLists.length-1) {
 					directions.add(new StopoverDirection(gf.createPoint(coords.get(coords.size()-1)), edgeListIdx+1));
@@ -253,8 +269,10 @@ public class EdgeMerger {
 			directions.add(new FinishDirection(gf.createPoint(coords.get(coords.size()-1))));
 			
 			// TODO make maximum standard vehicle size into config parameters
-			if((params.getHeight() != null && params.getHeight() > 4.15)
-					|| (params.getWidth() != null && params.getWidth() > 2.6)
+			if((params.getRestrictionValue(RestrictionType.VERTICAL) != null 
+						&& params.getRestrictionValue(RestrictionType.VERTICAL) > 4.15)
+					|| (params.getRestrictionValue(RestrictionType.HORIZONTAL) != null 
+						&& params.getRestrictionValue(RestrictionType.HORIZONTAL) > 2.6)
 					|| (params.getLength() != null && params.getLength() > 12.5)) {
 				notifications.add(new OversizeNotification());
 			}
@@ -400,14 +418,14 @@ public class EdgeMerger {
 		return notifications;
 	}
 
-	public void setPartition(EnumSet<Attribute> partitionAttributes) {
-		this.partitionAttributes = partitionAttributes;
-	}
-
 	public List<Partition> getPartitions() {
 		return partitions;
 	}
-	
+
+	public List<Integer> getRestrictions() {
+		return restrictions;
+	}
+
 	public List<Integer> getTlids() {
 		return tlids;
 	}
@@ -423,7 +441,7 @@ public class EdgeMerger {
 
 	public void calcDirections(GeometryFactory gf) {
 		calcRoute = true;
-		calcDirections  = true;
+		calcDirections = true;
 		mergeEdges(gf);
 		if(params.isSimplifyDirections() == true) {
 			simplifyDirections();
