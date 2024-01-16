@@ -16,8 +16,8 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 2. The BC Route Planner response now includes timestamps indicating when the data was last processed as well as the road network data vintage.
 3. Use the *enable* parameter to include a list of Transport Line ID's in the BC Route Planner response that are associated with the route.
 4. Use the *snapDistance* parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
-5. A list of Transport Line IDs can be included in the response by including &enable=tl in the request.
-6. Simplify driving directions using the simplifyDirections and simplityThreshold parameters
+5. A list of Transport Line IDs can be included in the response by including *&enable=tl* in the request.
+6. Simplify driving directions using the *simplifyDirections* and *simplityThreshold* parameters
 7. Enhanced route partitioning to include distance per partition
 8. Include a list of all restriction IDs impacting the direction of travel along a route.
 9. Specify the source of road restrictions. Options include ITN (Integrated Transportation Network) or RDM (Restriction Data Manager)
