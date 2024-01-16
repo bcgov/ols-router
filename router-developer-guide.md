@@ -12,15 +12,15 @@ Your application can store router results or display them on any web map. The BC
 
 Access to the BC Route Planner API is mediated by the Data Systems and Services branch [API Services Portal](https://api.gov.bc.ca/).
 
-Source data for the BC Route Planner comes from the BC Digital Road Atlas which is updated on a monthly basis by [GeoBC](https://www2.gov.bc.ca/gov/content?id=5C9D77FBC4C64A61979F78383F3DEC93). The BC Route Planner loads this data from files into in-memory data structures at startup. A small configuration file of global parameters is also loaded at startup from a key-value Datastore.  
+Source data for the BC Route Planner comes from a variety of sources outlined in data flow #1 and #3 of the [data pipeline](https://github.com/bcgov/ols-geocoder/blob/gh-pages/address-data-pipeline.md). Data is updated on a monthly basis. The BC Route Planner loads this data from files into in-memory data structures at startup. A small configuration file of global parameters is also loaded at startup from a key-value Datastore.  
 
-The BC Route Planner is written in Java 11.0 and uses the jSprit open source libraries. The [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html) web application, which demonstrates the features of the BC Route Planner, is written in JavaScript and uses jQuery and Leaflet libraries and plugins.
+The BC Route Planner is written in Java and uses the jSprit open source libraries. The [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html) web application, which demonstrates the features of the BC Route Planner, is written in JavaScript and uses jQuery and Leaflet libraries and plugins.
 
 ## Limitations of Route Planner API v2.1
-Route Planner API v2.1 is backward-compatible with v2.0. There are still some limitations on the new features and data in Route Planner v2.1 . For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
+Route Planner API v2.2.1 is backward-compatible with v2.x. There are still some limitations on the new features and data in Route Planner v2.2.1. For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
 
 ## API Key
-Use of the BC Route Planner REST API is currently restricted to use by BC government applications. A cost model may become available soon to enable use beyond government applications. If you are working on a government application that needs routing, please submit a request for access via the [API Services Portal](https://api.gov.bc.ca/)
+Use of the BC Route Planner REST API is currently restricted to use by BC government applications. If you are working on a government application that needs routing, please submit a request for access via the [API Services Portal](https://api.gov.bc.ca/)
 
 Every route planner request needs an apikey header that contains your api key as follows:
 ```
