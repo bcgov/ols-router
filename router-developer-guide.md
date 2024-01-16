@@ -1475,3 +1475,36 @@ Here is a sample json response:
    ]
 }
 ```
+
+<br><br>
+<a name=APIReponseErrorCodes></a>
+## API reponse error codes
+### KONG API gateway errors
+We used Kong API gateway to manage all API calls. Here is a list of the gateway errors for reference. You will not see those error if you install your own version of the router.
+
+|Response Code|Error Message|Error Description
+|--|--|--|
+|404|This page is not found|The path is not defined
+|401|No API key found in reques|The API endpoints requires an API key
+|401|Invalid authentication credentials|The provided API key is not found
+|403|You cannot consume this service|The provided API key is invalid, unapproved or expired.
+|429|API rate limit exceeded|Too many requests per minute
+
+### Application specific errors 
+Router can return a number of error response.
+|Response Code|Error Message|Error Description
+|--|--|--|
+|400|Invalid parameter: Parameter "points" is required and must be in the format "x,y,x,y..."|The provided points are missing or invalid
+|400|Invalid parameter values for the following parameters [detail]|The provided parameter is invalid
+|404|Not Found|The path is not found. Please make sure it’s one in document
+|500|Anything|This is a general internal error
+
+In addition to above common error responses there are also a number of errors that can happen occasionally or during the initialization state. These errors usually come with 500s but could also be 400s.
+
+- **Unable to load ConfigurationStore class:** check for invalid parcel API key.
+- **Invalid arguments to create WeeklyTimeRange:** database related error.
+- **Invalid DistanceUnit value:** database related error.
+- **Unable to load specified dataSource.class:** database related error.
+- **Unexpected error in coordinate reprojection:** unknown data error.
+- **KML output not supported for RouterDistanceBetweenPairsResponse.:** unknown internal/data error.
+- **Parameter must be in UUID format XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX:** invalid UUID
