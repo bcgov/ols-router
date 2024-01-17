@@ -90,7 +90,7 @@ For more information about the API, consult the [Route Planner Developer Guide](
 Feature                | Enabled<br>by Default| Feature Quality | Data Needed            |Data Quality          
 |----------------------|:---------:|------------------|-----------------------|----------------------|
 Correct-side routing|Yes|Good|Road geometry from ITN and address ranges from BC Address Geocoder|Excellent|
-Hard road restrictions|Yes|Acceptable; basic minimum height and weight restrictions (including directional weight restrictions) are supported;|road minimum height and weight from ITN<br>road width|height and weight: Acceptable in Metro Vancouver, poor elsewhere<br>width,length: no data in ITN, demo data only
+Hard road restrictions|Yes|Acceptable; basic minimum height and weight restrictions (including directional weight restrictions) are supported;|road minimum height and weight from ITN|height and weight: Acceptable in Metro Vancouver, poor elsewhere<br>width,length: no data in ITN, demo data only
 Time-dependent turn-restrictions|No|Functionally good but demo only due to poor data|Time-dependent turn restrictions from ITN|Poor. There are many missing time-dependent turn-restrictions in the data.
 Time independent turn restrictions|Yes|Supports restrictions on U-Turns,left-turns, right-turns, and straight-throughs.|[Implicit restrictions](https://www.mapbox.com/mapping/mapping-for-navigation/implicit-restrictions/)<br>Explicit restrictions from ITN (e.g., based on observed road signs)|Implicit restrictions: high<br> Explicit restrictions: Good in Metropolitan Vancouver area. Poor everywhere else
 Start time|No|Good|All time-dependent data|Variable|
