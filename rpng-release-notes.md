@@ -15,14 +15,15 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 1. Route Planner 2.2.1 is backward compatible with Route Planner 2.x.
 2. The BC Route Planner response now includes timestamps indicating when the data was last processed as well as the road network data vintage.
 3. Use the *enable* parameter to include a list of Transport Line ID's in the BC Route Planner response that are associated with the route.
-4. Use the *snapDistance* parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
-5. Simplify driving directions using the *simplifyDirections* and *simplityThreshold* parameters
-6. Enhanced route partitioning to include distance per partition
-7. Include a list of all restriction IDs impacting the direction of travel along a route.
-8. Specify the source of road restrictions. Options include ITN (Integrated Transportation Network) or RDM (Restriction Data Manager)
-9. Exclude specific restrictions by providing a comma-separated list of restriction IDs
-10. Restriction types can now be passed as parameters
-11. New restriction types have been added.
+   * tl - transportation line IDs; disabled by default
+5. Use the *snapDistance* parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
+6. Simplify driving directions using the *simplifyDirections* and *simplityThreshold* parameters
+7. Enhanced route partitioning to include distance per partition
+8. Include a list of all restriction IDs impacting the direction of travel along a route.
+9. Specify the source of road restrictions. Options include ITN (Integrated Transportation Network) or RDM (Restriction Data Manager)
+10. Exclude specific restrictions by providing a comma-separated list of restriction IDs
+11. Restriction types can now be passed as parameters
+12. New restriction types have been added.
 
 ### Route Planner 2.1.8
 1. Route Planner 2.1.8 is backward compatible with Route Planner 2.x.
