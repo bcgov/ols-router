@@ -7,6 +7,7 @@ Term | Definition
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API.
 <a name="correctSide">correctSide</a> | If true, the route starts and ends on same side of road as start and end points. Default is false.
 <a name="criteria">criteria</a> | Routing criteria to optimize. One of shortest or fastest. Default is fastest.
+<a name="dataProcessingTimestamp">dataProcessingTimestamp</a> | A timestamp indicating when the data was last processed (e.g., 2023-12-18T23:05:54Z)
 <a name="departure">departure</a> | The departure date and time in internet timestamp notation as defined in RFC 3339, section 5.6 (e.g., 2019-02-28T11:36:00-08:00). This parameter will be ignored if time-dependency is disabled.
 <a name="directions">directions</a> | A structured sequence of turn-by-turn directions including notifications.
 <a name="disable">disable</a> | Disable optional routing features; A comma-separated list of modules. See the description below of 'enable' for a full list of parameter values. Enable takes precedence over disable. When the enable parameter is used, unlisted values will be disabled.
@@ -30,6 +31,7 @@ Term | Definition
 <a name="privacyStatement">privacyStatement</a> | Privacy statement associated with the BC Route Planner API.
 <a name="restrictionSource">restrictionSource</a> | Specify the source of road restrictions. Default is ITN. <br><br>Options include:<br><br>**ITN** - Integrated Transportation Network.<br><br>**RDM** - Restriction Data Manager.
 <a name="restrictionValues">restrictionValues</a> | A comma-separated list of restriction types and their values.<br><br>If the parameters height, width, length and weight are provided but the restrictionValues parameter is not, those values will be translated into VERTICAL, HORIZONTAL, LENGTH and WEIGHT-GVW. If values are provided for both the vehicle dimension parameters and the restrictionValues parameter, only the restrictionValues parameter values will be used.<br><br>**VERTICAL** - Height in metres (e.g., VERTICAL:4.5).<br><br>**HORIZONTAL** - Width in metres (e.g., HORIZONTAL:3)<br><br>**LENGTH** - Length in metres (e.g., LENGTH:8.2)<br><br>**WEIGHT-GVW** - Gross vehicle weight in kilograms (e.g., WEIGHT-GVW:35000)<br><br>**WEIGHT-1AXLE** - Single axle weight (e.g., WEIGHT-1AXLE:10000)<br><br>**WEIGHT-2AXLE** - Tandem axle weight (e.g., WEIGHT-2AXLE:10000)<br><br>**WEIGHT-3AXLE** - Tridem axle weight (e.g., WEIGHT-3AXLE:15000)<br><br>**NCV** - No Commercial Vehicles (e.g., NCV:1)<br><br>**NSI** - No Self Issue
+<a name="roadNetworkTimestamp">roadNetworkTimestamp</a> | A timestamp indicating the road network data vintage (e.g., 2023-09-29T21:28:38Z)
 <a name="roundTrip">roundTrip</a> | true if a route should end back on its start point; false otherwise.
 <a name="routeFound">routeFound</a> | true if a route that visits origin, all waypoints, and destination has been found; false otherwise.
 <a name="route">route</a> | Geometry of the best route found; represented as a structured sequence of points.
