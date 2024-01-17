@@ -23,7 +23,11 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 9. Exclude specific restrictions by providing a comma-separated list of restriction IDs
 10. Restriction types can now be passed as parameters
 11. New restriction types have been added.
-    
+
+### Route Planner 2.1.8
+1. Route Planner 2.1.8 is backward compatible with Route Planner 2.x.
+2. Configuration updated to apply the Global Distortion Field (gdf) to cars. To avoid impacting existing routes, friction factors will only be applied to the following road classes to avoid their use where possible (recreation, resource, restricted, service)
+
 ### Route Planner 2.1.7
 1. Route Planner 2.1.7 is backward compatible with Route Planner 2.x.
 2. The betweenPairs request was updated to better handle situations where a route is not found. The updated version will return route information for all valid points and a -1 time and distance value as well as a routeFound:false value for failure cases.
