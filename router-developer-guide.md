@@ -3,7 +3,7 @@
 This guide is aimed at developers who would like to incorporate the BC Route Planner into their applications, websites and scripts.
 <br>
 ## Introduction
-The BC Route Planner REST API lets you integrate routing between locations in BC into your own applications. This document expands on aspects of the REST API that are covered in the [API Specification](https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). You can test and explore the API in the [API Console](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). For a list of the latest changes to the Route Planner API, see [Route Planner Release Notes](https://bcgov.github.io/ols-router/rpng-release-notes.html)
+The BC Route Planner REST API lets you integrate routing between locations in BC into your own applications. This document expands on aspects of the REST API that are covered in the [API Specification](https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). You can test and explore the API in the [API Console](https://openapi.apps.gov.bc.ca/?url=https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json). For a list of the latest changes to the Route Planner API, see [Route Planner Release Notes](https://bcgov.github.io/ols-router/rpng-release-notes.html)
 <br>
 
 Your application can store router results or display them on any web map. The BC Route Planner API supports GET and POST requests. POST should be used when you have many waypoints to visit.
