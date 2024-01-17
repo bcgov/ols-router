@@ -20,7 +20,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 6. Simplify driving directions using the *simplifyDirections* and *simplityThreshold* parameters. The default values are false and 250 respectively.
 7. Enhanced route partitioning to include distance per partition.
 8. Use the *listRestrictions* parameter to include a list of all restriction IDs impacting the direction of travel along a route.
-9. Specify the source of road restrictions using the *restrictionSource* parameter. Options include ITN (Integrated Transportation Network) or RDM (Restriction Data Manager). The default value is ITN. The RDM data is currently for demo purposes only.
+9. Specify the source of road restrictions using the *restrictionSource* parameter. Options include ITN (Integrated Transportation Network) or RDM (Restriction Data Manager). The default value is ITN.
 10. Use the *excludeRestrictions* parameter to exclude specific restrictions. Provided as a comma-separated list of restriction IDs.
 11. Restriction types can now be passed as parameters using the *restrictionValues* parameter
 12. New restriction types have been added (see [API console](https://openapi.apps.gov.bc.ca/?url=https://raw.githubusercontent.com/bcgov/api-specs/master/router/router.json)).
