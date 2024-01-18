@@ -41,7 +41,9 @@ The distance resource represents the length and duration of the shortest or fast
 4. Length and time of shortest route in km between all pairs of fromPoints and toPoints.<br>
 https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=betweenPairs%20test%20case&fromPoints=-123.70794%2C48.77869%2C-123.53785%2C48.38200&toPoints=-124.972951%2C49.715181%2C-123.139464%2C49.704015&criteria=shortest<br>
 
-5. Length and time of shortest route in km between pairs fromPoints and toPoints. In this example, we use the maxPairs parameter to control the maximum number of pairs to return for each toPoint. Pairs are ordered by distance/time from fromPoint<br>
+5. Length and time of the fastest route in km for a truck with specific dimensions and weight. This route will also arrive on the correct side of the road and use the default values for the enable and disable parameters. <br> https://router.api.gov.bc.ca/truck/distance.json?points=-123.70794,48.77869,-123.53785,48.38200&outputSRS=4326&criteria=fastest&distanceUnit=km&roundTrip=false&correctSide=true&truckRouteMultiplier=9&height=4.5&width=3&length=10&weight=18000&enable=gdf,ldf,tr,xc,tc&disable=td,ev,sc,tf,tl&snapDistance=1000&routeDescription=Truck routing example
+
+6. Length and time of shortest route in km between pairs fromPoints and toPoints. In this example, we use the maxPairs parameter to control the maximum number of pairs to return for each toPoint. Pairs are ordered by distance/time from fromPoint<br>
 https://router.api.gov.bc.ca/distance/betweenPairs.json?routeDescription=betweenPairs%20test%20case&fromPoints=-123.70794%2C48.77869%2C-123.53785%2C48.38200&toPoints=-124.972951%2C49.715181%2C-123.139464%2C49.704015&criteria=shortest&maxPairs=1<br>
 
 **The betweenPairs request can also be submitted to follow a truck route by changing '/distance' to '/truck/distance'**
