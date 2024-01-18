@@ -16,8 +16,8 @@ Source data for the BC Route Planner comes from a variety of sources outlined in
 
 The BC Route Planner is written in Java and uses the jSprit open source libraries. The [Location Services in Action](https://bcgov.github.io/ols-devkit/ols-demo/index.html) web application, which demonstrates the features of the BC Route Planner, is written in JavaScript and uses jQuery and Leaflet libraries and plugins.
 
-## Limitations of Route Planner API v2.1
-Route Planner API v2.2.1 is backward-compatible with v2.x. There are still some limitations on the new features and data in Route Planner v2.2.1. For complete details, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
+## Latest updates to the Route Planner API
+For a list of the latest updates to the BC Route Planner API, see the [release notes](https://github.com/bcgov/ols-router/blob/gh-pages/rpng-release-notes.md).
 
 ## API Key
 Use of the BC Route Planner REST API is currently restricted to use by BC government applications. If you are working on a government application that needs routing, please submit a request for access via the [API Services Portal](https://api.gov.bc.ca/)
@@ -66,6 +66,8 @@ Attribute Name |	Type
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
+[dataProcessingTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp) | String
+[roadNetworkTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distance) | String
@@ -82,17 +84,19 @@ and here is the json response:
 ```json
 {
    "routeDescription": "fastest distance in km and json",
-   "searchTimestamp": "2023-02-14 23:2:40",
+   "searchTimestamp": "2024-01-17T23:54:17.171470456",
    "executionTime": 128,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.70794,
@@ -154,6 +158,8 @@ Attribute Name |	Type
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
+[dataProcessingTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp) | String
+[roadNetworkTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distance) | String
@@ -174,17 +180,19 @@ and here's the json response:
 ```json
 {
    "routeDescription": null,
-   "searchTimestamp": "2023-02-14 23:28:56",
+   "searchTimestamp": "2024-01-18T00:02:12.905033425",
    "executionTime": 1,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.11389,
@@ -199,25 +207,31 @@ and here's the json response:
    "distance": 0.874,
    "time": 131.71439858979718,
    "timeText": "2 minutes 12 seconds",
-   "partition": "isFerry,isTruckRoute,locality",
+   "partition": "isFerry,isTruckRoute,locality,ownership",
    "partitions": [
       {
          "index": 0,
+         "distance": 0.231,
          "isFerry": false,
          "isTruckRoute": false,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       },
       {
          "index": 3,
+         "distance": 0.422,
          "isFerry": false,
          "isTruckRoute": true,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       },
       {
-         "index": 8,
+         "index": 9,
+         "distance": 0.221,
          "isFerry": false,
          "isTruckRoute": false,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       }
    ],
    "route": [
@@ -312,6 +326,8 @@ Attribute Name |	Type
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
+[dataProcessingTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp) | String
+[roadNetworkTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | List of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distance) | String
@@ -326,7 +342,7 @@ Attribute Name |	Type
 
 Here is a sample request for a route in json that includes multiple partitions:
 
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality,ownership
 
 
 and here's the json response:
@@ -334,17 +350,19 @@ and here's the json response:
 ```json
 {
    "routeDescription": null,
-   "searchTimestamp": "2023-02-14 23:31:1",
+   "searchTimestamp": "2024-01-18T00:07:14.093209488",
    "executionTime": 1,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.11389,
@@ -359,25 +377,31 @@ and here's the json response:
    "distance": 0.874,
    "time": 131.71439858979718,
    "timeText": "2 minutes 12 seconds",
-   "partition": "isFerry,isTruckRoute,locality",
+   "partition": "isFerry,isTruckRoute,locality,ownership",
    "partitions": [
       {
          "index": 0,
+         "distance": 0.231,
          "isFerry": false,
          "isTruckRoute": false,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       },
       {
          "index": 3,
+         "distance": 0.422,
          "isFerry": false,
          "isTruckRoute": true,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       },
       {
-         "index": 8,
+         "index": 9,
+         "distance": 0.221,
          "isFerry": false,
          "isTruckRoute": false,
-         "locality": "Vancouver"
+         "locality": "Vancouver",
+         "ownership": null
       }
    ],
    "route": [
@@ -495,17 +519,19 @@ and here's the json response:
 ```json
 {
    "routeDescription": null,
-   "searchTimestamp": "2023-02-14 23:34:28",
+   "searchTimestamp": "2024-01-18T00:11:30.638192471",
    "executionTime": 2,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.10084,
@@ -524,6 +550,7 @@ and here's the json response:
    "partitions": [
       {
          "index": 0,
+         "distance": 2.96,
          "isTruckRoute": true
       }
    ],
@@ -892,6 +919,8 @@ Attribute Name |	Type
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
+[dataProcessingTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp) | String
+[roadNetworkTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distance) | String
@@ -906,19 +935,21 @@ Here is a sample json response:
 ```json
 {
    "routeDescription": null,
-   "searchTimestamp": "2023-02-14 23:44:47",
+   "searchTimestamp": "2024-01-18T00:16:46.497283541",
    "executionTime": 87,
    "routingExecutionTime": 2,
    "optimizationExecutionTime": 83,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.36517,
@@ -1110,6 +1141,8 @@ Attribute Name |	Type
 [criteria](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#criteria) | String
 [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) | String
 [distanceUnit](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distanceUnit) | String
+[dataProcessingTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp) | String
+[roadNetworkTimestamp](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp) | String
 [points](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#points) | list of Point
 [routeFound](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#routeFound) | Boolean
 [distance](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#distance) | String
@@ -1125,19 +1158,21 @@ Here is a sample json response:
 ```json
 {
    "routeDescription": null,
-   "searchTimestamp": "2023-02-14 23:48:49",
+   "searchTimestamp": "2024-01-18T00:19:07.508034926",
    "executionTime": 80,
    "routingExecutionTime": 1,
    "optimizationExecutionTime": 77,
-   "version": "2.1.7-RELEASE",
+   "version": "2.2.1-RELEASE",
    "disclaimer": "https://www2.gov.bc.ca/gov/content?id=79F93E018712422FBC8E674A67A70535",
    "privacyStatement": "https://www2.gov.bc.ca/gov/content?id=9E890E16955E4FF4BF3B0E07B4722932",
-   "copyrightNotice": "Copyright 2022 Province of British Columbia - Open Government License",
+   "copyrightNotice": "Copyright 2024 Province of British Columbia",
    "copyrightLicense": "https://www2.gov.bc.ca/gov/content?id=A519A56BC2BF44E4A008B33FCF527F61",
    "srsCode": 4326,
    "criteria": "fastest",
    "enable": "gdf,ldf,tc,tr,xc",
    "distanceUnit": "km",
+   "dataProcessingTimestamp": "2023-12-18T23:05:54Z",
+   "roadNetworkTimestamp": "2023-09-29T21:28:38Z",
    "points": [
       [
          -123.36517,
