@@ -141,7 +141,7 @@ https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2
 8. Fastest route in km and json between Williams Lake and a mine. In this case, we are trying to navigate to a location that is not found on the road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
 https://router.api.gov.bc.ca/route.json?points=-122.14%2C52.1288889%2C-121.61941%2C52.54039&snapDistance=1200&apikey=JKM6YZujMf93wbQQVxAHM7XIWAWeaFX4<br>
    
-9. Length and time of the fastest route in km for a truck with specific dimensions and weight. This route will also arrive on the correct side of the road and use the default values for the enable and disable parameters. This example will also include route partitions and restriction IDs <br> https://router.api.gov.bc.ca/truck/route.json?points=-123.70794,48.77869,-123.53785,48.38200&outputSRS=4326&criteria=fastest&distanceUnit=km&roundTrip=false&correctSide=true&truckRouteMultiplier=9&height=4.5&width=3&length=10&weight=18000&partition=isTruckRoute,isFerry,locality,ownership&enable=gdf,ldf,tr,xc,tc&disable=td,ev,sc,tf,tl&snapDistance=1000&listRestrictions=true&restrictionSource=ITN&routeDescription=Truck_routing_example
+9. Length and time of the fastest route in km for a truck with specific dimensions and weight. This route will also arrive on the correct side of the road and use the default values for the enable and disable parameters. This example will also include route partitions and restriction IDs <br> https://router.api.gov.bc.ca/truck/route.json?points=-123.70794,48.77869,-123.53785,48.38200&outputSRS=4326&criteria=fastest&distanceUnit=km&roundTrip=false&correctSide=true&height=4.5&width=3&length=10&weight=18000&partition=isTruckRoute,isFerry,locality,ownership&enable=gdf,ldf,tr,xc,tc&disable=td,ev,sc,tf,tl&snapDistance=1000&listRestrictions=true&restrictionSource=ITN&routeDescription=Truck_routing_example
 
 
 ### HTTP response
@@ -175,7 +175,7 @@ Attribute Name |	Type
 
 Here is a request for fastest route in vancouver with partitions in json:
 
-https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality
+https://router.api.gov.bc.ca/truck/route.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality,ownership
 
 
 and here's the json response:
@@ -305,11 +305,13 @@ https://router.api.gov.bc.ca/truck/directions.json?points=-123.392803%2C48.43301
 6. Directions and fastest route around a bridge for an overweight truck<br>
 https://router.api.gov.bc.ca/truck/directions.json?points=-116.80488%2C49.69928%2C-116.8053633591626%2C49.6953321774235&followTruckRoute=true&weight=30001<br>
    
-7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, and locality<br>
-https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality<br>
+7. Directions and fastest route for a truck following truck routes in Vancouver with partitioning of best route by truck route, ferry, locality and ownership<br>
+https://router.api.gov.bc.ca/truck/directions.json?points=-123.1138889%2C49.2611111%2C-123.11165904393421%2C49.26551411372797&followTruckRoute=true&partition=isTruckRoute,isFerry,locality,ownership<br>
 
 8. Directions and fastest route in km and json between Williams Lake and a mine. In this case, we are trying to navigate to a location that is not found on the road network. By default, a route cannot be found to a point that is beyond 1000 metres from the road network. Using the snapDistance parameter we can override this default.<br>
 https://router.api.gov.bc.ca/directions.json?points=-122.14%2C52.1288889%2C-121.61941%2C52.54039&snapDistance=1200&apikey=JKM6YZujMf93wbQQVxAHM7XIWAWeaFX4<br>
+
+9. Length and time of the fastest route in km for a truck with specific dimensions and weight. This route will also arrive on the correct side of the road and use the default values for the enable and disable parameters. This example will also include route partitions and restriction IDs <br> https://router.api.gov.bc.ca/truck/directions.json?points=-123.70794,48.77869,-123.53785,48.38200&outputSRS=4326&criteria=fastest&distanceUnit=km&roundTrip=false&correctSide=true&height=4.5&width=3&length=10&weight=18000&partition=isTruckRoute,isFerry,locality,ownership&enable=gdf,ldf,tr,xc,tc&disable=td,ev,sc,tf,tl&snapDistance=1000&listRestrictions=true&restrictionSource=ITN&routeDescription=Truck_routing_example
 
 
 ### HTTP response
