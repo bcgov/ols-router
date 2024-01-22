@@ -6,7 +6,6 @@ package ca.bc.gov.ols.router.rest.messageconverters.json;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;

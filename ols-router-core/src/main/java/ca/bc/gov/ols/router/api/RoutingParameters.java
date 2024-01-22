@@ -518,6 +518,13 @@ public class RoutingParameters {
 		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
 	}
 	
+	/**
+	 * Resolves any parameters whose values are dependent on other parameters; called after all parameter setters have been called.
+	 *  
+	 * @param config the RouterConfig to use for defaults values and SRS
+	 * @param gf the geometryFactory to use to create point geometry parameters
+	 * @param gr the GeometryReprojector to use to reproject geometries as required
+	 */
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {
 		if(point != null && point.length == 2) {
 			pointPoint = gr.reproject(gf.createPoint(new Coordinate(point[0], point[1])), config.getBaseSrsCode());

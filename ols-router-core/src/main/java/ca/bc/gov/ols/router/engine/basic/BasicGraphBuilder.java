@@ -616,6 +616,12 @@ public class BasicGraphBuilder implements GraphBuilder {
 	}
 	
 	public BasicGraph build() {
+		if(turnLookup == null) {
+			turnLookup = new TurnLookup(graph);
+		}
+		if(eventLookup == null) {
+			eventLookup = new EventLookup();
+		}
 		graph.build();
 		graph.setTurnCostLookup(turnLookup);
 		graph.setEventLookup(eventLookup);
