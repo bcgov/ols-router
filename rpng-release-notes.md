@@ -59,7 +59,7 @@ The partitions are returned in a separate partitions parameter; the route output
 
 8. One-way weight restrictions are now supported. This is necessary to prevent heavy trucks from turning onto a road with a steep downward grade.
 
-9. Route directions now include ([notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) for oversize commercial vehicles (in the Greater Vancouver area)
+9. Route directions now include ([notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) for oversize commercial vehicles (in the Greater Vancouver area))
 
 
 ### Route Planner 2.0
