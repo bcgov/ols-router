@@ -26,7 +26,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ### Route Planner 2.1.8
 1. Route Planner 2.1.8 is backward compatible with Route Planner 2.x.
-2. Configuration updated to apply the Global Distortion Field (gdf) to cars. To avoid impacting existing routes, friction factors will only be applied to the following road classes to avoid their use where possible (recreation, resource, restricted, service)
+2. Configuration updated to apply the Global Distortion Field ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) to cars. To avoid impacting existing routes, friction factors will only be applied to the following road classes to avoid their use where possible (recreation, resource, restricted, service)
 
 ### Route Planner 2.1.7
 1. Route Planner 2.1.7 is backward compatible with Route Planner 2.x.
