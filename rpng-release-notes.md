@@ -16,7 +16,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 2. The BC Route Planner response now includes timestamps indicating when the data was last processed (dataProcessingTimestamp) as well as the road network data vintage (roadNetworkTimestamp).
 3. Use the *enable* parameter to include a list of Transport Line ID's in the BC Route Planner response that are associated with the route.
    * tl - transportation line IDs; disabled by default
-5. Use the *snapDistance* parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
+5. Use the [*snapDistance*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#snapDistance) parameter to adjust the maximum distance (in metres) away from the road that a point can be located within and still find a route. The default value is 1000.
 6. Simplify driving directions using the *simplifyDirections* and *simplityThreshold* parameters. The default values are false and 250 respectively.
 7. Enhanced route partitioning to include distance per partition.
 8. Use the *listRestrictions* parameter to include a list of all restriction IDs impacting the direction of travel along a route.
