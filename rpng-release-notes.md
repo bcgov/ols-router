@@ -39,27 +39,27 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ### Route Planner 2.1.3
 1. Route Planner 2.1.3 is backward compatible with Route Planner 2.x.
-2. Truck resources now have default for followTruckRoute set to true.
+2. Truck resources now have a default value of followTruckRoute=true.
 
 ### Route Planner 2.1
 1. Route Planner 2.1 is backward compatible with Route Planner 2.x.
 
-2. Enable intersection crossing costs to more accurately model all combinations of major and minor road crossings.
+2. Enable intersection crossing costs (([xc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable))) to more accurately model all combinations of major and minor road crossings.
 
-3. Enable the global distortion field to allow the router to prefer major roads over minor ones. Global distortion fields only affect truck routing (e.g. requests that specify the /truck resource).
+3. Enable the global distortion field ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) to allow the router to prefer major roads over minor ones. Global distortion fields ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) only affect truck routing (e.g. requests that specify the /truck resource).
 
-4. Enable local distortion fields to steer trucks away from particular roads or truck routes. Local distortion fields only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
+4. Enable local distortion fields ([ldf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) to steer trucks away from particular roads or truck routes. Local distortion fields ([ldf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) only affect truck routing (e.g., requests that specify the /truck resource). Local distortion fields are defined by road authorities.
 
-5. Use the [*enable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) parameter to turn on optional features including honouring route start time, turn restrictions, turn costs, intersection crossing costs, global and local distortion fields, ferry schedules (**demo use only**), historic traffic congestion (**demo use only**), and road events(**demo use only**).
+5. Use the [*enable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) parameter to turn on optional features including honouring route start time, turn restrictions ([tr](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)), turn costs ([tc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)), intersection crossing costs ([xc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)), global ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) and local distortion fields ([ldf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)), ferry schedules ([sc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) (**demo use only**), historic traffic congestion ([tf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) (**demo use only**), and road events ([ev](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) (**demo use only**).
 
-6. The [*disable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disable) parameter is now deprecated. Use the enable parameter instead.
+6. The [*disable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disable) parameter is now deprecated. Use the [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) parameter instead.
 
 7. Use the [*partition*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#partition) parameter to partition the best route by truck/non-truck segments, ferry/non-ferry segments, and locality. 
 The partitions are returned in a separate partitions parameter; the route output parameter is unchanged. Partitions give your application enough information to treat truck route portions of a route differently than non-truck route portions (e.g., different styles). Same for ferry segments. Locality partitioning gives your application a complete list of municipalities traversed by the best route which is useful in determining appropriate truck bylaws for example.
 
 8. One-way weight restrictions are now supported. This is necessary to prevent heavy trucks from turning onto a road with a steep downward grade.
 
-9. Route directions now include notifications for oversize commercial vehicles (in the Greater Vancouver area)
+9. Route directions now include ([notifications](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#notifications) for oversize commercial vehicles (in the Greater Vancouver area)
 
 
 ### Route Planner 2.0
@@ -70,14 +70,14 @@ The partitions are returned in a separate partitions parameter; the route output
 3. Use the new [*correctSide*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#correctSide) parameter to specify if origin and destination should begin and end on the correct side of the street. For example, 1175 Douglas St, Victoria, BC is on the east side of Douglas St. To start or end on this side of the street, set correctSide to True.
 
 4. All new features are grouped into modules that can be turned on or off with each routing request using the new [*disable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disable) parameter as follows:
-   * td – time-dependency; disabling this disables sc, tf, and ev modules
-   * tr – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
-   * tc - turn costs (e.g., left turns take longer than right turns)
-   * sc – ferry schedules; disabled by default; **uses dummy data so is only suitable for demos**
-   * tf – historic traffic congestion; disabled by default; **uses dummy data so is only suitable for demos**
-   * ev – road events; disabled by default; **uses dummy data so is only suitable for demos**
+   * [td](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – time-dependency; disabling this disables sc, tf, and ev modules
+   * [tr](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
+   * [tc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) - turn costs (e.g., left turns take longer than right turns)
+   * [sc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – ferry schedules; disabled by default; **uses dummy data so is only suitable for demos**
+   * [tf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – historic traffic congestion; disabled by default; **uses dummy data so is only suitable for demos**
+   * [ev](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – road events; disabled by default; **uses dummy data so is only suitable for demos**
 
-5. You can specify truck dimensions with the *height* (OAH in metres), *width* (OAW in metres), and *weight* (GVW in kg) parameters. **Note that dimension restrictions are only suitable for demos**</b>
+5. You can specify truck dimensions with the [*height*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#height) (OAH in metres), [*width*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#width) (OAW in metres), and [*weight*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#weight) (GVW in kg) parameters. **Note that dimension restrictions are only suitable for demos**</b>
 
 6. Use the [*truckRouteMultiplier*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#truckRouteMultiplier) parameter to specify how strongly a route should be attracted to truck routes; 9 is good, 100 simulates a black hole, o is a meander that’s fun to watch. Thanks to open data from TransLink, you will find many truck routes in the Greater Vancouver area but nowhere else in the province.
 
