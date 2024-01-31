@@ -44,7 +44,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 ### Route Planner 2.1
 1. Route Planner 2.1 is backward compatible with Route Planner 2.x.
 
-2. Enable intersection crossing costs (([xc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable))) to more accurately model all combinations of major and minor road crossings.
+2. Enable intersection crossing costs ([xc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) to more accurately model all combinations of major and minor road crossings.
 
 3. Enable the global distortion field ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) to allow the router to prefer major roads over minor ones. Global distortion fields ([gdf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable)) only affect truck routing (e.g. requests that specify the /truck resource).
 
