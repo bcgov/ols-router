@@ -55,7 +55,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 6. The [*disable*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#disable) parameter is now deprecated. Use the [enable](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) parameter instead.
 
 7. Use the [*partition*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#partition) parameter to partition the best route by truck/non-truck segments, ferry/non-ferry segments, and locality. 
-The partitions are returned in a separate partitions parameter; the route output parameter is unchanged. Partitions give your application enough information to treat truck route portions of a route differently than non-truck route portions (e.g., different styles). Same for ferry segments. Locality partitioning gives your application a complete list of municipalities traversed by the best route which is useful in determining appropriate truck bylaws for example.
+The partitions are returned in a separate partitions parameter; the route output parameter is unchanged. [*Partitions*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#partitions) give your application enough information to treat truck route portions of a route differently than non-truck route portions (e.g., different styles). Same for ferry segments. Locality partitioning gives your application a complete list of municipalities traversed by the best route which is useful in determining appropriate truck bylaws for example.
 
 8. One-way weight restrictions are now supported. This is necessary to prevent heavy trucks from turning onto a road with a steep downward grade.
 
