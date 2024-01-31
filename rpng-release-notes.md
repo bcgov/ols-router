@@ -73,9 +73,9 @@ The partitions are returned in a separate partitions parameter; the route output
    * [td](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – time-dependency; disabling this disables sc, tf, and ev modules
    * [tr](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – turn restrictions; if td is disabled, time-dependent turn restrictions are ignored
    * [tc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) - turn costs (e.g., left turns take longer than right turns)
-   * [sc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – ferry schedules; disabled by default; **uses dummy data so is only suitable for demos**
-   * [tf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – historic traffic congestion; disabled by default; **uses dummy data so is only suitable for demos**
-   * [ev](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – road events; disabled by default; **uses dummy data so is only suitable for demos**
+   * [sc](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – ferry schedules; disabled by default; **only suitable for demos**
+   * [tf](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – historic traffic congestion; disabled by default; **only suitable for demos**
+   * [ev](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#enable) – road events; disabled by default; **only suitable for demos**
 
 5. You can specify truck dimensions with the [*height*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#height) (OAH in metres), [*width*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#width) (OAW in metres), and [*weight*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#weight) (GVW in kg) parameters. **Note that dimension restrictions are only suitable for demos**</b>
 
