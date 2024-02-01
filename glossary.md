@@ -3,7 +3,7 @@
 Term | Definition
 ----: | -----------
 <a name=best route>best route</a> | The route found by the route planner that best meets the constraints specified by the input parameters of a given routing request.
-<a name="betweenPairs">betweenPairs</a> | A resource to get the distance and travel time between all pairs of fromPoints and toPoints.
+<a name="betweenPairs">betweenPairs</a> | A request to get the distance and travel time between all pairs of fromPoints and toPoints.
 <a name="copyrightNotice">copyrightNotice</a> | Copyright notice applicable to all responses of the BC Route Planner API.
 <a name="copyrightLicense">copyrightLicense</a> | Copyright license applicable to all responses of the BC Route Planner API.
 <a name="correctSide">correctSide</a> | If true, the route starts and ends on same side of road as start and end points. Default is false.
