@@ -30,7 +30,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ### Route Planner 2.1.7
 1. Route Planner 2.1.7 is backward compatible with Route Planner 2.x.
-2. The betweenPairs request was updated to better handle situations where a route is not found. The updated version will return route information for all valid points and a -1 time and distance value as well as a routeFound:false value for failure cases.
+2. The [betweenPairs](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#betweenPairs) request was updated to better handle situations where a route is not found. The updated version will return route information for all valid points and a -1 time and distance value as well as a routeFound:false value for failure cases.
 
 ### Route Planner 2.1.4
 1. Route Planner 2.1.4 is backward compatible with Route Planner 2.x.
