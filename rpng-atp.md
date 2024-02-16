@@ -3,9 +3,9 @@
 ## Background
 Route Planner Next Generation is a three year project to develop an open source route planner capable of time-dependent routing and commercial vehicle routing.
 
-- Version 2.0, due for release in May, 2019 will support time-dependent routing. 
-- Version 2.1 will support truck routing for use in height clearance applications.
-- Version 3.0 will support truck routing as needed in core truck permitting.
+- Version 2.0 supports time-dependent routing. 
+- Version 2.2.1 will support truck routing for use in height clearance applications.
+- Version 3.0 will support support truck routing as needed in core truck permitting.
 - Version 4.0 will support ferry schedules, real-time road events, and truck routing as needed in advanced truck permitting.
 
 ## Purpose
