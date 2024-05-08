@@ -95,6 +95,20 @@ public class HtmlConverterHelper extends ConverterHelper {
 		writeField("distanceUnit", response.getDistanceUnit().abbr());
 		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
 		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
+		writeField("departure", String.valueOf(response.getDeparture()));
+		writeField("correctSide", response.isCorrectSide());
+		writeField("vehicleType", String.valueOf(response.getVehicleType()));
+		writeField("followTruckRoute", response.isFollowTruckRoute());
+		writeField("truckRouteMultiplier", response.getTruckRouteMultiplier());
+		writeField("xingCost", response.getXingCostString());
+		writeField("turnCost", response.getTurnCostString());
+		writeField("globalDistortionField", formatMap(response.getGlobalDistortionField().toMap(response.getVehicleType())));
+		writeField("snapDistance", response.getSnapDistance());
+		writeField("simplifyDirections", response.isSimplifyDirections());
+		writeField("simplifyThreshold", response.getSimplifyThreshold());
+		writeField("restrictionSource", String.valueOf(response.getRestrictionSource()));
+		writeField("restrictionValues", formatMap(response.getRestrictionValues()));
+		writeField("excludeRestrictions", String.valueOf(response.getExcludeRestrictions()));
 	}
 	
 	protected void writeFields(RouterDistanceResponse response) throws IOException {

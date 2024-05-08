@@ -8,8 +8,18 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+
+import com.google.gson.stream.JsonWriter;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
@@ -31,14 +41,6 @@ import ca.bc.gov.ols.router.engine.basic.Attribute;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.router.rest.messageconverters.ConverterHelper;
 import ca.bc.gov.ols.router.util.TimeHelper;
-
-import com.google.gson.stream.JsonWriter;
-import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.MultiPolygon;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.Polygon;
 
 public class JsonConverterHelper extends ConverterHelper {
 
@@ -76,6 +78,24 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.name("distanceUnit").value(response.getDistanceUnit().abbr());
 		jw.name("dataProcessingTimestamp").value(String.valueOf(response.getDataProcessingTimestamp()));
 		jw.name("roadNetworkTimestamp").value(String.valueOf(response.getRoadNetworkTimestamp()));
+		jw.name("departure").value(String.valueOf(response.getDeparture()));
+		jw.name("correctSide").value(response.isCorrectSide());
+		jw.name("vehicleType").value(String.valueOf(response.getVehicleType()));
+		jw.name("followTruckRoute").value(response.isFollowTruckRoute());
+		jw.name("truckRouteMultiplier").value(response.getTruckRouteMultiplier());
+		jw.name("xingCost").value(response.getXingCostString());
+		jw.name("turnCost").value(response.getTurnCostString());
+		jw.name("globalDistortionField");
+		outputMap(jw, response.getGlobalDistortionField().toMap(response.getVehicleType()));
+		//response.getGlobalDistortionField().toJson(jw, response.getVehicleType());
+		jw.name("snapDistance").value(response.getSnapDistance());
+		jw.name("simplifyDirections").value(response.isSimplifyDirections());
+		jw.name("simplifyThreshold").value(response.getSimplifyThreshold());
+		jw.name("restrictionSource").value(String.valueOf(response.getRestrictionSource()));
+		jw.name("restrictionValues");
+		outputMap(jw, response.getRestrictionValues());
+		jw.name("excludeRestrictions");
+		outputList(jw, response.getExcludeRestrictions());
 	}
 	
 	protected void writeFields(RouterDistanceResponse response) throws IOException {
@@ -150,7 +170,7 @@ public class JsonConverterHelper extends ConverterHelper {
 		}
 		List<Partition> parts = response.getPartitions();
 		if(parts != null && !parts.isEmpty()) {
-			jw.name("partition").value(String.join(",", response.getPartition().parallelStream().map(Attribute::toString).collect(Collectors.toList())));
+			jw.name("partition").value(String.join(",", response.getPartition().stream().map(Attribute::toString).collect(Collectors.toList())));
 			jw.name("partitions");
 			jw.beginArray();
 			for(Partition p : parts) {
@@ -341,6 +361,35 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.jsonValue(formatOrdinate(x));
 		jw.jsonValue(formatOrdinate(y));
 		jw.endArray();		
+	}
+
+	public static void outputValue(JsonWriter jw, Object value) throws IOException {
+		if(value instanceof Number) {
+			jw.value((Number)value);
+		} else {
+			jw.value(value.toString());
+		}		
+	}
+	
+	public static <E> void outputList(JsonWriter jw, Collection<E> list) throws IOException {
+		jw.beginArray();
+		if(list != null && !list.isEmpty()) {
+			for(E item : list) {
+				outputValue(jw, item);
+			}
+		}
+		jw.endArray();
+	}
+
+	public static <A,B> void outputMap(JsonWriter jw, Map<A,B> map) throws IOException {
+		jw.beginObject();
+		if(map != null && !map.isEmpty()) {
+			for(Entry<A, B> entry : map.entrySet()) {
+				jw.name(entry.getKey().toString());
+				outputValue(jw, entry.getValue());
+			}
+		}
+		jw.endObject();	
 	}
 
 }

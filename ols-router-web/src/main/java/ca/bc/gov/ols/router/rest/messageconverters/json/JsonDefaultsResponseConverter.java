@@ -9,7 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpInputMessage;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import com.google.gson.stream.JsonWriter;
 
-import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.api.DefaultsResponse;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
@@ -77,30 +75,10 @@ public class JsonDefaultsResponseConverter extends AbstractHttpMessageConverter<
 		jw.beginObject();
 		
 		jw.name("CAR");
-		jw.beginObject();
-		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.CAR).getNonTruckField().entrySet()) {
-			if(entry.getKey().isRouteable()) {
-				jw.name(entry.getKey().toString());
-				jw.value(entry.getValue());
-			}
-		}
-		jw.endObject(); // globalDistortionField.CAR
+		JsonConverterHelper.outputMap(jw, response.getGlobalDistortionField(VehicleType.CAR).toMap(VehicleType.CAR)); // globalDistortionField.CAR
 
 		jw.name("TRUCK");
-		jw.beginObject();
-		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.TRUCK).getNonTruckField().entrySet()) {
-			if(entry.getKey().isRouteable()) {
-				jw.name(entry.getKey().toString());	
-				jw.value(entry.getValue());
-			}
-		}
-		for(Entry<RoadClass, Double> entry : response.getGlobalDistortionField(VehicleType.TRUCK).getTruckField().entrySet()) {
-			if(entry.getKey().isRouteable()) {
-				jw.name(entry.getKey().toString() + ".truck");
-				jw.value(entry.getValue());
-			}
-		}
-		jw.endObject(); // globalDistortionField.TRUCK
+		JsonConverterHelper.outputMap(jw, response.getGlobalDistortionField(VehicleType.TRUCK).toMap(VehicleType.TRUCK)); // globalDistortionField.CAR
 		
 		jw.endObject(); // globalDistortionField
 		
