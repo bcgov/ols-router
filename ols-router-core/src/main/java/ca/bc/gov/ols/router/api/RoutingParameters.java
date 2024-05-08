@@ -52,7 +52,6 @@ public class RoutingParameters {
 	private Instant departure = Instant.now();
 	private boolean correctSide = false;
 	private VehicleType vehicleType = VehicleType.CAR;
-	private Double length;
 	private boolean followTruckRoute = false;
 	private double truckRouteMultiplier = 9;
 	private static Map<TrafficImpactor,Double> defaultXingCostMap;
@@ -270,27 +269,25 @@ public class RoutingParameters {
 	}
 
 	public void setHeight(Double height) {
-		if(this.restrictionValues.get(RestrictionType.VERTICAL) == null) {
+		if(height != null && this.restrictionValues.get(RestrictionType.VERTICAL) == null) {
 			this.restrictionValues.put(RestrictionType.VERTICAL, height);
 		}
 	}
 
 	public void setWidth(Double width) {
-		if(this.restrictionValues.get(RestrictionType.HORIZONTAL) == null) {
+		if(width != null && this.restrictionValues.get(RestrictionType.HORIZONTAL) == null) {
 			this.restrictionValues.put(RestrictionType.HORIZONTAL, width);
 		}
 	}
 
-	public Double getLength() {
-		return length;
-	}
-
 	public void setLength(Double length) {
-		this.length = length;
+		if(length != null && this.restrictionValues.get(RestrictionType.LENGTH) == null) {
+			this.restrictionValues.put(RestrictionType.LENGTH, length);
+		}
 	}
 
 	public void setWeight(Double weight) {
-		if(this.restrictionValues.get(RestrictionType.WEIGHT_GVW) == null) {
+		if(weight != null && this.restrictionValues.get(RestrictionType.WEIGHT_GVW) == null) {
 			this.restrictionValues.put(RestrictionType.WEIGHT_GVW, weight);
 		}
 	}

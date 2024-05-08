@@ -364,7 +364,9 @@ public class JsonConverterHelper extends ConverterHelper {
 	}
 
 	public static void outputValue(JsonWriter jw, Object value) throws IOException {
-		if(value instanceof Number) {
+		if(value == null) {
+			jw.value("");
+		} else if(value instanceof Number) {
 			jw.value((Number)value);
 		} else {
 			jw.value(value.toString());

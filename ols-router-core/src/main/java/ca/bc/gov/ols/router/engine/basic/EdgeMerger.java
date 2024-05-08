@@ -273,7 +273,8 @@ public class EdgeMerger {
 						&& params.getRestrictionValue(RestrictionType.VERTICAL) > 4.15)
 					|| (params.getRestrictionValue(RestrictionType.HORIZONTAL) != null 
 						&& params.getRestrictionValue(RestrictionType.HORIZONTAL) > 2.6)
-					|| (params.getLength() != null && params.getLength() > 12.5)) {
+					|| (params.getRestrictionValue(RestrictionType.LENGTH) != null)
+						&& params.getRestrictionValue(RestrictionType.LENGTH) > 12.5) {
 				notifications.add(new OversizeNotification());
 			}
 		}
