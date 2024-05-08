@@ -31,7 +31,7 @@ import gnu.trove.map.TIntObjectMap;
 
 /**
  * BasicGraph encapsulates all of the data required to route using the BasicGraphEngine, 
- * including the internal graph structure itself, as well as the various auxilliary data lookups
+ * including the internal graph structure itself, as well as the various auxiliary data lookups
  * such as restrictions, event, schedules, etc.
  */
 public class BasicGraph implements SegmentIdLookup {
@@ -55,7 +55,7 @@ public class BasicGraph implements SegmentIdLookup {
 
 	/**
 	 * Copy constructor for updating
-	 * @param BasicGraph the BasicGraph to copy
+	 * @param g the BasicGraph to copy
 	 */
 	public BasicGraph(BasicGraph g) {
 		internalGraph = g.internalGraph;
