@@ -5,30 +5,19 @@
 package ca.bc.gov.ols.router.datasource;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnClass;
 import ca.bc.gov.ols.router.data.TurnRestriction;
-import ca.bc.gov.ols.router.data.enums.RestrictionSource;
-import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
 import ca.bc.gov.ols.router.open511.parser.Open511Parser;
-import ca.bc.gov.ols.router.restrictions.rdm.RdmParser;
-import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
-import ca.bc.gov.ols.router.restrictions.rdm.RestrictionBuilder;
-import ca.bc.gov.ols.rowreader.JsonRowReader;
 import ca.bc.gov.ols.rowreader.RowReader;
 
 public class RouterDataLoader {
@@ -37,11 +26,13 @@ public class RouterDataLoader {
 	private RouterConfig config;
 	private RouterDataSource dataSource;
 	private GraphBuilder graphBuilder;
+	private DataUpdateManager dum;
 	
-	public RouterDataLoader(RouterConfig config, RouterDataSource dataSource, GraphBuilder graphBuilder) {
+	public RouterDataLoader(RouterConfig config, RouterDataSource dataSource, GraphBuilder graphBuilder, DataUpdateManager dum) {
 		this.config = config;
 		this.dataSource = dataSource;
 		this.graphBuilder = graphBuilder;
+		this.dum = dum;
 	}
 	
 	public void loadData() throws IOException {
@@ -63,9 +54,7 @@ public class RouterDataLoader {
 		
 		Open511Parser open511parser = new Open511Parser(new GeometryFactory(new PrecisionModel(),4326));
 		graphBuilder.addEvents(open511parser.parseEventResponse(dataSource.getOpen511Reader()));
-		
-		RdmParser rdmParser = new RdmParser(new GeometryFactory(RouterConfig.BASE_PRECISION_MODEL, 3005));
-		graphBuilder.addRestrictions(rdmParser.parseRestrictions(dataSource.getRestrictionReader()));
+		graphBuilder.addRestrictions(dum.loadRdmRestrictions(dataSource.getRestrictionReader()));
 		
 		graphBuilder.addTraffic(dataSource.getTrafficReader());
 		

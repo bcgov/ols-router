@@ -30,7 +30,6 @@ import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.restrictions.Constraint;
-import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.util.LineStringSplitter;
 
 public class DijkstraShortestPath {
@@ -92,7 +91,7 @@ public class DijkstraShortestPath {
 					}
 					edges.add(toEdgeIdx);
 				}
-				costByToEdgeIdx[toEdgeIdx] = new DijkstraWalker(toEdge.getEdgeIds()[0], BasicGraph.NO_NODE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, null);
+				costByToEdgeIdx[toEdgeIdx] = new DijkstraWalker(toEdge.getEdgeIds()[0], BasicGraphInternal.NO_NODE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, null);
 			}
 		}
 		
@@ -190,7 +189,7 @@ public class DijkstraShortestPath {
 			int nodeId = walker.getNodeId();
 			int fromEdgeId = walker.getEdgeId();
 			nextEdge:
-			for(int edgeId = graph.nextEdge(nodeId, BasicGraph.NO_EDGE); edgeId != BasicGraph.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
+			for(int edgeId = graph.nextEdge(nodeId, BasicGraphInternal.NO_EDGE); edgeId != BasicGraphInternal.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
 				// if we've already been to this non-end, non-internal edge, or it is part of a loop
 				List<Integer> endEdges = endEdgesById.get(edgeId);
 				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) || isLoop(edgeId, walker))) {
@@ -218,7 +217,7 @@ public class DijkstraShortestPath {
 				
 				// filter the edge based on restrictions
 				if(!params.getRestrictionValues().isEmpty()) {
-					List<? extends Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					List<? extends Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
 					for(Constraint c : constraints) {
 						if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 							continue nextEdge;

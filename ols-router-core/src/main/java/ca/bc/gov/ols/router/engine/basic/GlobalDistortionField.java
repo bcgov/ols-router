@@ -1,13 +1,19 @@
 package ca.bc.gov.ols.router.engine.basic;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.stream.JsonWriter;
+
 import ca.bc.gov.ols.enums.RoadClass;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class GlobalDistortionField {
 	private static final Logger logger = LoggerFactory.getLogger(GlobalDistortionField.class.getCanonicalName());
@@ -81,4 +87,21 @@ public class GlobalDistortionField {
 		return Collections.unmodifiableMap(baseField);
 	}
 
+	public Map<String, Double> toMap(VehicleType type) {
+		HashMap<String, Double> map = new HashMap<String, Double>();
+		for(Entry<RoadClass, Double> entry : baseField.entrySet()) {
+			if(entry.getKey().isRouteable()) {
+				map.put(entry.getKey().toString(), entry.getValue());
+			}
+		}
+		if(VehicleType.TRUCK == type) {
+			for(Entry<RoadClass, Double> entry : truckRouteField.entrySet()) {
+				if(entry.getKey().isRouteable()) {
+					map.put(entry.getKey().toString() + ".truck", entry.getValue());
+				}
+			}
+		}
+		return map;
+	}
+	
 }

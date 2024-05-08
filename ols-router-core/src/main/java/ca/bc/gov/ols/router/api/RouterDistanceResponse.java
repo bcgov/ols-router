@@ -11,7 +11,6 @@ import java.util.Map;
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.rowreader.DateType;
 
 public class RouterDistanceResponse extends ApiResponse {

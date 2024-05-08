@@ -4,18 +4,14 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ca.bc.gov.ols.router.data.RoadClosureEvent;
-import ca.bc.gov.ols.router.data.RoadDelayEvent;
 import ca.bc.gov.ols.router.data.RoadEvent;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 public class EventLookup {
 
@@ -26,7 +22,7 @@ public class EventLookup {
 	}
 	
 	public void addEvent(int edgeId, RoadEvent evt) {
-		if(edgeId == BasicGraph.NO_EDGE) return;
+		if(edgeId == BasicGraphInternal.NO_EDGE) return;
 		ArrayList<RoadEvent> eventList = eventMap.get(edgeId);
 		if(eventList == null) {
 			eventList = new ArrayList<RoadEvent>(1);

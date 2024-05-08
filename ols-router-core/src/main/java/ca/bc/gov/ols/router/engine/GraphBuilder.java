@@ -23,21 +23,21 @@ public interface GraphBuilder {
 
 	public abstract void addEdge(StreetSegment seg);
 
-	public abstract void addTurnRestriction(TurnRestriction cost);
+	public default void addTurnRestriction(TurnRestriction cost) {}
 
-	public abstract void addTurnClass(TurnClass turnClass);
+	public default void addTurnClass(TurnClass turnClass) {}
 
 	public default void addRestrictions(List<Restriction> parseRestrictions) {}
 
-	public abstract void addEvents(EventResponse eventResponse);
+	public default void addEvents(EventResponse eventResponse) {}
 
-	public abstract void addTraffic(RowReader trafficReader);
+	public default void addTraffic(RowReader trafficReader) {}
 
-	public abstract void addSchedules(GtfsDaoImpl gtfs, RowReader mappingReader) throws IOException;
+	public default void addSchedules(GtfsDaoImpl gtfs, RowReader mappingReader) throws IOException {}
 
-	public abstract void addTruckNotices(RowReader truckNoticeReader, RowReader truckNoticeMappingReader);
+	public default void addTruckNotices(RowReader truckNoticeReader, RowReader truckNoticeMappingReader) {}
 
-	public abstract void addLocalDistortionField(RowReader localDistortionFieldReader);
+	public default void addLocalDistortionField(RowReader localDistortionFieldReader) {}
 
 	public abstract void setDates(Map<DateType, ZonedDateTime> dates);
 

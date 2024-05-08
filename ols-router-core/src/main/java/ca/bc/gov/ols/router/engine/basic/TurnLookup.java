@@ -22,13 +22,13 @@ import gnu.trove.set.hash.TIntHashSet;
 public class TurnLookup {
 	private static final Logger logger = LoggerFactory.getLogger(TurnLookup.class.getCanonicalName());
 	
-	private BasicGraph graph;
+	private BasicGraphInternal internalGraph;
 	private IntObjectArrayMap<ArrayList<TurnRestrictionEntry>> turnRestrictionMap;
 	private TIntHashSet internalEdges = new TIntHashSet();
 	
-	public TurnLookup(BasicGraph graph) {
-		this.graph = graph;
-		turnRestrictionMap = new IntObjectArrayMap<ArrayList<TurnRestrictionEntry>>(graph.numEdges());
+	public TurnLookup(BasicGraphInternal internalGraph) {
+		this.internalGraph = internalGraph;
+		turnRestrictionMap = new IntObjectArrayMap<ArrayList<TurnRestrictionEntry>>(internalGraph.numEdges());
 	}
 	
 	public void addRestriction(int[] ids, WeeklyTimeRange restriction, Set<VehicleType> vehicleTypes) {

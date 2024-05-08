@@ -5,14 +5,12 @@
 package ca.bc.gov.ols.router.datasource;
 
 import java.lang.reflect.Constructor;
-import java.util.Properties;
 
+import org.locationtech.jts.geom.GeometryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
-
-import org.locationtech.jts.geom.GeometryFactory;
 
 public class RouterDataSourceFactory {
 	private static final Logger logger = LoggerFactory.getLogger(RouterDataSourceFactory.class.getCanonicalName());

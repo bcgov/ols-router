@@ -316,8 +316,19 @@ public class RoutingParameters {
 		return xingClass.applyMultiplier(xingCostMap.get(imp), xingCostMultiplier);
 	}
 
+	public String getXingCostString() {
+		return xingCostMap.get(TrafficImpactor.YIELD)
+				+ "," + xingCostMap.get(TrafficImpactor.STOPSIGN)
+				+ "," + xingCostMap.get(TrafficImpactor.LIGHT)
+				+ "," + xingCostMultiplier;
+	}
+
 	public double getTurnCost(TurnDirection td, XingClass xingClass) {
 		return xingClass.applyMultiplier(turnCostMap.get(td), xingCostMultiplier);
+	}
+	
+	public String getTurnCostString() {
+		return turnCostMap.get(TurnDirection.LEFT) + "," + turnCostMap.get(TurnDirection.RIGHT);
 	}
 
 	public void setXingCost(double[] xingCost) {

@@ -20,3 +20,5 @@ ROUTER,defaultGlobalDistortionField.TRUCK,""
 ROUTER,defaultGlobalDistortionField.CAR,""
 ROUTER,defaultSnapDistance,1000
 ROUTER,defaultSimplifyThreshold,250
+ROUTER,rdmUpdateInterval,3600
+ROUTER,rdmApiUrl,"https://tst-rdm-public.th.gov.bc.ca/api"

@@ -4,6 +4,7 @@
  */
 package ca.bc.gov.ols.router.api;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -15,10 +16,13 @@ import java.util.Set;
 import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
+import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.engine.basic.Attribute;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.router.engine.basic.GlobalDistortionField;
 import ca.bc.gov.ols.rowreader.DateType;
 
 public class ApiResponse {
@@ -34,7 +38,23 @@ public class ApiResponse {
 	protected String routeDescription;
 	protected ZonedDateTime dataProcessingTimestamp;
 	protected ZonedDateTime roadNetworkTimestamp;
+	
+	protected Instant departure;
+	protected boolean correctSide;
+	protected VehicleType vehicleType;
+	protected boolean followTruckRoute;
+	protected double truckRouteMultiplier;
+	protected String xingCostString;
+	protected double xingCostMultiplier;
+	protected String turnCostString;
+	protected GlobalDistortionField globalDistortionField;
 	protected EnumSet<Attribute> partition;
+	protected int snapDistance;
+	protected boolean simplifyDirections;
+	protected int simplifyThreshold;
+	protected RestrictionSource restrictionSource;
+	protected Map<RestrictionType,Double> restrictionValues;
+	protected Set<Integer> excludeRestrictions;
 
 	public ApiResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
 		timeStamp = LocalDateTime.now();
@@ -48,7 +68,22 @@ public class ApiResponse {
 			dataProcessingTimestamp = dates.get(DateType.PROCESSING_DATE);
 			roadNetworkTimestamp = dates.get(DateType.ITN_VINTAGE_DATE);
 		}
+		departure = params.getDeparture();
+		correctSide = params.isCorrectSide();
+		vehicleType = params.getVehicleType();
+		followTruckRoute = params.isFollowTruckRoute();
+		truckRouteMultiplier = params.getTruckRouteMultiplier();
+		xingCostString = params.getXingCostString();
+		turnCostString = params.getTurnCostString();
+		globalDistortionField = params.getGlobalDistortionField();
+
 		partition = params.getPartition();
+		snapDistance = params.getSnapDistance();
+		simplifyDirections = params.isSimplifyDirections();
+		simplifyThreshold = params.getSimplifyThreshold();
+		restrictionSource = params.getRestrictionSource();
+		restrictionValues = params.getRestrictionValues();
+		excludeRestrictions = params.getExcludeRestrictions();
 	}
 	
 	public LocalDateTime getTimeStamp() {
@@ -123,6 +158,66 @@ public class ApiResponse {
 		return roadNetworkTimestamp;
 	}
 	
+	public Instant getDeparture() {
+		return departure;
+	}
+
+	public boolean isCorrectSide() {
+		return correctSide;
+	}
+
+	public VehicleType getVehicleType() {
+		return vehicleType;
+	}
+
+	public boolean isFollowTruckRoute() {
+		return followTruckRoute;
+	}
+
+	public double getTruckRouteMultiplier() {
+		return truckRouteMultiplier;
+	}
+
+	public String getXingCostString() {
+		return xingCostString;
+	}
+
+	public double getXingCostMultiplier() {
+		return xingCostMultiplier;
+	}
+
+	public String getTurnCostString() {
+		return turnCostString;
+	}
+
+	public GlobalDistortionField getGlobalDistortionField() {
+		return globalDistortionField;
+	}
+
+	public int getSnapDistance() {
+		return snapDistance;
+	}
+
+	public boolean isSimplifyDirections() {
+		return simplifyDirections;
+	}
+
+	public int getSimplifyThreshold() {
+		return simplifyThreshold;
+	}
+
+	public RestrictionSource getRestrictionSource() {
+		return restrictionSource;
+	}
+
+	public Map<RestrictionType, Double> getRestrictionValues() {
+		return restrictionValues;
+	}
+
+	public Set<Integer> getExcludeRestrictions() {
+		return excludeRestrictions;
+	}
+
 	public EnumSet<Attribute> getPartition() {
 		return partition;
 	}

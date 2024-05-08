@@ -21,11 +21,11 @@ public class TrafficLookupBuilder {
 	// beyond this time, samples are forced to base speed (speedLimt)
 	private static final double SPREAD = 2D;
 
-	private BasicGraph graph;
+	private BasicGraphInternal internalGraph;
 	TIntObjectHashMap<Map<DayOfWeek,List<TrafficEntry>>> trafficData;
 	
-	public TrafficLookupBuilder(BasicGraph graph) {
-		this.graph = graph;
+	public TrafficLookupBuilder(BasicGraphInternal internalGraph) {
+		this.internalGraph = internalGraph;
 		trafficData = new TIntObjectHashMap<Map<DayOfWeek,List<TrafficEntry>>>();
 	}
 	
@@ -56,7 +56,7 @@ public class TrafficLookupBuilder {
 			@Override
 			public boolean execute(int edgeId, Map<DayOfWeek, List<TrafficEntry>> trafficMap) {
 				trafficData.remove(edgeId);
-				short baseSpeed = graph.getSpeedLimit(edgeId);
+				short baseSpeed = internalGraph.getSpeedLimit(edgeId);
 				short[] t = new short[7*24];
 				traffic.put(edgeId, t);
 				for(DayOfWeek day : DayOfWeek.values()) {

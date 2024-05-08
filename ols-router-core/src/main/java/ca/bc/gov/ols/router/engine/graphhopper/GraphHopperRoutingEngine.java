@@ -59,12 +59,15 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
+import ca.bc.gov.ols.router.datasource.DataUpdateManager;
 import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.FinishDirection;
 import ca.bc.gov.ols.router.directions.StreetDirection;
 import ca.bc.gov.ols.router.directions.StreetDirectionType;
+import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.StatusMessage.Type;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.StopWatch;
 
@@ -93,8 +96,8 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 		this.config = config;
 		
 		GraphHopperGraphBuilder graphBuilder = new GraphHopperGraphBuilder(reprojector);
-
-		RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder);
+		DataUpdateManager dum = new DataUpdateManager(config);
+		RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder, dum);
 		loader.loadData();
 		graphHopper = new RouterGraphHopper(graphBuilder);
 	}
@@ -476,6 +479,17 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 	@Override
 	public NavInfoResponse navInfo(NavInfoParameters params) {
 		return new NavInfoResponse(params, Collections.emptyList());
+	}
+
+	@Override
+	public RoutingEngine getUpdatedEngine(DataUpdateManager dum) {
+		// updates currently not supported for this engine
+		return this;
+	}
+
+	@Override
+	public List<StatusMessage> getMessages(Type type) {
+		return Collections.emptyList();
 	}
 	
 //	private List<Direction> directionsFromInstructionList(InstructionList il, RoutingParameters params) {
