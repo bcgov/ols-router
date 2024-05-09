@@ -20,7 +20,7 @@ public class RdmFetcher {
 	private String rdmApiUrl = "https://tst-rdm-public.th.gov.bc.ca/api";
 	private static final String RESTRICTIONS_ACTIVE_ENDPOINT = "/view/restrictions_active";
 	private static final String RESTRICTIONS_DELETED_ENDPOINT = "/view/restrictions_deleted";
-	private static final int OFFSET_INCREMENT = 250;
+	private static final int OFFSET_INCREMENT = 500;
 	
 	public RdmFetcher(RouterConfig config) {
 		rdmApiUrl = config.getRdmApiUrl();
@@ -30,7 +30,7 @@ public class RdmFetcher {
 		List<Restriction> allRestrictions = new ArrayList<Restriction>();
 		int offset = 0;
 		while(true) {
-			Reader pageReader = fetchPage(rdmApiUrl + RESTRICTIONS_ACTIVE_ENDPOINT + "?offset=" + offset);
+			Reader pageReader = fetchPage(rdmApiUrl + RESTRICTIONS_ACTIVE_ENDPOINT + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
 			offset += OFFSET_INCREMENT;
 			List<Restriction> restrictions = parser.parseRestrictions(pageReader);
 			if(restrictions.isEmpty()) {
@@ -45,7 +45,7 @@ public class RdmFetcher {
 		List<Restriction> changedRestrictions = new ArrayList<Restriction>();
 		int offset = 0;
 		while(true) {
-			Reader pageReader = fetchPage(rdmApiUrl + RESTRICTIONS_ACTIVE_ENDPOINT + "?offset=" + offset + 
+			Reader pageReader = fetchPage(rdmApiUrl + RESTRICTIONS_ACTIVE_ENDPOINT + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset + 
 					"&filter=LAST_UPDATE_TIMESTAMP BETWEEN '2024-02-10' AND '9999-12-31'");
 			offset += OFFSET_INCREMENT;
 			List<Restriction> restrictions = parser.parseRestrictions(pageReader);
