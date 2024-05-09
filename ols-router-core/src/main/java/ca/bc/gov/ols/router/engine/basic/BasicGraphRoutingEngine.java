@@ -560,7 +560,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RestrictionLookupBuilder rlb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
 			List<Restriction> newRestrictions = dum.fetchRdmRestrictions();
 			rlb.addRestrictions(newRestrictions);
-			graph.setRestrictionLookup(RestrictionSource.RDM, rlb.build());
+			newGraph.setRestrictionLookup(RestrictionSource.RDM, rlb.build());
 			return new BasicGraphRoutingEngine(this, newGraph);
 		} catch(IOException ioe) {
 			logger.warn("IO Error trying to update router data: {}", ioe.getMessage());
