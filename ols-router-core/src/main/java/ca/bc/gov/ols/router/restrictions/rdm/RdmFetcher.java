@@ -60,6 +60,7 @@ public class RdmFetcher {
 	private Reader fetchPage(String urlString) throws IOException {
 		logger.info("Fetching page: {}", urlString);
 		URL url = new URL(urlString);
+		// TODO: we might want to allow retrying with a delay, if a connection fails, to allow for a random failure 
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 		return reader;
 	}

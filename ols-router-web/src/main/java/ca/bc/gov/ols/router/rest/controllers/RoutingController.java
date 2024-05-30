@@ -38,6 +38,7 @@ import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.rest.GeotoolsGeometryReprojector;
 import ca.bc.gov.ols.router.rest.exceptions.InvalidParameterException;
 import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.util.StopWatch;
 
 @RestController
@@ -264,9 +265,14 @@ public class RoutingController {
 		NavInfoResponse response = router.navInfo(params);
 		return response;
 	}
-	
+
+	@RequestMapping(value = "/status", method = {RequestMethod.GET})
+	public SystemStatus status() {
+		return router.getStatus();
+	}
+
 	@RequestMapping(value = "/status/{type}", method = {RequestMethod.GET})
-	public List<StatusMessage> status(@PathVariable StatusMessage.Type type) {
+	public List<StatusMessage> statusByType(@PathVariable StatusMessage.Type type) {
 		return router.getMessages(type);
 	}
 }

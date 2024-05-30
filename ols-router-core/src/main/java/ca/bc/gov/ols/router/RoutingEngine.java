@@ -19,6 +19,7 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.datasource.DataUpdateManager;
 import ca.bc.gov.ols.router.status.StatusMessage;
 import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 
 public interface RoutingEngine {
 
@@ -43,7 +44,7 @@ public interface RoutingEngine {
 
 	public abstract NavInfoResponse navInfo(NavInfoParameters params);
 
-	public abstract RoutingEngine getUpdatedEngine(DataUpdateManager dum);
+	public abstract RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status);
 
 	public abstract List<StatusMessage> getMessages(Type type);
 

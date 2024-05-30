@@ -12,6 +12,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,13 +43,6 @@ import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.CoordinateSequence;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 
 import ca.bc.gov.ols.router.RoutingEngine;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
@@ -68,6 +68,7 @@ import ca.bc.gov.ols.router.directions.StreetDirection;
 import ca.bc.gov.ols.router.directions.StreetDirectionType;
 import ca.bc.gov.ols.router.status.StatusMessage;
 import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.StopWatch;
 
@@ -482,7 +483,7 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 	}
 
 	@Override
-	public RoutingEngine getUpdatedEngine(DataUpdateManager dum) {
+	public RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status) {
 		// updates currently not supported for this engine
 		return this;
 	}

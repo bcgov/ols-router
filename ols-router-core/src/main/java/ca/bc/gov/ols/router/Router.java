@@ -5,6 +5,7 @@
 package ca.bc.gov.ols.router;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Properties;
 
@@ -35,11 +36,13 @@ import ca.bc.gov.ols.router.engine.basic.BasicGraphBuilder;
 import ca.bc.gov.ols.router.engine.basic.BasicGraphRoutingEngine;
 import ca.bc.gov.ols.router.status.StatusMessage;
 import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 
 public class Router {
 	private static final Logger logger = LoggerFactory.getLogger(Router.class.getCanonicalName());
 
 	private RouterConfig config;
+	private SystemStatus status;
 
 	/* This is the global geometry factory, all geometries are created using it */
 	private GeometryFactory geometryFactory;
@@ -53,6 +56,8 @@ public class Router {
 	public Router(Properties bootstrapConfig, GeometryFactory gf,
 			GeometryReprojector reprojector) {
 		logger.debug("{} constructor called", getClass().getName());
+		status = new SystemStatus();
+		status.startTimestamp = ZonedDateTime.now().toString();
 		this.geometryFactory = gf;
 		this.reprojector = reprojector;
 
@@ -80,7 +85,7 @@ public class Router {
 	}
 
 	public void update() {
-		engine = engine.getUpdatedEngine(dum);
+		engine = engine.getUpdatedEngine(dum, status);
 	}
 	
 	public RouterConfig getConfig() {
@@ -137,6 +142,10 @@ public class Router {
 
 	public List<StatusMessage> getMessages(Type type) {
 		return engine.getMessages(type);
+	}
+
+	public SystemStatus getStatus() {
+		return status;
 	}
 
 }

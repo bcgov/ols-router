@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,6 +67,7 @@ import ca.bc.gov.ols.router.restrictions.RestrictionLookupBuilder;
 import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.router.status.StatusMessage;
 import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.MapList;
@@ -554,15 +556,20 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	 * then create a new engine with the new graph and other bits from the old engine.
 	 */
 	@Override
-	public synchronized RoutingEngine getUpdatedEngine(DataUpdateManager dum) {
+	public synchronized RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status) {
 		try {
 			BasicGraph newGraph = new BasicGraph(graph);
 			RestrictionLookupBuilder rlb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
 			List<Restriction> newRestrictions = dum.fetchRdmRestrictions();
 			rlb.addRestrictions(newRestrictions);
 			newGraph.setRestrictionLookup(RestrictionSource.RDM, rlb.build());
+			status.rdmLastSuccessfulUpdate = ZonedDateTime.now().toString();
+			status.rdmSuccessfulUpdateCount++;
+			status.rdmLastRecordCount = newRestrictions.size();
 			return new BasicGraphRoutingEngine(this, newGraph);
 		} catch(IOException ioe) {
+			status.rdmFailedUpdateCount++;
+			status.rdmLastFailedUpdate = ZonedDateTime.now().toString();
 			logger.warn("IO Error trying to update router data: {}", ioe.getMessage());
 		}
 		return this;
