@@ -2,7 +2,6 @@ package ca.bc.gov.ols.router.restrictions;
 
 import org.locationtech.jts.geom.Point;
 
-import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
 

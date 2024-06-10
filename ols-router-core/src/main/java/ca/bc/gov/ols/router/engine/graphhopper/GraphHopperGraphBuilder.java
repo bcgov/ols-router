@@ -4,13 +4,11 @@
  */
 package ca.bc.gov.ols.router.engine.graphhopper;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
-import gnu.trove.map.hash.TIntIntHashMap;
-
-import org.onebusaway.gtfs.impl.GtfsDaoImpl;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +18,13 @@ import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.storage.RAMDirectory;
 import com.graphhopper.storage.TurnCostExtension;
 import com.graphhopper.util.PointList;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.enums.TravelDirection;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
 import ca.bc.gov.ols.router.data.StreetSegment;
-import ca.bc.gov.ols.router.data.TurnClass;
-import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.router.engine.GraphBuilder;
-import ca.bc.gov.ols.router.open511.EventResponse;
-import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
 import ca.bc.gov.ols.rowreader.DateType;
-import ca.bc.gov.ols.rowreader.RowReader;
+import gnu.trove.map.hash.TIntIntHashMap;
 
 public class GraphHopperGraphBuilder implements GraphBuilder {
 	private static final Logger logger = LoggerFactory.getLogger(GraphHopperGraphBuilder.class.getCanonicalName());
@@ -92,12 +84,6 @@ public class GraphHopperGraphBuilder implements GraphBuilder {
 
 	}
 
-	@Override
-	public void addTurnRestriction(TurnRestriction cost) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	private int addNode(int intId, Point point) {
 		int nodeId = nextNodeId++;
 		intIdToNodeIdMap.put(intId, nodeId);
@@ -111,25 +97,7 @@ public class GraphHopperGraphBuilder implements GraphBuilder {
 			return addNode(intId, p);
 		}
 		return nodeId;
-	}
-	
-	@Override
-	public void addEvents(EventResponse eventResponse) {
-		// TODO Auto-generated method stub		
-	}
-
-	@Override
-	public void addTraffic(RowReader trafficReader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addSchedules(GtfsDaoImpl gtfs, RowReader mappingReader)
-			throws IOException {
-		// TODO Auto-generated method stub
-		
-	}
+	}	
 
 	// add turn cost info to otherwise complete graph
 //	public void calcTurnCosts() {
@@ -278,24 +246,6 @@ public class GraphHopperGraphBuilder implements GraphBuilder {
 
 	public EncodingManager getEncodingManager() {
 		return encodingManager;
-	}
-
-	@Override
-	public void addTruckNotices(RowReader truckNoticeReader, RowReader truckNoticeMappingReader) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addTurnClass(TurnClass turnClass) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addLocalDistortionField(RowReader localDistortionFieldReader) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

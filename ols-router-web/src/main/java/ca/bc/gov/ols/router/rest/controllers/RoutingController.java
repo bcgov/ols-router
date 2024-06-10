@@ -6,6 +6,10 @@ package ca.bc.gov.ols.router.rest.controllers;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.DefaultsResponse;
@@ -37,6 +37,8 @@ import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.rest.GeotoolsGeometryReprojector;
 import ca.bc.gov.ols.router.rest.exceptions.InvalidParameterException;
+import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.util.StopWatch;
 
 @RestController
@@ -262,5 +264,15 @@ public class RoutingController {
 
 		NavInfoResponse response = router.navInfo(params);
 		return response;
+	}
+
+	@RequestMapping(value = "/status", method = {RequestMethod.GET})
+	public SystemStatus status() {
+		return router.getStatus();
+	}
+
+	@RequestMapping(value = "/status/{type}", method = {RequestMethod.GET})
+	public List<StatusMessage> statusByType(@PathVariable StatusMessage.Type type) {
+		return router.getMessages(type);
 	}
 }

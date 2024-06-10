@@ -15,6 +15,7 @@ public class RestrictionType {
 	private static final HashMap<String, RestrictionType> typeMap = new HashMap<String, RestrictionType>();
 	public static final RestrictionType HORIZONTAL = new RestrictionType("HORIZONTAL", "Width", "m", true);
 	public static final RestrictionType VERTICAL = new RestrictionType("VERTICAL", "Height", "m", true);
+	public static final RestrictionType LENGTH = new RestrictionType("LENGTH", "Length", "m", true);
 	public static final RestrictionType WEIGHT_GVW = new RestrictionType("WEIGHT-GVW", "Gross Vehicle Weight", "kg", true); // Gross Vehicle Weight
 	public static final RestrictionType WEIGHT_1AXLE = new RestrictionType("WEIGHT-1AXLE", "Single Axle Weight", "kg", true); // weight on a single axle
 	public static final RestrictionType WEIGHT_2AXLE = new RestrictionType("WEIGHT-2AXLE", "Tandem Axle Weight", "kg", true); // weight on a tandem-axle

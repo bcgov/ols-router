@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -56,11 +58,16 @@ import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.vis.VisFeature;
-import ca.bc.gov.ols.router.datasource.RouterDataLoader;
-import ca.bc.gov.ols.router.datasource.RouterDataSource;
+import ca.bc.gov.ols.router.datasource.DataUpdateManager;
 import ca.bc.gov.ols.router.restrictions.Constraint;
+import ca.bc.gov.ols.router.restrictions.RestrictionLookupBuilder;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
+import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.router.util.TimeHelper;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.MapList;
@@ -74,16 +81,22 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	
 	BasicGraph graph;
 	
-	public BasicGraphRoutingEngine(RouterConfig config, RouterDataSource dataSource,
+	public BasicGraphRoutingEngine(RouterConfig config, BasicGraph graph,
 			GeometryFactory geometryFactory, GeometryReprojector reprojector) throws IOException {
 		logger.trace("{}() constructor called", getClass().getName());
 		this.config = config;
 		this.gf = geometryFactory;
-		
-		BasicGraphBuilder graphBuilder = new BasicGraphBuilder(config, reprojector); 
-		RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder);
-		loader.loadData();
-		graph = graphBuilder.build();
+		this.graph = graph;
+	}
+	
+	/**
+	 * copy constructor with new graph
+	 * @param engine
+	 */
+	public BasicGraphRoutingEngine(BasicGraphRoutingEngine engine, BasicGraph newGraph) {
+		this.config = engine.config;
+		this.gf = engine.gf;
+		this.graph = newGraph;
 	}
 	
 	@Override
@@ -341,7 +354,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		for(Point p : points) {
 			int edgeId = graph.findClosestEdge(p, snapDistance);
 			int[] edgeIds = null;
-			if(edgeId == BasicGraph.NO_EDGE) {
+			if(edgeId == BasicGraphInternal.NO_EDGE) {
 				//throw new RuntimeException("ERROR: point not near any edge");
 				if(!allowNullEdges) {
 					throw new IllegalArgumentException("Point (" + p.getX() + "," + p.getY() + ") is too far from any edge.");
@@ -350,7 +363,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			} else {
 				LineString[] splitString = LineStringSplitter.split(graph.getLineString(edgeId), p);
 				int otherEdgeId = graph.getOtherEdgeId(edgeId);
-				if(otherEdgeId == BasicGraph.NO_EDGE) {
+				if(otherEdgeId == BasicGraphInternal.NO_EDGE) {
 					// this is a 1-way segment, doesn't matter which side
 					edgeIds = new int[] {edgeId};
 				} else {
@@ -397,7 +410,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// one-way markers
 			if(params.getTypes().contains(NavInfoType.DIR)) {
-				if(graph.getOtherEdgeId(edgeId) == BasicGraph.NO_EDGE) {
+				if(graph.getOtherEdgeId(edgeId) == BasicGraphInternal.NO_EDGE) {
 					Coordinate c = lil.extractPoint(lil.getEndIndex()/2);
 					Coordinate c2 = lil.extractPoint(1 + lil.getEndIndex()/2);
 					int angle = (int) Math.round(Angle.toDegrees(Angle.normalizePositive(Angle.angle(c, c2))));
@@ -420,12 +433,10 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			}
 			// Hard Restrictions 
 			if(params.getTypes().contains(NavInfoType.HR)) {
-				List<Constraint> constraints = graph.getRestrictionLookup().lookup(null, edgeId);
+				List<Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
 				MapList<Point,Constraint> constraintMap = new MapList<>();
 				for(Constraint c : constraints) {
-						if(params.getRestrictionSource() == null || c.getSource() == params.getRestrictionSource()) {
-							constraintMap.add(c.getLocation(), c);
-						}
+					constraintMap.add(c.getLocation(), c);
 				}
 				if(!constraintMap.isEmpty()) {
 					for(Entry<Point, List<Constraint>> entry: constraintMap.entrySet()) {
@@ -539,4 +550,37 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		}
 		return Orientation.index(coord0[nearestPointIdx], coord0[nearestPointIdx+1], pt.getCoordinate());
 	  }
+
+	/**
+	 * To perform an update we clone the current graph, make changes to it, 
+	 * then create a new engine with the new graph and other bits from the old engine.
+	 */
+	@Override
+	public synchronized RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status) {
+		try {
+			BasicGraph newGraph = new BasicGraph(graph);
+			RestrictionLookupBuilder rlb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
+			List<Restriction> newRestrictions = dum.fetchRdmRestrictions();
+			rlb.addRestrictions(newRestrictions);
+			newGraph.setRestrictionLookup(RestrictionSource.RDM, rlb.build());
+			status.rdmLastSuccessfulUpdate = ZonedDateTime.now().toString();
+			status.rdmSuccessfulUpdateCount++;
+			status.rdmLastRecordCount = newRestrictions.size();
+			return new BasicGraphRoutingEngine(this, newGraph);
+		} catch(IOException ioe) {
+			status.rdmFailedUpdateCount++;
+			status.rdmLastFailedUpdate = ZonedDateTime.now().toString();
+			logger.warn("IO Error trying to update router data: {}", ioe.getMessage());
+		}
+		return this;
+	}
+
+	@Override
+	public List<StatusMessage> getMessages(Type type) {
+		switch(type) {
+		case RDM: return graph.getRestrictionLookup(RestrictionSource.RDM).getMessages();
+		}
+		return Collections.emptyList();
+	}
+	
 }

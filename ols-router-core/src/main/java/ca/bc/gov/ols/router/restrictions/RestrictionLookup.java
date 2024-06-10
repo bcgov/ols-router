@@ -4,39 +4,40 @@
  */
 package ca.bc.gov.ols.router.restrictions;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ca.bc.gov.ols.router.data.enums.RestrictionSource;
-import ca.bc.gov.ols.router.data.enums.RestrictionType;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
-import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
-import ca.bc.gov.ols.rowreader.XsvRowWriter;
+import ca.bc.gov.ols.router.status.RdmStatusMessage;
+import ca.bc.gov.ols.router.status.StatusMessage;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
 
 public class RestrictionLookup {
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionLookup.class.getCanonicalName());
 	
 	private TIntObjectHashMap<ArrayList<Constraint>> restrictions;
+	private List<StatusMessage> messages = Collections.emptyList();
 	
-	RestrictionLookup(TIntObjectHashMap<ArrayList<Constraint>> restrictions) {
+	RestrictionLookup(TIntObjectHashMap<ArrayList<Constraint>> restrictions, List<StatusMessage> messages) {
 		this.restrictions = restrictions;
+		this.messages = messages;
 	}
 	
-	public List<Constraint> lookup(RestrictionSource source, int edgeId) {
+	public List<Constraint> lookup(int edgeId) {
 		List<Constraint> list = restrictions.get(edgeId);
 		if(list == null) return Collections.emptyList();
-		return list.stream().filter(r -> source == null || r.getSource() == source).toList();
+		return list;
 		// TODO filter restrictions that apply to a given time
+		//return list.stream().filter(r -> source == null || r.getSource() == source).toList();
 	}
 
+	public List<StatusMessage> getMessages() {
+		return messages;
+	}
+	
 //	public void analyze(BasicGraph graph) {
 //		RestrictionAnalyzer ra = new RestrictionAnalyzer(graph);
 //		restrictions.forEachEntry(ra);

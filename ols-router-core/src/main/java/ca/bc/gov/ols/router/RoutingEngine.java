@@ -4,6 +4,8 @@
  */
 package ca.bc.gov.ols.router;
 
+import java.util.List;
+
 import ca.bc.gov.ols.router.api.IsochroneResponse;
 import ca.bc.gov.ols.router.api.NavInfoParameters;
 import ca.bc.gov.ols.router.api.NavInfoResponse;
@@ -14,6 +16,10 @@ import ca.bc.gov.ols.router.api.RouterOptimalDirectionsResponse;
 import ca.bc.gov.ols.router.api.RouterOptimalRouteResponse;
 import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.datasource.DataUpdateManager;
+import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 
 public interface RoutingEngine {
 
@@ -37,5 +43,9 @@ public interface RoutingEngine {
 	public abstract IsochroneResponse loop(RoutingParameters params);
 
 	public abstract NavInfoResponse navInfo(NavInfoParameters params);
+
+	public abstract RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status);
+
+	public abstract List<StatusMessage> getMessages(Type type);
 
 }

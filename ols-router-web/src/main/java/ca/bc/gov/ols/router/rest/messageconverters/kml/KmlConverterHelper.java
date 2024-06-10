@@ -42,6 +42,11 @@ public class KmlConverterHelper extends ConverterHelper {
 		out.write("</Document>\r\n</kml>");		
 	}
 
+	protected void writeField(String fieldName, Object fieldValue) throws IOException {
+		out.write("<Data name=\"" + fieldName + "\"><value>" + escape(fieldValue) + "</value></Data>\r\n");
+	}
+	
+
 	protected void writePoint(String name, String style, Point point) throws IOException {
 		out.write("<Placemark>\r\n"
 		  	+ "<open>1</open>\r\n"
@@ -60,63 +65,43 @@ public class KmlConverterHelper extends ConverterHelper {
 				+ "<Snippet maxLines=\"2\">\r\n"
 				+ escape(response.getRouteDescription())
 				+ "</Snippet>"
-				+ "<ExtendedData>\r\n"
-				+ "<Data name=\"routeDescription\"><value>" 
-				+ escape(response.getRouteDescription())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"searchTimestamp\"><value>" 
-				+ escape(response.getTimeStamp())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"executionTime\"><value>"
-				+ escape(response.getExecutionTime())
-				+ "</value></Data>\r\n");
+				+ "<ExtendedData>\r\n");
+		writeField("routeDescription", response.getRouteDescription());
+		writeField("searchTimestamp", response.getTimeStamp());
+		writeField("executionTime", response.getExecutionTime());
 		if(response instanceof RouterOptimizedResponse) {
-			out.write("<Data name=\"routingExecutionTime\"><value>"
-					+ escape(((RouterOptimizedResponse)response).getRoutingExecutionTime())
-					+ "</value></Data>\r\n"
-					+"<Data name=\"optimizationExecutionTime\"><value>"
-					+ escape(((RouterOptimizedResponse)response).getOptimizationExecutionTime())
-					+ "</value></Data>\r\n");
+			writeField("routingExecutionTime", ((RouterOptimizedResponse)response).getRoutingExecutionTime());
+			writeField("optimizationExecutionTime", ((RouterOptimizedResponse)response).getOptimizationExecutionTime());
 		}
-		out.write("<Data name=\"version\"><value>"
-				+ escape(RouterConfig.VERSION)
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"disclaimer\"><value>" 
-				+ escape(config.getDisclaimer())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"privacyStatement\"><value>" 
-				+ escape(config.getPrivacyStatement())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"copyrightNotice\"><value>" 
-				+ escape(config.getCopyrightNotice())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"copyrightLicense\"><value>" 
-				+ escape(config.getCopyrightLicense())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"criteria\"><value>"
-				+ escape(response.getCriteria().toString())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"routeFound\"><value>"
-				+ escape(response.isRouteFound())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"distance\"><value>"
-				+ escape(response.getDistanceStr())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"distanceUnit\"><value>"
-				+ escape(response.getDistanceUnit().abbr())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"dataProcessingTimestamp\"><value>"
-				+ escape(String.valueOf(response.getDataProcessingTimestamp()))
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"roadNetworkTimestamp\"><value>"
-				+ escape(String.valueOf(response.getRoadNetworkTimestamp()))
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"time\"><value>"
-				+ escape(response.getTime())
-				+ "</value></Data>\r\n"
-				+ "<Data name=\"timeText\"><value>" 
-				+ escape(TimeHelper.formatTime(response.getTime())) + "</value></Data>\r\n"
-				+ "</ExtendedData>\r\n"
+		writeField("version", RouterConfig.VERSION);
+		writeField("disclaimer", config.getDisclaimer());
+		writeField("privacyStatement", config.getPrivacyStatement());
+		writeField("copyrightNotice", config.getCopyrightNotice());
+		writeField("copyrightLicense", config.getCopyrightLicense());
+		writeField("criteria", response.getCriteria().toString());
+		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
+		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
+		writeField("routeFound", response.isRouteFound());
+		writeField("distance", response.getDistanceStr());
+		writeField("distanceUnit", response.getDistanceUnit().abbr());
+		writeField("time", response.getTime());
+		writeField("timeText", TimeHelper.formatTime(response.getTime()));
+		writeField("departure", String.valueOf(response.getDeparture()));
+		writeField("correctSide", response.isCorrectSide());
+		writeField("vehicleType", String.valueOf(response.getVehicleType()));
+		writeField("followTruckRoute", response.isFollowTruckRoute());
+		writeField("truckRouteMultiplier", response.getTruckRouteMultiplier());
+		writeField("xingCost", response.getXingCostString());
+		writeField("turnCost", response.getTurnCostString());
+		writeField("globalDistortionField", formatMap(response.getGlobalDistortionField().toMap(response.getVehicleType())));
+		writeField("snapDistance", response.getSnapDistance());
+		writeField("simplifyDirections", response.isSimplifyDirections());
+		writeField("simplifyThreshold", response.getSimplifyThreshold());
+		writeField("restrictionSource", String.valueOf(response.getRestrictionSource()));
+		writeField("restrictionValues", formatMap(response.getRestrictionValues()));
+		writeField("excludeRestrictions", String.valueOf(response.getExcludeRestrictions()));
+
+		out.write("</ExtendedData>\r\n"
 				+ "<styleUrl>"
 				+ config.getKmlStylesUrl() + "#route_results</styleUrl>\r\n");
 		

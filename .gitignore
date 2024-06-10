@@ -28,6 +28,7 @@ target/
 # Eclipse
 .project
 .metadata
+.factorypath
 bin/**
 tmp/**
 tmp/**/*

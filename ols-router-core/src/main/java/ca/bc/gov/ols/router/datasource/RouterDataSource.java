@@ -11,8 +11,6 @@ import java.util.Map;
 
 import org.onebusaway.gtfs.impl.GtfsDaoImpl;
 
-import com.google.gson.stream.JsonReader;
-
 import ca.bc.gov.ols.router.data.StreetSegment;
 import ca.bc.gov.ols.router.data.TurnRestriction;
 import ca.bc.gov.ols.rowreader.DateType;

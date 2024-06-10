@@ -1,11 +1,8 @@
 package ca.bc.gov.ols.router.restrictions.rdm;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
-import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.restrictions.AbstractRestriction;
 
 public class Restriction extends AbstractRestriction {

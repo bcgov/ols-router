@@ -15,9 +15,6 @@ import com.google.gson.stream.JsonToken;
 
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
-import ca.bc.gov.ols.router.datasource.RouterDataLoader;
-import ca.bc.gov.ols.router.engine.GraphBuilder;
-import ca.bc.gov.ols.router.restrictions.RestrictionLookupBuilder;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 
 public class RdmParser {

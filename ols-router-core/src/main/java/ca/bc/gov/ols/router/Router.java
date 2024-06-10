@@ -5,6 +5,8 @@
 package ca.bc.gov.ols.router;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Properties;
 
 import org.locationtech.jts.geom.GeometryFactory;
@@ -25,14 +27,22 @@ import ca.bc.gov.ols.router.api.RouterRouteResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.config.RouterConfigurationStoreFactory;
+import ca.bc.gov.ols.router.datasource.DataUpdateManager;
+import ca.bc.gov.ols.router.datasource.RouterDataLoader;
 import ca.bc.gov.ols.router.datasource.RouterDataSource;
 import ca.bc.gov.ols.router.datasource.RouterDataSourceFactory;
+import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.router.engine.basic.BasicGraphBuilder;
 import ca.bc.gov.ols.router.engine.basic.BasicGraphRoutingEngine;
+import ca.bc.gov.ols.router.status.StatusMessage;
+import ca.bc.gov.ols.router.status.StatusMessage.Type;
+import ca.bc.gov.ols.router.status.SystemStatus;
 
 public class Router {
 	private static final Logger logger = LoggerFactory.getLogger(Router.class.getCanonicalName());
 
 	private RouterConfig config;
+	private SystemStatus status;
 
 	/* This is the global geometry factory, all geometries are created using it */
 	private GeometryFactory geometryFactory;
@@ -40,10 +50,14 @@ public class Router {
 	GeometryReprojector reprojector;
 
 	private RoutingEngine engine;
+	private DataUpdateManager dum;
+	
 
 	public Router(Properties bootstrapConfig, GeometryFactory gf,
 			GeometryReprojector reprojector) {
 		logger.debug("{} constructor called", getClass().getName());
+		status = new SystemStatus();
+		status.startTimestamp = ZonedDateTime.now().toString();
 		this.geometryFactory = gf;
 		this.reprojector = reprojector;
 
@@ -58,12 +72,22 @@ public class Router {
 		try {
 			//config.baseSrsCode = GraphHopperRoutingEngine.GH_SRS;
 			//engine = new GraphHopperRoutingEngine(config, dataSource, geometryFactory, reprojector);
-			engine = new BasicGraphRoutingEngine(config, dataSource, geometryFactory, reprojector);
+			
+			BasicGraphBuilder graphBuilder = new BasicGraphBuilder(config, reprojector);
+			dum = new DataUpdateManager(config);
+			RouterDataLoader loader = new RouterDataLoader(config, dataSource, graphBuilder, dum);
+			loader.loadData();
+			BasicGraph graph = graphBuilder.build();
+			engine = new BasicGraphRoutingEngine(config, graph, geometryFactory, reprojector);
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
 	}
 
+	public void update() {
+		engine = engine.getUpdatedEngine(dum, status);
+	}
+	
 	public RouterConfig getConfig() {
 		return config;
 	}
@@ -114,6 +138,14 @@ public class Router {
 
 	public NavInfoResponse navInfo(NavInfoParameters params) {
 		return engine.navInfo(params);
+	}
+
+	public List<StatusMessage> getMessages(Type type) {
+		return engine.getMessages(type);
+	}
+
+	public SystemStatus getStatus() {
+		return status;
 	}
 
 }

@@ -55,6 +55,8 @@ public class RouterConfig {
 	private double defaultTruckRouteMultiplier = 9;
 	private int defaultSnapDistance = 1000;
 	private int defaultSimplifyThreshold = 250;
+	private int rdmUpdateInterval = 3600;
+	private String rdmApiUrl = "https://tst-rdm-public.th.gov.bc.ca/api";
 		
 	static {
 		try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("app.properties")) {
@@ -140,6 +142,12 @@ public class RouterConfig {
 					break;
 				case "defaultSimplifyThreshold":
 					defaultSimplifyThreshold = Integer.parseInt(value); 
+					break;
+				case "rdmUpdateInterval":
+					rdmUpdateInterval = Integer.parseInt(value); 
+					break;
+				case "rdmApiUrl":
+					rdmApiUrl = value; 
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -240,6 +248,14 @@ public class RouterConfig {
 
 	public int getDefaultSimplifyThreshold() {
 		return defaultSimplifyThreshold;
+	}
+
+	public int getRdmUpdateInterval() {
+		return rdmUpdateInterval;
+	}
+
+	public String getRdmApiUrl() {
+		return rdmApiUrl;
 	}
 
 

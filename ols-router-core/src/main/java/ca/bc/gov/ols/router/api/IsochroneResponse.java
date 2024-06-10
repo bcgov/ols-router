@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.Geometry;
 
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.rowreader.DateType;
 
 public class IsochroneResponse extends ApiResponse {

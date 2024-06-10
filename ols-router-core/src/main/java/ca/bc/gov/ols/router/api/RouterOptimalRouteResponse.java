@@ -11,7 +11,6 @@ import java.util.Map;
 import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.directions.Partition;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.rowreader.DateType;
 
 public class RouterOptimalRouteResponse extends RouterRouteResponse implements RouterOptimizedResponse {

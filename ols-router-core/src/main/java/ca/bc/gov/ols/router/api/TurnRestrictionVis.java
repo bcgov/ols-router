@@ -10,7 +10,7 @@ import org.locationtech.jts.linearref.LengthIndexedLine;
 
 import ca.bc.gov.ols.router.data.WeeklyTimeRange;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.router.engine.basic.BasicGraphInternal;
 
 public class TurnRestrictionVis {
 	private final WeeklyTimeRange restriction;
@@ -19,20 +19,20 @@ public class TurnRestrictionVis {
 	private final LineString toFragment;
 	private final int angle;
 	
-	public TurnRestrictionVis(BasicGraph graph, int[] ids, WeeklyTimeRange restriction) {
+	public TurnRestrictionVis(BasicGraphInternal internalGraph, int[] ids, WeeklyTimeRange restriction) {
 		this.restriction = restriction;
-		LineString fromLine = graph.getLineString(ids[0]);
+		LineString fromLine = internalGraph.getLineString(ids[0]);
 		LengthIndexedLine fromLil = new LengthIndexedLine(fromLine);
-		if(graph.getReversed(ids[0])) {
+		if(internalGraph.getReversed(ids[0])) {
 			fromFragment = (LineString) fromLil.extractLine(10, 0);			
 		} else {
 			double end = fromLil.getEndIndex();
 			fromFragment = (LineString) fromLil.extractLine(end-10, end);
 		}
 		LineString endFragment;
-		LineString toLine = graph.getLineString(ids[ids.length-1]);
+		LineString toLine = internalGraph.getLineString(ids[ids.length-1]);
 		LengthIndexedLine toLil = new LengthIndexedLine(toLine);
-		if(!graph.getReversed(ids[ids.length-1])) {
+		if(!internalGraph.getReversed(ids[ids.length-1])) {
 			endFragment = (LineString) toLil.extractLine(0,10);
 		} else {
 			double end = toLil.getEndIndex();

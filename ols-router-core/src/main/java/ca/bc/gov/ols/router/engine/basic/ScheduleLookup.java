@@ -19,13 +19,11 @@ import ca.bc.gov.ols.router.time.WeeklyDateRange;
 public class ScheduleLookup {
 	
 	private boolean sorted = false;
-	private BasicGraph graph;
 	private TIntObjectHashMap<ArrayList<LocalDateTime>> departureTimesByEdgeId;
 	private TIntObjectHashMap<FerryInfo> ferryInfoByEdgeId;
 	private static final int[] NONE = {0, -1};
 	
-	public ScheduleLookup(BasicGraph graph) {
-		this.graph = graph;
+	public ScheduleLookup() {
 		departureTimesByEdgeId = new TIntObjectHashMap<ArrayList<LocalDateTime>>();
 		ferryInfoByEdgeId = new TIntObjectHashMap<FerryInfo>();
 	}

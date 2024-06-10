@@ -30,10 +30,10 @@ public class RdmFetcher {
 	private static final String RDM_API = "https://tst-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
 	private static final String OUTPUT_FILE = "restrictions_active.json";
 	private static final String OUTPUT_GEOJSON_FILE = "restrictions_active.geojson";
-	private static final int OFFSET_INCREMENT = 250;
-	private static final String[] PROPERTIES = {"RESTRICTION_ID", "RESTRICTION_TYPE", "PERMITABLE_VALUE", "PUBLIC_COMMENT", "TRAVEL_DIRECTION", 
-			"GROUP_NAME", "LOCATION_ID", "LOCATION_ROAD_NAME", "NETWORK_SEGMENT_ID", "RESTRICTION_AZIMUTH", "NETWORK_VERSION", "LAST_UPDATE_CONTEXT",
-			"FEATURE_NAME", "FEATURE_SOURCE_SYSTEM", "FEATURE_SOURCE_SYSTEM_KEY"};
+	private static final int OFFSET_INCREMENT = 500;
+//	private static final String[] PROPERTIES = {"RESTRICTION_ID", "RESTRICTION_TYPE", "PERMITABLE_VALUE", "PUBLIC_COMMENT", "TRAVEL_DIRECTION", 
+//			"GROUP_NAME", "LOCATION_ID", "LOCATION_ROAD_NAME", "NETWORK_SEGMENT_ID", "RESTRICTION_AZIMUTH", "NETWORK_VERSION", "LAST_UPDATE_CONTEXT",
+//			"FEATURE_NAME", "FEATURE_SOURCE_SYSTEM", "FEATURE_SOURCE_SYSTEM_KEY"};
 	
 	private int offset = 0;
 	
@@ -112,7 +112,7 @@ public class RdmFetcher {
 	}
 	
 	private Reader fetchNext() throws IOException {
-		URL url = new URL(RDM_API + "?offset=" + offset);
+		URL url = new URL(RDM_API + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
 		System.out.println(url.toString());
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 		offset += OFFSET_INCREMENT;

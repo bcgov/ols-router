@@ -52,7 +52,6 @@ public class RoutingParameters {
 	private Instant departure = Instant.now();
 	private boolean correctSide = false;
 	private VehicleType vehicleType = VehicleType.CAR;
-	private Double length;
 	private boolean followTruckRoute = false;
 	private double truckRouteMultiplier = 9;
 	private static Map<TrafficImpactor,Double> defaultXingCostMap;
@@ -270,27 +269,25 @@ public class RoutingParameters {
 	}
 
 	public void setHeight(Double height) {
-		if(this.restrictionValues.get(RestrictionType.VERTICAL) == null) {
+		if(height != null && this.restrictionValues.get(RestrictionType.VERTICAL) == null) {
 			this.restrictionValues.put(RestrictionType.VERTICAL, height);
 		}
 	}
 
 	public void setWidth(Double width) {
-		if(this.restrictionValues.get(RestrictionType.HORIZONTAL) == null) {
+		if(width != null && this.restrictionValues.get(RestrictionType.HORIZONTAL) == null) {
 			this.restrictionValues.put(RestrictionType.HORIZONTAL, width);
 		}
 	}
 
-	public Double getLength() {
-		return length;
-	}
-
 	public void setLength(Double length) {
-		this.length = length;
+		if(length != null && this.restrictionValues.get(RestrictionType.LENGTH) == null) {
+			this.restrictionValues.put(RestrictionType.LENGTH, length);
+		}
 	}
 
 	public void setWeight(Double weight) {
-		if(this.restrictionValues.get(RestrictionType.WEIGHT_GVW) == null) {
+		if(weight != null && this.restrictionValues.get(RestrictionType.WEIGHT_GVW) == null) {
 			this.restrictionValues.put(RestrictionType.WEIGHT_GVW, weight);
 		}
 	}
@@ -316,8 +313,19 @@ public class RoutingParameters {
 		return xingClass.applyMultiplier(xingCostMap.get(imp), xingCostMultiplier);
 	}
 
+	public String getXingCostString() {
+		return xingCostMap.get(TrafficImpactor.YIELD)
+				+ "," + xingCostMap.get(TrafficImpactor.STOPSIGN)
+				+ "," + xingCostMap.get(TrafficImpactor.LIGHT)
+				+ "," + xingCostMultiplier;
+	}
+
 	public double getTurnCost(TurnDirection td, XingClass xingClass) {
 		return xingClass.applyMultiplier(turnCostMap.get(td), xingCostMultiplier);
+	}
+	
+	public String getTurnCostString() {
+		return turnCostMap.get(TurnDirection.LEFT) + "," + turnCostMap.get(TurnDirection.RIGHT);
 	}
 
 	public void setXingCost(double[] xingCost) {
@@ -518,6 +526,13 @@ public class RoutingParameters {
 		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
 	}
 	
+	/**
+	 * Resolves any parameters whose values are dependent on other parameters; called after all parameter setters have been called.
+	 *  
+	 * @param config the RouterConfig to use for defaults values and SRS
+	 * @param gf the geometryFactory to use to create point geometry parameters
+	 * @param gr the GeometryReprojector to use to reproject geometries as required
+	 */
 	public void resolve(RouterConfig config, GeometryFactory gf, GeometryReprojector gr) {
 		if(point != null && point.length == 2) {
 			pointPoint = gr.reproject(gf.createPoint(new Coordinate(point[0], point[1])), config.getBaseSrsCode());

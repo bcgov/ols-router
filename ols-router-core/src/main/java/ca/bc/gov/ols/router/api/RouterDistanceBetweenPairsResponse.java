@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.Point;
 
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.rowreader.DateType;
 
 public class RouterDistanceBetweenPairsResponse extends ApiResponse {

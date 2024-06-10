@@ -45,7 +45,7 @@ public class RasterHullBuilder {
             }
         }
         ConformingDelaunayTriangulator conformingDelaunayTriangulator = new ConformingDelaunayTriangulator(sites, 0.000001);
-        conformingDelaunayTriangulator.setConstraints(new ArrayList(), new ArrayList());
+        conformingDelaunayTriangulator.setConstraints(new ArrayList<Object>(), new ArrayList<Object>());
         conformingDelaunayTriangulator.formInitialDelaunay();
         QuadEdgeSubdivision tin = conformingDelaunayTriangulator.getSubdivision();
         for (Vertex vertex : (Collection<Vertex>) tin.getVertices(true)) {

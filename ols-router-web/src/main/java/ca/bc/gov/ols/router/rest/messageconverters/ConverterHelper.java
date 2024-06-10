@@ -10,7 +10,10 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.Router;
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.GeometryReprojector;
@@ -125,6 +128,19 @@ public abstract class ConverterHelper {
 			return ((LocalDateTime)field).format(DATE_TIME_FORMATTER);
 		}
 		return field;
+	}
+	
+	public static <A,B> String formatMap(Map<A,B> map) {
+		if(map == null || map.isEmpty()) return "";
+		StringBuilder sb = new StringBuilder();
+		for(Entry<A, B> entry : map.entrySet()) {
+			sb.append(entry.getKey().toString());
+			sb.append(": ");
+			sb.append(entry.getValue().toString());
+			sb.append(", ");
+		}
+		sb.delete(sb.length() - 2, sb.length());
+		return sb.toString();
 	}
 	
 }

@@ -130,7 +130,7 @@ public class EdgeMerger {
 					for(Attribute attr : partitionAttributes) {
 						Object val = attr.get(graph, edgeId);
 						// always include the first edge
-						if(edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
+						if(edgeListIdx == 0 && edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
 							changed = true;
 							partitionValues.put(attr, val);
 						}
@@ -239,7 +239,7 @@ public class EdgeMerger {
 								.forEach(curDir::addNotification);
 						
 						// find and add lane-based restriction notifications
-						List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+						List<Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
 						constraints.stream()
 								.filter(c -> c instanceof LaneBasedRestriction && c.constrains(params))
 								.map(c -> new LaneRequirement((LaneBasedRestriction)c, params, graph.getLineString(edgeId), graph.getReversed(edgeId), preDist))
@@ -249,7 +249,7 @@ public class EdgeMerger {
 				}
 				
 				if(params.isListRestrictions()) {
-					List<Constraint> constraints = graph.getRestrictionLookup().lookup(params.getRestrictionSource(), edgeId);
+					List<Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
 					for(Constraint c : constraints) {
 						restrictions.addAll(c.getIds());
 					}
@@ -273,7 +273,8 @@ public class EdgeMerger {
 						&& params.getRestrictionValue(RestrictionType.VERTICAL) > 4.15)
 					|| (params.getRestrictionValue(RestrictionType.HORIZONTAL) != null 
 						&& params.getRestrictionValue(RestrictionType.HORIZONTAL) > 2.6)
-					|| (params.getLength() != null && params.getLength() > 12.5)) {
+					|| (params.getRestrictionValue(RestrictionType.LENGTH) != null)
+						&& params.getRestrictionValue(RestrictionType.LENGTH) > 12.5) {
 				notifications.add(new OversizeNotification());
 			}
 		}

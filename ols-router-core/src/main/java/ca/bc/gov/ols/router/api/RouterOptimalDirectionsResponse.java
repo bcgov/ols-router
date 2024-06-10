@@ -13,7 +13,6 @@ import org.locationtech.jts.geom.LineString;
 
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.Partition;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.rowreader.DateType;
 
