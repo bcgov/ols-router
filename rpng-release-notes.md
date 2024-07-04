@@ -11,6 +11,12 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
+### Route Planner 2.3.0
+1. Route Planner 2.3.0 is backward compatible with Route Planner 2.x.
+2. Support for RDM restrictions of type LENGTH
+3. All input parameters are included in all output formats
+4. New status API for RDM error messages - /status/RDM
+
 ### Route Planner 2.2.1
 1. Route Planner 2.2.1 is backward compatible with Route Planner 2.x.
 2. The BC Route Planner response now includes timestamps indicating when the data was last processed ([*dataProcessingTimestamp*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#dataProcessingTimestamp)) as well as the road network data vintage ([*roadNetworkTimestamp*](https://github.com/bcgov/ols-router/blob/gh-pages/glossary.md#roadNetworkTimestamp)).
