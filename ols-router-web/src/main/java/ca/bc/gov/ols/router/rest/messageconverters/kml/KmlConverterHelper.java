@@ -74,13 +74,13 @@ public class KmlConverterHelper extends ConverterHelper {
 			writeField("optimizationExecutionTime", ((RouterOptimizedResponse)response).getOptimizationExecutionTime());
 		}
 		writeField("version", RouterConfig.VERSION);
+		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
+		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
 		writeField("disclaimer", config.getDisclaimer());
 		writeField("privacyStatement", config.getPrivacyStatement());
 		writeField("copyrightNotice", config.getCopyrightNotice());
 		writeField("copyrightLicense", config.getCopyrightLicense());
 		writeField("criteria", response.getCriteria().toString());
-		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
-		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
 		writeField("routeFound", response.isRouteFound());
 		writeField("distance", response.getDistanceStr());
 		writeField("distanceUnit", response.getDistanceUnit().abbr());
@@ -98,6 +98,8 @@ public class KmlConverterHelper extends ConverterHelper {
 		writeField("simplifyDirections", response.isSimplifyDirections());
 		writeField("simplifyThreshold", response.getSimplifyThreshold());
 		writeField("restrictionSource", String.valueOf(response.getRestrictionSource()));
+		writeField("listRestrictions", String.valueOf(response.isListRestrictions()));
+		writeField("roundTrip", String.valueOf(response.isRoundTrip()));
 		writeField("restrictionValues", formatMap(response.getRestrictionValues()));
 		writeField("excludeRestrictions", String.valueOf(response.getExcludeRestrictions()));
 
