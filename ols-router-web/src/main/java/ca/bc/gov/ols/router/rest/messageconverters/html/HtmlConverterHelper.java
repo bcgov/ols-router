@@ -86,6 +86,8 @@ public class HtmlConverterHelper extends ConverterHelper {
 			writeField("optimizationExecutionTime", ((RouterOptimizedResponse)response).getOptimizationExecutionTime());
 		}
 		writeField("version", RouterConfig.VERSION);
+		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
+		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
 		writeField("disclaimer", config.getDisclaimer());
 		writeField("privacyStatement", config.getPrivacyStatement());
 		writeField("copyrightNotice", config.getCopyrightNotice());
@@ -93,8 +95,6 @@ public class HtmlConverterHelper extends ConverterHelper {
 		writeField("srsCode", response.getSrsCode());
 		writeField("criteria", response.getCriteria().toString());		
 		writeField("distanceUnit", response.getDistanceUnit().abbr());
-		writeField("dataProcessingTimestamp", String.valueOf(response.getDataProcessingTimestamp()));
-		writeField("roadNetworkTimestamp", String.valueOf(response.getRoadNetworkTimestamp()));
 		writeField("departure", String.valueOf(response.getDeparture()));
 		writeField("correctSide", response.isCorrectSide());
 		writeField("vehicleType", String.valueOf(response.getVehicleType()));
@@ -107,6 +107,8 @@ public class HtmlConverterHelper extends ConverterHelper {
 		writeField("simplifyDirections", response.isSimplifyDirections());
 		writeField("simplifyThreshold", response.getSimplifyThreshold());
 		writeField("restrictionSource", String.valueOf(response.getRestrictionSource()));
+		writeField("listRestrictions", String.valueOf(response.isListRestrictions()));
+		writeField("roundTrip", String.valueOf(response.isRoundTrip()));
 		writeField("restrictionValues", formatMap(response.getRestrictionValues()));
 		writeField("excludeRestrictions", String.valueOf(response.getExcludeRestrictions()));
 	}

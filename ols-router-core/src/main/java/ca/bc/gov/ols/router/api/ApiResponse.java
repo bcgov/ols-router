@@ -48,6 +48,7 @@ public class ApiResponse {
 	protected double xingCostMultiplier;
 	protected String turnCostString;
 	protected GlobalDistortionField globalDistortionField;
+	protected boolean roundTrip;
 	protected EnumSet<Attribute> partition;
 	protected int snapDistance;
 	protected boolean simplifyDirections;
@@ -55,6 +56,8 @@ public class ApiResponse {
 	protected RestrictionSource restrictionSource;
 	protected Map<RestrictionType,Double> restrictionValues;
 	protected Set<Integer> excludeRestrictions;
+	protected boolean listRestrictions;
+	
 
 	public ApiResponse(RoutingParameters params, Map<DateType, ZonedDateTime> dates) {
 		timeStamp = LocalDateTime.now();
@@ -76,7 +79,7 @@ public class ApiResponse {
 		xingCostString = params.getXingCostString();
 		turnCostString = params.getTurnCostString();
 		globalDistortionField = params.getGlobalDistortionField();
-
+		roundTrip = params.isRoundTrip();
 		partition = params.getPartition();
 		snapDistance = params.getSnapDistance();
 		simplifyDirections = params.isSimplifyDirections();
@@ -84,6 +87,7 @@ public class ApiResponse {
 		restrictionSource = params.getRestrictionSource();
 		restrictionValues = params.getRestrictionValues();
 		excludeRestrictions = params.getExcludeRestrictions();
+		listRestrictions = params.isListRestrictions();
 	}
 	
 	public LocalDateTime getTimeStamp() {
@@ -216,6 +220,14 @@ public class ApiResponse {
 
 	public Set<Integer> getExcludeRestrictions() {
 		return excludeRestrictions;
+	}
+
+	public boolean isListRestrictions() {
+		return listRestrictions;
+	}
+
+	public boolean isRoundTrip() {
+		return roundTrip;
 	}
 
 	public EnumSet<Attribute> getPartition() {

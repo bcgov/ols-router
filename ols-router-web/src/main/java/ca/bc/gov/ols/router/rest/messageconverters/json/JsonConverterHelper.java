@@ -68,6 +68,8 @@ public class JsonConverterHelper extends ConverterHelper {
 			jw.name("optimizationExecutionTime").value(((RouterOptimizedResponse)response).getOptimizationExecutionTime());
 		}
 		jw.name("version").value(RouterConfig.VERSION);
+		jw.name("dataProcessingTimestamp").value(String.valueOf(response.getDataProcessingTimestamp()));
+		jw.name("roadNetworkTimestamp").value(String.valueOf(response.getRoadNetworkTimestamp()));
 		jw.name("disclaimer").value(config.getDisclaimer());
 		jw.name("privacyStatement").value(config.getPrivacyStatement());
 		jw.name("copyrightNotice").value(config.getCopyrightNotice());
@@ -76,8 +78,6 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.name("criteria").value(response.getCriteria().toString());
 		jw.name("enable").value(RouteOption.setToString(response.getEnabledOptions()));
 		jw.name("distanceUnit").value(response.getDistanceUnit().abbr());
-		jw.name("dataProcessingTimestamp").value(String.valueOf(response.getDataProcessingTimestamp()));
-		jw.name("roadNetworkTimestamp").value(String.valueOf(response.getRoadNetworkTimestamp()));
 		jw.name("departure").value(String.valueOf(response.getDeparture()));
 		jw.name("correctSide").value(response.isCorrectSide());
 		jw.name("vehicleType").value(String.valueOf(response.getVehicleType()));
@@ -92,6 +92,8 @@ public class JsonConverterHelper extends ConverterHelper {
 		jw.name("simplifyDirections").value(response.isSimplifyDirections());
 		jw.name("simplifyThreshold").value(response.getSimplifyThreshold());
 		jw.name("restrictionSource").value(String.valueOf(response.getRestrictionSource()));
+		jw.name("listRestrictions").value(response.isListRestrictions());
+		jw.name("roundTrip").value(response.isRoundTrip());
 		jw.name("restrictionValues");
 		outputMap(jw, response.getRestrictionValues());
 		jw.name("excludeRestrictions");
