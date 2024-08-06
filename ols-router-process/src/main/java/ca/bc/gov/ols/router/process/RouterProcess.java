@@ -21,7 +21,6 @@ import org.locationtech.jts.geom.LineString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import ca.bc.gov.ols.enums.DividerType;
@@ -652,67 +651,7 @@ public class RouterProcess {
 		        	}
 	        	}
 
-		        handleDeadEnds(intersection, intersectionIdMap, turnRestrictions);
-		        		        
 		        return true;
-			}
-
-			private void handleDeadEnds(final RpStreetIntersection intersection, 
-					TIntObjectHashMap<RpStreetIntersection> intersectionIdMap,
-					TIntObjectHashMap<List<TurnRestriction>> turnRestrictions) {
-				// build dead-ended trees by working up from dead-ends
-				List<RpStreetEnd> ends = intersection.getEnds();
-				RpStreetEnd newDeadEnd = null;
-		        if(ends.size() == 1) {
-		        	newDeadEnd = ends.get(0);
-		        } else if(ends.size() > 1) {
-		        	for(RpStreetEnd possibleDeadEnd : ends) {
-		        		newDeadEnd = possibleDeadEnd;
-		        		// if every other end has a full-time turn restriction onto this end, it is a dead-end
-		        		for(RpStreetEnd in : ends) {
-		        			if(possibleDeadEnd == in) {
-		        				continue;
-		        			}
-		        			if(!checkTurnRestriction(turnRestrictions, in.getSegment().getSegmentId(), 
-		        					intersection.getId(), possibleDeadEnd.getSegment().getSegmentId())) {
-		        				newDeadEnd = null;
-			        			break;
-		        			}
-		        		}
-		        	}
-		        }
-	        	int nextIntId;
-	        	while(newDeadEnd != null) {
-		        	newDeadEnd.getSegment().setIsDeadEnded();
-		        	deadEndCount++;
-		        	nextIntId = newDeadEnd.getOtherEnd().getIntersectionId();
-		        	RpStreetIntersection nextIntersection = intersectionIdMap.get(nextIntId);
-		        	newDeadEnd = null;
-		        	for(RpStreetEnd end: nextIntersection.getEnds()) {
-		        		if(!end.getSegment().isDeadEnded()) {
-		        			if(newDeadEnd != null) {
-			        			// there is more than one new (non) dead-end here, we're done
-		        				newDeadEnd = null; 
-		        				break;
-		        			}
-		        			newDeadEnd = end;
-		        		}
-		        	}
-	        	}
-			}
-			
-			private boolean checkTurnRestriction(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions,
-					int inSegId, int intId, int outSegId) {
-				List<TurnRestriction> tcs = turnRestrictions.get(inSegId);
-				if(tcs == null) return false;
-				for(TurnRestriction tc : tcs) {
-					int[] ids = tc.getIdSeq();
-					if(ids.length == 3 && ids[1] == intId && ids[2] == outSegId
-							&& WeeklyTimeRange.isAlways(tc.getRestriction())) {
-						return true;
-					}
-				}
-				return false;
 			}
 
 			private FerryRoute buildFerryRoute(RpStreetEnd ferryEnd, FerryRoute fr) {
@@ -761,6 +700,93 @@ public class RouterProcess {
 
 		// apply custom restrictions
 		readTurnRestrictions(turnRestrictions, dataDir + "turn_restrictions_custom.csv");
+		
+		// handle Dead-ends
+		// Dead ends are any reason that you cannot always follow a correct-side rule
+		// It can be impossible to leave or arrive at a segment from or at a given direction/end
+		// so essentially 4 different correct-side situations that can be impossible to achieve
+		// we are reducing this down to a single flag - this means that in some situations,
+		// we will return a route that does not confirm to the correct-side request when it possibly could have.
+		intersectionIdMap.forEachEntry(new TIntObjectProcedure<RpStreetIntersection>() {
+			@Override
+			public boolean execute(final int id, final RpStreetIntersection intersection) {
+				// build dead-ended trees by working up from dead-ends
+				if(intersection.getId() == 37125) {
+					System.out.println("foo");
+				}
+				List<RpStreetEnd> ends = intersection.getEnds();
+				RpStreetEnd newDeadEnd = null;
+	        	for(RpStreetEnd possibleDeadEnd : ends) {
+	        		// if this end is an entrance to the segment, and all paths into the entrance are blocked, it is a dead end
+	        		if(TravelDirection.REVERSE != possibleDeadEnd.getTravelDir()) {
+		        		newDeadEnd = possibleDeadEnd;
+		        		// if every other end has a turn restriction onto this end, or is one way away from this end, it is a dead-end
+		        		for(RpStreetEnd in : ends) {
+		        			if(possibleDeadEnd == in) {
+		        				continue;
+		        			}
+		        			if(!checkTurnRestriction(turnRestrictions, in.getSegment().getSegmentId(), 
+		        					intersection.getId(), possibleDeadEnd.getSegment().getSegmentId())
+		        					&& TravelDirection.FORWARD != in.getTravelDir()) {
+		        				newDeadEnd = null;
+			        			break;
+		        			}
+		        		}
+	        		}
+	        		// if it isn't a dead end for that reason, then check if this end is an exit from the segment, and all exit paths are blocked
+	        		if(newDeadEnd == null && TravelDirection.FORWARD != possibleDeadEnd.getTravelDir()) {
+	        			newDeadEnd = possibleDeadEnd;
+		        		// if this end has a full-time turn restriction onto every other end, or the other end is one way towards this end, it is a dead-end (dead-start?)
+		        		for(RpStreetEnd in : ends) {
+		        			if(possibleDeadEnd == in) {
+		        				continue;
+		        			}
+		        			if(!checkTurnRestriction(turnRestrictions, possibleDeadEnd.getSegment().getSegmentId(), 
+		        					intersection.getId(), in.getSegment().getSegmentId())
+		        					&& TravelDirection.REVERSE != in.getTravelDir()) {
+		        				newDeadEnd = null;
+			        			break;
+		        			}
+		        		}
+	        		}
+		        	int nextIntId;
+		        	while(newDeadEnd != null) {
+			        	newDeadEnd.getSegment().setIsDeadEnded();
+			        	deadEndCount++;
+			        	nextIntId = newDeadEnd.getOtherEnd().getIntersectionId();
+			        	RpStreetIntersection nextIntersection = intersectionIdMap.get(nextIntId);
+			        	newDeadEnd = null;
+			        	for(RpStreetEnd end: nextIntersection.getEnds()) {
+			        		if(!end.getSegment().isDeadEnded()) {
+			        			if(newDeadEnd != null) {
+				        			// there is more than one new (non) dead-end here, we're done
+			        				newDeadEnd = null; 
+			        				break;
+			        			}
+			        			newDeadEnd = end;
+			        		}
+			        	}
+		        	}
+				}
+	        	return true;
+			}
+				
+			private boolean checkTurnRestriction(TIntObjectHashMap<List<TurnRestriction>> turnRestrictions,
+					int inSegId, int intId, int outSegId) {
+				List<TurnRestriction> tcs = turnRestrictions.get(inSegId);
+				if(tcs == null) return false;
+				for(TurnRestriction tc : tcs) {
+					int[] ids = tc.getIdSeq();
+					if(ids.length == 3 && ids[1] == intId && ids[2] == outSegId) {
+							// I think we actually need to include part-time restrictions as well because 
+							// otherwise we will be unable to route to some segments at certain days/times
+							//&& WeeklyTimeRange.isAlways(tc.getRestriction())) {
+						return true;
+					}
+				}
+				return false;
+			}				
+		});
 		
 		logWriter.close();
 		//trWriter.close();
