@@ -9,6 +9,7 @@ import ca.bc.gov.ols.rowreader.DateType;
 public class SystemStatus {
 	
 	public final String version = RouterConfig.VERSION;
+	public final String gitCommitId = RouterConfig.GIT_COMMIT_ID;
 	public String dataProcessingTimestamp;
 	public String roadNetworkTimestamp;
 
