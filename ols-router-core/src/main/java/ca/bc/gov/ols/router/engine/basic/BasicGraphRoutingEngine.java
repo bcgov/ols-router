@@ -563,6 +563,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			List<Restriction> newRestrictions = dum.fetchRdmRestrictions();
 			rlb.addRestrictions(newRestrictions);
 			newGraph.setRestrictionLookup(RestrictionSource.RDM, rlb.build());
+			status.setDates(newGraph.getDates());
 			status.rdmLastSuccessfulUpdate = ZonedDateTime.now().toString();
 			status.rdmSuccessfulUpdateCount++;
 			status.rdmLastRecordCount = newRestrictions.size();

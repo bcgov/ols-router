@@ -24,6 +24,7 @@ import ca.bc.gov.ols.router.data.enums.VehicleType;
 
 public class RouterConfig {
 	public static final String VERSION;
+	public static final String GIT_COMMIT_ID;
 	public static final PrecisionModel BASE_PRECISION_MODEL = new PrecisionModel(1000);
 	public static final float ERROR_TIME = -1;
 	public static final float ERROR_DISTANCE = -1;
@@ -63,6 +64,13 @@ public class RouterConfig {
             Properties props = new Properties();
             props.load(input);
             VERSION = props.getProperty("app.version");
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+		try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("git.properties")) {
+            Properties props = new Properties();
+            props.load(input);
+            GIT_COMMIT_ID = props.getProperty("git.commit.id.abbrev");
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
