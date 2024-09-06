@@ -11,9 +11,14 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
+### Route Planner 2.3.2
+1. Route Planner 2.3.2 is backward compatible with Route Planner 2.x.
+2. Updated to resolve an issue where a *route not found* response was provided when using the parameter *correctSide=true* due to road restrictions or one-way streets.
+3. Updated to query the Restriction Data Manager (RDM) more frequently.
+
 ### Route Planner 2.3.0
 1. Route Planner 2.3.0 is backward compatible with Route Planner 2.x.
-2. Support for RDM restrictions of type LENGTH
+2. Support for Restriction Data Manager (RDM) restrictions of type LENGTH
 3. All input parameters are included in all output formats
 4. New status API for RDM error messages - /status/RDM
 
