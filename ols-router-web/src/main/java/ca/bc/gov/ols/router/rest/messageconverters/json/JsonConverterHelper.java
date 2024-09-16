@@ -142,12 +142,14 @@ public class JsonConverterHelper extends ConverterHelper {
 		writeFields((RouterDistanceResponse)response);
 		if(response instanceof RouterOptimizedResponse) {
 			int[] visitOrder = ((RouterOptimizedResponse)response).getVisitOrder();
-			jw.name("visitOrder");
-			jw.beginArray();
-			for(int order : visitOrder) {
-				jw.value(order);
+			if(visitOrder != null) {
+				jw.name("visitOrder");
+				jw.beginArray();
+				for(int order : visitOrder) {
+					jw.value(order);
+				}
+				jw.endArray();
 			}
-			jw.endArray();
 		}
 		List<Partition> parts = response.getPartitions();
 		if(parts != null && !parts.isEmpty()) {
