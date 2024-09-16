@@ -26,8 +26,9 @@ public class RdmFetcher {
 	private final static Logger logger = LoggerFactory.getLogger(RdmFetcher.class.getCanonicalName());
 	
 	private static String outputDir = "C:/apps/router/data/";
-	//private static final String RDM_API = "https://dev-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
-	private static final String RDM_API = "https://tst-rdm-public.th.gov.bc.ca/api/view/restrictions_active";
+	//private static final String RDM_API = "https://dev-rdm-public.th.gov.bc.ca/api/view/restrictions_active"; // dev API
+	//private static final String RDM_API = "https://tst-rdm-public.th.gov.bc.ca/api/view/restrictions_active"; // test API
+	private static final String RDM_API = "https://rdm-public.th.gov.bc.ca/api/view/restrictions_active"; // prod API
 	private static final String OUTPUT_FILE = "restrictions_active.json";
 	private static final String OUTPUT_GEOJSON_FILE = "restrictions_active.geojson";
 	private static final int OFFSET_INCREMENT = 250;
