@@ -100,7 +100,7 @@ public class DijkstraShortestPath {
 		int pathsFinished = 0;
 		double worstPathCost = 0;
 		LocalDateTime startTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset)), RouterConfig.DEFAULT_TIME_ZONE);
-		
+				
 		// check all of the to edges for the special case of being the same edge as the start edge
 		nextEndEdge:
 		for(int toEdgeIdx = 0; toEdgeIdx < toEdges.length; toEdgeIdx++) {
@@ -111,7 +111,12 @@ public class DijkstraShortestPath {
 			if(endEdge == null) continue;
 			for(int startEdgeId : startEdge.getEdgeIds()) {
 				for(int endEdgeId : endEdge.getEdgeIds()) {
-					if(startEdgeId == endEdgeId 
+					double pointDistance = startEdge.getPoint().distance(endEdge.getPoint());
+					// check if the distance is less than the min routing distance 
+					if(pointDistance < params.getMinRoutingDistance()) {
+						costByToEdgeIdx[toEdgeIdx] = new DijkstraWalker(endEdge.getEdgeIds()[0], BasicGraphInternal.NO_NODE, 0, 0, pointDistance, null);
+						pathsFinished++;
+					} else if(startEdgeId == endEdgeId 
 							&& (graph.getReversed(startEdgeId) 
 									? startEdge.getToSplitLength() <= endEdge.getToSplitLength()
 									: startEdge.getFromSplitLength() <= endEdge.getFromSplitLength())) {
