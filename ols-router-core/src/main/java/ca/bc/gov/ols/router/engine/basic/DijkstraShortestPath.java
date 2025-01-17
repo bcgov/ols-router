@@ -102,57 +102,95 @@ public class DijkstraShortestPath {
 		LocalDateTime startTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset)), RouterConfig.DEFAULT_TIME_ZONE);
 				
 		// check all of the to edges for the special case of being the same edge as the start edge
-		nextEndEdge:
 		for(int toEdgeIdx = 0; toEdgeIdx < toEdges.length; toEdgeIdx++) {
 			// shortcut the case where start and end edge are the same, and can be traversed between
-			// if the start and end edge are the same
-			// and either the street is bidir or it is one-way and the end point is further along than the start point
+			// or the segments is a loop (in which case there may be more than one way to go around)
 			SplitEdge endEdge = toEdges[toEdgeIdx];
 			if(endEdge == null) continue;
 			for(int startEdgeId : startEdge.getEdgeIds()) {
+				nextEndEdge:
 				for(int endEdgeId : endEdge.getEdgeIds()) {
 					double pointDistance = startEdge.getPoint().distance(endEdge.getPoint());
 					// check if the distance is less than the min routing distance 
 					if(pointDistance < params.getMinRoutingDistance()) {
 						costByToEdgeIdx[toEdgeIdx] = new DijkstraWalker(endEdge.getEdgeIds()[0], BasicGraphInternal.NO_NODE, 0, 0, pointDistance, null);
 						pathsFinished++;
-					} else if(startEdgeId == endEdgeId 
-							&& (graph.getReversed(startEdgeId) 
-									? startEdge.getToSplitLength() <= endEdge.getToSplitLength()
-									: startEdge.getFromSplitLength() <= endEdge.getFromSplitLength())) {
-						// then shortcut the graph walking
-						int toNodeId;
-						LineString[] splitString;
-						double length;
-						if(graph.getReversed(startEdgeId)) {
-							toNodeId = graph.getFromNodeId(startEdgeId);
-							splitString = LineStringSplitter.split(startEdge.getFromSplit(), endEdge.getPoint());
-							splitString[0] = splitString[1]; 
-							splitString[1] = startEdge.getToSplit();
-							length = splitString[0].getLength();
-						} else {
-							toNodeId = graph.getToNodeId(startEdgeId);
-							splitString = LineStringSplitter.split(startEdge.getToSplit(), endEdge.getPoint());
-							splitString[1] = splitString[0]; 
-							splitString[0] = startEdge.getFromSplit();
-							length = splitString[1].getLength();
+					} else if(startEdgeId == endEdgeId) {
+						// if the start and end edge are the same
+						// and if the end point is further along the direction of this edge the start point
+						if(graph.getReversed(startEdgeId) 
+								? startEdge.getToSplitLength() <= endEdge.getToSplitLength()
+								: startEdge.getFromSplitLength() <= endEdge.getFromSplitLength()) {
+							// then shortcut the graph walking
+							int toNodeId;
+							LineString[] splitString;
+							double length;
+							if(graph.getReversed(startEdgeId)) {
+								toNodeId = graph.getFromNodeId(startEdgeId);
+								splitString = LineStringSplitter.split(startEdge.getFromSplit(), endEdge.getPoint());
+								splitString[0] = splitString[1]; 
+								splitString[1] = startEdge.getToSplit();
+								length = splitString[0].getLength();
+							} else {
+								toNodeId = graph.getToNodeId(startEdgeId);
+								splitString = LineStringSplitter.split(startEdge.getToSplit(), endEdge.getPoint());
+								splitString[1] = splitString[0]; 
+								splitString[0] = startEdge.getFromSplit();
+								length = splitString[1].getLength();
+							}
+				
+							SplitEdge newStartEdge = new SplitEdge(new int[] {startEdgeId}, startEdge.getPoint(), splitString);
+							double time = length * 3.6 / speedFunction.apply(endEdgeId, startTime);
+							EdgeList edges = new EdgeList(1);
+							edges.add(startEdgeId, time, length, 0);
+							edges.setStartEdge(newStartEdge);
+							edges.setEndEdge(endEdge);
+							double cost = costFunction.apply(endEdgeId, time, length);
+							DijkstraWalker newWalker = new DijkstraWalker(endEdgeId, toNodeId, cost, time, length, null);
+							double prevCost = costByToEdgeIdx[toEdgeIdx].getCost();
+							if (cost < prevCost) {
+								costByToEdgeIdx[toEdgeIdx] = newWalker;
+								paths[toEdgeIdx] = edges;
+								if(prevCost == Double.MAX_VALUE) {
+									pathsFinished++;
+								}
+								if(cost > worstPathCost) {
+									worstPathCost = cost;
+								}
+							}
+							continue nextEndEdge;						
+						} else if(startEdge.getFromSplit().getStartPoint().equals(endEdge.getToSplit().getEndPoint())) {
+							// if the start edge is a loop 
+							// we also know that if the end point NOT is further along the direction of this edge the start point
+							// because this is an else after the previous if
+							// then shortcut the graph walking with a 2-edge path across the start-end of the loop
+
+							// TODO we need to correctly pick this direction vs. the other direction handled above
+							// TODO probably need to do something different based on graph.getReversed(startEdgeId)
+							
+							EdgeList edges = new EdgeList(2);
+							edges.add(startEdgeId, startEdge.getFromSplitLength() * 3.6 / speedFunction.apply(startEdgeId, startTime), startEdge.getFromSplitLength(), 0);
+							edges.add(startEdgeId, endEdge.getToSplitLength() * 3.6 / speedFunction.apply(endEdgeId, startTime), endEdge.getToSplitLength(), 0);
+							edges.setStartEdge(startEdge);
+							edges.setEndEdge(endEdge);
+							paths[toEdgeIdx] = edges;
+							double time = edges.time(0) + edges.time(1);
+							double length = edges.dist(0) + edges.dist(1);
+							double cost = costFunction.apply(endEdgeId, time, length);
+							DijkstraWalker newWalker = new DijkstraWalker(endEdgeId, graph.getFromNodeId(startEdgeId), cost, time, length, null);
+							double prevCost = costByToEdgeIdx[toEdgeIdx].getCost();
+							if (cost < prevCost) {
+								costByToEdgeIdx[toEdgeIdx] = newWalker;
+								paths[toEdgeIdx] = edges;
+								if(prevCost == Double.MAX_VALUE) {
+									pathsFinished++;
+								}
+								if(cost > worstPathCost) {
+									worstPathCost = cost;
+								}
+							}
+							continue nextEndEdge;						
 						}
-						
-			
-						SplitEdge newStartEdge = new SplitEdge(new int[] {startEdgeId}, startEdge.getPoint(), splitString);
-						double time = length * 3.6 / speedFunction.apply(endEdgeId, startTime);
-						EdgeList edges = new EdgeList(1);
-						edges.add(startEdgeId, time, length, 0);
-						edges.setStartEdge(newStartEdge);
-						edges.setEndEdge(endEdge);
-						paths[toEdgeIdx] = edges;
-						double cost = costFunction.apply(endEdgeId, time, length);
-						costByToEdgeIdx[toEdgeIdx] = new DijkstraWalker(endEdgeId, toNodeId, cost, time, length, null);
-						pathsFinished++;
-						if(cost > worstPathCost) {
-							worstPathCost = cost;
-						}
-						continue nextEndEdge;						
 					}
 				}
 			} 
