@@ -24,7 +24,7 @@ public class TurnLookup {
 	
 	private BasicGraphInternal internalGraph;
 	private IntObjectArrayMap<ArrayList<TurnRestrictionEntry>> turnRestrictionMap;
-	private TIntHashSet internalEdges = new TIntHashSet();
+	private TIntHashSet midRestrictionEdges = new TIntHashSet();
 	
 	public TurnLookup(BasicGraphInternal internalGraph) {
 		this.internalGraph = internalGraph;
@@ -41,7 +41,7 @@ public class TurnLookup {
 		restrictionList.add(new TurnRestrictionEntry(ids, restriction, vehicleTypes));
 		if(ids.length > 3) {
 			for(int i = 2; i < ids.length - 1; i += 2) {
-				internalEdges.add(ids[i]);
+				midRestrictionEdges.add(ids[i]);
 			}
 		}
 	}
@@ -55,8 +55,8 @@ public class TurnLookup {
 		restrictionList.add(new TurnRestrictionEntry(ids, turnDir));
 	}
 	
-	public boolean isInternalEdge(int edgeId) {
-		return internalEdges.contains(edgeId);
+	public boolean isMidRestriction(int edgeId) {
+		return midRestrictionEdges.contains(edgeId);
 	}
 	
 	public TurnDirection lookupTurn(final int toEdge, final DijkstraWalker fromWalker, final LocalDateTime dateTime, final VehicleType vehicleType, boolean useRestrictions) {

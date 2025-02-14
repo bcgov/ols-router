@@ -35,10 +35,10 @@ import ca.bc.gov.ols.util.LineStringSplitter;
 public class DijkstraShortestPath {
 	private final static Logger logger = LoggerFactory.getLogger(DijkstraShortestPath.class.getCanonicalName());
 	
-	private BasicGraph graph;
+	private iBasicGraph graph;
 	private RoutingParameters params;
 	
-	public DijkstraShortestPath(BasicGraph graph, RoutingParameters params) {
+	public DijkstraShortestPath(iBasicGraph graph, RoutingParameters params) {
 		this.graph = graph;
 		this.params = params;
 	}
@@ -235,7 +235,7 @@ public class DijkstraShortestPath {
 			for(int edgeId = graph.nextEdge(nodeId, BasicGraphInternal.NO_EDGE); edgeId != BasicGraphInternal.NO_EDGE; edgeId = graph.nextEdge(nodeId, edgeId)) {
 				// if we've already been to this non-end, non-internal edge, or it is part of a loop
 				List<Integer> endEdges = endEdgesById.get(edgeId);
-				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.getTurnLookup().isInternalEdge(edgeId))) || isLoop(edgeId, walker))) {
+				if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.isMidRestriction(edgeId))) || isLoop(edgeId, walker))) {
 					// skip it
 					continue nextEdge;
 				}
@@ -260,7 +260,7 @@ public class DijkstraShortestPath {
 				
 				// filter the edge based on restrictions
 				if(!params.getRestrictionValues().isEmpty()) {
-					List<? extends Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
+					List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
 						if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 							continue nextEdge;
@@ -275,7 +275,7 @@ public class DijkstraShortestPath {
 				if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
 					currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.getTime())), RouterConfig.DEFAULT_TIME_ZONE);
 					if(params.isEnabled(RouteOption.EVENTS)) {
-						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime);
+						List<RoadEvent> events = graph.lookupEvent(edgeId, currentDateTime);
 						for(RoadEvent event : events) {
 							int t = event.getDelay(currentDateTime);
 							if(t == -1) {
@@ -291,7 +291,7 @@ public class DijkstraShortestPath {
 						// TODO handle other types of events (slow-downs due to partial lane closures, etc.)
 					}
 					if(params.isEnabled(RouteOption.SCHEDULING)) {
-						int[] waitAndTravelTime = graph.getScheduleLookup().lookup(edgeId, currentDateTime);
+						int[] waitAndTravelTime = graph.lookupSchedule(edgeId, currentDateTime);
 						
 						if(waitAndTravelTime[1] > 0) {
 							waitTime = waitAndTravelTime[0]; 
@@ -301,7 +301,7 @@ public class DijkstraShortestPath {
 					}
 				}
 				if(!params.isEnabled(RouteOption.TIME_DEPENDENCY) || !params.isEnabled(RouteOption.SCHEDULING)) {
-					FerryInfo info = graph.getScheduleLookup().getFerryInfo(edgeId);
+					FerryInfo info = graph.getFerryInfo(edgeId);
 					if(info != null && info.getMinWaitTime() > 0) {
 						waitTime = info.getMinWaitTime();
 					}
@@ -309,7 +309,7 @@ public class DijkstraShortestPath {
 				
 				TurnDirection turnDir = TurnDirection.CENTER;
 				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
-					turnDir = graph.getTurnLookup().lookupTurn(edgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
+					turnDir = graph.lookupTurn(edgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
 				}
 				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
 

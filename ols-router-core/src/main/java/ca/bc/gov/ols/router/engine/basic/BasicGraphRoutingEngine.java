@@ -223,12 +223,13 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	private EdgeMerger doCoreRoute(RoutingParameters params, SplitEdge[] edgeSplits) {
 		EdgeList[] edgeLists = new EdgeList[edgeSplits.length-1];
 		double timeOffset = 0;
+		ProxyGraph proxyGraph = new ProxyGraph(graph);
 		for(int i = 1; i < edgeSplits.length; i++) {
-			DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
+			DijkstraShortestPath dsp = new DijkstraShortestPath(proxyGraph, params);
 			edgeLists[i-1] = dsp.findShortestPath(edgeSplits[i-1], edgeSplits[i], timeOffset);
 			timeOffset += edgeLists[i-1].time(0);
 		}
-		return new EdgeMerger(edgeLists, graph, params);
+		return new EdgeMerger(edgeLists, proxyGraph, params);
 	}
 
 
