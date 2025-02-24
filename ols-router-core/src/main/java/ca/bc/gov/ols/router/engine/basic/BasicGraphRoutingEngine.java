@@ -69,7 +69,6 @@ import ca.bc.gov.ols.router.status.StatusMessage;
 import ca.bc.gov.ols.router.status.StatusMessage.Type;
 import ca.bc.gov.ols.router.status.SystemStatus;
 import ca.bc.gov.ols.router.util.TimeHelper;
-import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.MapList;
 import ca.bc.gov.ols.util.StopWatch;
 
@@ -209,24 +208,24 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private EdgeMerger doRoute(RoutingParameters params) {
 		List<Point> points = params.getFullPoints();
-		SplitEdge[] edgeSplits = getEdges(points, params.getSnapDistance(), params.isCorrectSide(), false);
-		return doCoreRoute(params, edgeSplits);
+		return doCoreRoute(params);
 	}
 
 	private EdgeMerger doOptimizedRoute(RoutingParameters params, StopWatch routingTimer, StopWatch optimizationTimer,
 			int[] visitOrder) throws Throwable {
-		SplitEdge[] edgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
+		WayPoint[] edgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
 		// do a final route on the resulting optimally-ordered points
-		return doCoreRoute(params, edgeSplits);
+		return doCoreRoute(params);
 	}
 
-	private EdgeMerger doCoreRoute(RoutingParameters params, SplitEdge[] edgeSplits) {
-		EdgeList[] edgeLists = new EdgeList[edgeSplits.length-1];
+	private EdgeMerger doCoreRoute(RoutingParameters params) {
+		ProxyGraph proxyGraph = new ProxyGraph(graph, params);
+		WayPoint[] wayPoints = getWayPoints(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);		
+		EdgeList[] edgeLists = new EdgeList[wayPoints.length-1];
 		double timeOffset = 0;
-		ProxyGraph proxyGraph = new ProxyGraph(graph);
-		for(int i = 1; i < edgeSplits.length; i++) {
+		for(int i = 1; i < wayPoints.length; i++) {
 			DijkstraShortestPath dsp = new DijkstraShortestPath(proxyGraph, params);
-			edgeLists[i-1] = dsp.findShortestPath(edgeSplits[i-1], edgeSplits[i], timeOffset);
+			edgeLists[i-1] = dsp.findShortestPath(wayPoints[i-1], wayPoints[i], timeOffset);
 			timeOffset += edgeLists[i-1].time(0);
 		}
 		return new EdgeMerger(edgeLists, proxyGraph, params);
@@ -241,8 +240,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
-			SplitEdge[] fromEdgeSplits = getEdges(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
-			SplitEdge[] toEdgeSplits = getEdges(toPoints, params.getSnapDistance(), params.isCorrectSide(), true);
+			WayPoint[] fromEdgeSplits = getWayPoints(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
+			WayPoint[] toEdgeSplits = getWayPoints(toPoints, params.getSnapDistance(), params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
 				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
 				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
@@ -279,9 +278,9 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return null;
 	}
 
-	private SplitEdge[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
+	private WayPoint[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		SplitEdge[] edgeSplits = getEdges(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);
+		WayPoint[] edgeSplits = getWayPoints(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
@@ -331,7 +330,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		VehicleRoutingProblemSolution sol = Solutions.bestOf(solutions);
 
 		// reorder the edgeSplits into optimal order
-		SplitEdge[] optimizedEdgeSplits = new SplitEdge[edgeSplits.length + (params.isRoundTrip() ? 1 : 0)];
+		WayPoint[] optimizedEdgeSplits = new WayPoint[edgeSplits.length + (params.isRoundTrip() ? 1 : 0)];
 		optimizedEdgeSplits[0] = edgeSplits[0];
 		visitOrder[0] = 0;
 		int index = 1;
@@ -349,8 +348,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return optimizedEdgeSplits;
 	}
 	
-	private SplitEdge[] getEdges(List<Point> points, int snapDistance, boolean correctSide, boolean allowNullEdges) {
-		SplitEdge[] edgeSplits = new SplitEdge[points.size()];
+	private WayPoint[] getWayPoints(List<Point> points, int snapDistance, boolean correctSide, boolean allowNullEdges) {
+		WayPoint[] edgeSplits = new WayPoint[points.size()];
 		int i = 0;
 		for(Point p : points) {
 			int edgeId = graph.findClosestEdge(p, snapDistance);
@@ -362,7 +361,6 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 				}
 				edgeSplits[i++] = null;
 			} else {
-				LineString[] splitString = LineStringSplitter.split(graph.getLineString(edgeId), p);
 				int otherEdgeId = graph.getOtherEdgeId(edgeId);
 				if(otherEdgeId == BasicGraphInternal.NO_EDGE) {
 					// this is a 1-way segment, doesn't matter which side
@@ -384,7 +382,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 						edgeIds = new int[] {edgeId, otherEdgeId};
 					}
 				}
-				edgeSplits[i++] = new SplitEdge(edgeIds, p, splitString);
+				edgeSplits[i++] = new WayPoint(edgeIds, p);
 			}
 		}
 		return edgeSplits;

@@ -100,23 +100,7 @@ public class EdgeMerger {
 				int edgeId = edges.edgeId(edgeIdx);
 				LineString ls;
 				String curName = null;
-				if(edgeIdx == edges.size()-1) {
-					// start edge
-					if(graph.getReversed(edgeId)) {
-						ls = edges.getStartEdge().getFromSplit();
-					} else {
-						ls = edges.getStartEdge().getToSplit();
-					}
-				} else if(edgeIdx == 0) {
-					// end edge
-					if(graph.getReversed(edgeId)) {
-						ls = edges.getEndEdge().getToSplit();
-					} else {
-						ls = edges.getEndEdge().getFromSplit();
-					}
-				} else {
-					ls = graph.getLineString(edgeId);
-				}
+				ls = graph.getLineString(edgeId);
 	
 				CoordinateSequence curCoords = ls.getCoordinateSequence();
 				CardinalDirection heading = null;

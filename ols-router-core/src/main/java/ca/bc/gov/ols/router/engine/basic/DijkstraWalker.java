@@ -8,14 +8,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+/* 
+ * Represents one step in a graph traversal.
+ */
 public class DijkstraWalker implements Comparable<DijkstraWalker>{
-	private final int edgeId;
-	private final int nodeId;
-	private final double cost;
-	private final double time;
-	private final double dist;
-	private final int waitTime;
-	private final DijkstraWalker from;
+	private final int edgeId; // the edge just traversed
+	private final int nodeId; // the node just arrived at
+	private final double cost; // the cumulative cost from start to the nodeId
+	private final double time; // the cumulative time from start to the nodeId
+	private final double dist; // the cumulative distance from start to the nodeId
+	private final int waitTime; // the cumulative waitTime from start to the nodeId
+	private final DijkstraWalker from; // a reference to the previous step
 	
 	public DijkstraWalker(int edgeId, int nodeId, double cost, double time, double dist, DijkstraWalker from) {
 		this.edgeId = edgeId;

@@ -7,9 +7,6 @@ import java.util.Map.Entry;
 
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.linearref.LengthLocationMap;
-import org.locationtech.jts.linearref.LinearLocation;
-import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

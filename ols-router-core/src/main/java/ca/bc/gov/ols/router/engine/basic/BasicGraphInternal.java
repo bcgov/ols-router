@@ -27,8 +27,8 @@ import ca.bc.gov.ols.util.IntObjectArrayMap;
 public class BasicGraphInternal {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraphInternal.class.getCanonicalName());
 
-	public static final int NO_EDGE = -1;
-	public static final int NO_NODE = -1;
+	public static final int NO_EDGE = Integer.MIN_VALUE;
+	public static final int NO_NODE = Integer.MIN_VALUE;
 
 	private int nextNodeId = 0;
 	private int nextEdgeId = 0;

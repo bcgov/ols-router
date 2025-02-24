@@ -73,4 +73,6 @@ public interface iBasicGraph {
 
 	int getSegmentId(int edgeId);
 
+	boolean isDeadEnded(int edgeId);
+
 }

@@ -85,7 +85,6 @@ public class BasicGraph implements iBasicGraph, SegmentIdLookup {
 	public int[] getEdgesForSegment(int segmentId) {
 		return edgeIdBySegId.get(segmentId);
 	}
-
 		
 	public void setTurnCostLookup(TurnLookup lookup) {
 		turnCostLookup = lookup;
