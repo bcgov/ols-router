@@ -4,9 +4,12 @@
  */
 package ca.bc.gov.ols.router.engine.basic;
 
+import java.util.List;
+
 import org.locationtech.jts.geom.Point;
 
 public record WayPoint ( 
-		int[] edgeIds,
+		List<Integer> outgoingEdgeIds,
+		List<Integer> incomingEdgeIds,
 		Point point
 ) {}

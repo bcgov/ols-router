@@ -14,8 +14,8 @@ public class EdgeList {
 	private TDoubleArrayList times;
 	private TDoubleArrayList dists;
 	private TIntArrayList waitTimes;
-	private WayPoint startEdge;
-	private WayPoint endEdge;
+	private WayPoint startWp;
+	private WayPoint endWp;
 	
 	public EdgeList() {
 		this(DEFAULT_INITIAL_CAPACITY);
@@ -58,19 +58,19 @@ public class EdgeList {
 	}
 
 	public WayPoint getStartEdge() {
-		return startEdge;
+		return startWp;
 	}
 
 	public WayPoint getEndEdge() {
-		return endEdge;
+		return endWp;
 	}
 
-	public void setStartEdge(WayPoint startEdge) {
-		this.startEdge = startEdge;
+	public void setStartWayPoint(WayPoint startWp) {
+		this.startWp = startWp;
 	}
 
-	public void setEndEdge(WayPoint endEdge) {
-		this.endEdge = endEdge;
+	public void setEndWayPoint(WayPoint endWp) {
+		this.endWp = endWp;
 	}
 
 

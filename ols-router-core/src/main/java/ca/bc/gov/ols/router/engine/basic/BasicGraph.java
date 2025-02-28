@@ -10,16 +10,15 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
@@ -37,7 +36,7 @@ import gnu.trove.map.TIntObjectMap;
  * including the internal graph structure itself, as well as the various auxiliary data lookups
  * such as restrictions, event, schedules, etc.
  */
-public class BasicGraph implements iBasicGraph, SegmentIdLookup {
+public class BasicGraph implements SegmentIdLookup {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraph.class.getCanonicalName());
 	
 	private BasicGraphInternal internalGraph;
@@ -263,35 +262,29 @@ public class BasicGraph implements iBasicGraph, SegmentIdLookup {
 		this.edgeIdBySegId = edgeIdBySegId;
 	}
 
-	@Override
 	public boolean isMidRestriction(int edgeId) {
 		return turnCostLookup.isMidRestriction(edgeId);
 	}
 
-	@Override
 	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {
 		return restrictionLookupMap.get(restrictionSource).lookup(edgeId);
 	}
 
-	@Override
 	public List<RoadEvent> lookupEvent(int edgeId, LocalDateTime currentDateTime) {
 		return eventLookup.lookup(edgeId, currentDateTime);
 	}
 
-	@Override
 	public int[] lookupSchedule(int edgeId, LocalDateTime currentDateTime) {
 		return scheduleLookup.lookup(edgeId, currentDateTime);
 	}
 
-	@Override
 	public FerryInfo getFerryInfo(int edgeId) {
 		return scheduleLookup.getFerryInfo(edgeId);
 	}
 
-	@Override
-	public TurnDirection lookupTurn(int edgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
+	public TurnDirection lookupTurn(QueryGraph queryGraph, int edgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
 			VehicleType vehicleType, boolean enabled) {
-		return turnCostLookup.lookupTurn(edgeId, walker, currentDateTime, vehicleType, enabled);
+		return turnCostLookup.lookupTurn(queryGraph, edgeId, walker, currentDateTime, vehicleType, enabled);
 	}
 
 }

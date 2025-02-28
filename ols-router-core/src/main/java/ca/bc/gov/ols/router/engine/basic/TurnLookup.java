@@ -22,12 +22,10 @@ import gnu.trove.set.hash.TIntHashSet;
 public class TurnLookup {
 	private static final Logger logger = LoggerFactory.getLogger(TurnLookup.class.getCanonicalName());
 	
-	private BasicGraphInternal internalGraph;
 	private IntObjectArrayMap<ArrayList<TurnRestrictionEntry>> turnRestrictionMap;
 	private TIntHashSet midRestrictionEdges = new TIntHashSet();
 	
 	public TurnLookup(BasicGraphInternal internalGraph) {
-		this.internalGraph = internalGraph;
 		turnRestrictionMap = new IntObjectArrayMap<ArrayList<TurnRestrictionEntry>>(internalGraph.numEdges());
 	}
 	
@@ -59,7 +57,8 @@ public class TurnLookup {
 		return midRestrictionEdges.contains(edgeId);
 	}
 	
-	public TurnDirection lookupTurn(final int toEdge, final DijkstraWalker fromWalker, final LocalDateTime dateTime, final VehicleType vehicleType, boolean useRestrictions) {
+	public TurnDirection lookupTurn(QueryGraph queryGraph, final int toEdge, final DijkstraWalker fromWalker, 
+			final LocalDateTime dateTime, final VehicleType vehicleType, boolean useRestrictions) {
 		ArrayList<TurnRestrictionEntry> restrictionList = turnRestrictionMap.get(toEdge);
 		TurnDirection turnDir = null;
 		if(restrictionList != null) {
@@ -68,10 +67,15 @@ public class TurnLookup {
 				// loop through the ids while walking back through the path and confirm the match
 				DijkstraWalker walker = fromWalker;
 				for(int idx = restrictionEntry.ids.length - 3; idx >= 0; idx -= 2) {
+					// skip over split nodes
+					while(walker != null && walker.nodeId() < 0) {
+						walker = walker.from();
+					}
+					// if we get to the beginning of the path
 					if(walker == null) {
 						continue entry;
 					}
-					if(walker.getEdgeId() != restrictionEntry.ids[idx] || walker.getNodeId() != restrictionEntry.ids[idx+1]) {
+					if(queryGraph.getBaseEdgeId(walker.edgeId()) != restrictionEntry.ids[idx] || walker.nodeId() != restrictionEntry.ids[idx+1]) {
 						// not a match, start on next entry
 						continue entry;
 					}
@@ -79,7 +83,7 @@ public class TurnLookup {
 						turnDir = restrictionEntry.turnDir;
 						if(!useRestrictions && turnDir != null) return turnDir;
 					}
-					walker = walker.getFrom();
+					walker = walker.from();
 				}
 				if(useRestrictions 
 						&& restrictionEntry.vehicleTypes.contains(vehicleType) 

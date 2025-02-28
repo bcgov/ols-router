@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
@@ -39,31 +41,37 @@ record SplitEdge(
  * The "virtual" split edges are given negative edgeIds to make it easy to identify them.
  * The split points are also give negative nodeIds for the same reason.
  */
-public class ProxyGraph implements iBasicGraph {
+public class QueryGraph {
 
-	int firstSplitEdgeId;
-	int nextEdgeId;
-	BasicGraph baseGraph;
-	ArrayList<SplitEdge> splitEdges;
-	HashMap<Point,Integer> nodeIdByPoint;
-	MapList<Integer, Integer> baseEdgeToNewEdgeLookup;
-	MapList<Integer, SplitEdge> splitNodes;
+	private int firstSplitEdgeId;
+	private int nextEdgeId;
+	private BasicGraph baseGraph;
+	private ArrayList<SplitEdge> splitEdges;
+	private HashMap<Point,Integer> nodeIdByPoint;
+	private MapList<Integer, Integer> baseEdgeToNewEdgeLookup;
+	private MapList<Integer, SplitEdge> splitNodes;
 	
-	public ProxyGraph(BasicGraph baseGraph, RoutingParameters params) {
+	public QueryGraph(BasicGraph baseGraph, RoutingParameters params) {
 		this.baseGraph = baseGraph;
 		firstSplitEdgeId = baseGraph.numEdges();
 		// make up new edgeIds
 		nextEdgeId = firstSplitEdgeId;
-		buildSplitEdges(params);
+		List<Point> points = params.getPoints();
+		if(points != null && !points.isEmpty()) {
+			buildSplitEdges(params, points);
+		} else {
+			List<Point> allPoints = Stream.concat(params.getFromPoints().stream(), params.getToPoints().stream())
+                    .collect(Collectors.toList());
+			buildSplitEdges(params, allPoints);
+		}
 	}
 	
-	private void buildSplitEdges(RoutingParameters params) {
+	private void buildSplitEdges(RoutingParameters params, List<Point> points) {
 		splitEdges = new ArrayList<>();
 		nodeIdByPoint = new HashMap<>();
 		baseEdgeToNewEdgeLookup = new MapList<>();
 		splitNodes = new MapList<>();
 		// loop over points, build a map from edgeId to points on that edge
-		List<Point> points = params.getPoints();
 		MapList<Integer,Integer> pointIdxByEdgeId = new MapList<>();
 		for(int pointIdx = 0; pointIdx < points.size(); pointIdx++) {
 			int edgeId = baseGraph.findClosestEdge(points.get(pointIdx), params.getSnapDistance());
@@ -118,23 +126,28 @@ public class ProxyGraph implements iBasicGraph {
 				int otherSplitEdgeId = BasicGraphInternal.NO_EDGE;
 				
 				// create the reverse direction edge if needed
+				SplitEdge otherNewEdge = null;
 				if(otherBaseEdgeId != BasicGraphInternal.NO_EDGE) {
 					otherSplitEdgeId = nextEdgeId++;
-					SplitEdge otherNewEdge = new SplitEdge(otherSplitEdgeId, otherBaseEdgeId, splitEdgeId, toNodeId, fromNodeId, splitLine, splitRestrictions.get(splitLineIndex));
-					addSplitEdge(otherNewEdge);					
+					otherNewEdge = new SplitEdge(otherSplitEdgeId, otherBaseEdgeId, splitEdgeId, toNodeId, fromNodeId, splitLine, otherSplitRestrictions.get(splitLineIndex));				
 				}
-				SplitEdge newEdge = new SplitEdge(splitEdgeId, baseEdgeId, otherSplitEdgeId, fromNodeId, toNodeId, splitLine, otherSplitRestrictions.get(splitLineIndex));
+				SplitEdge newEdge = new SplitEdge(splitEdgeId, baseEdgeId, otherSplitEdgeId, fromNodeId, toNodeId, splitLine, splitRestrictions.get(splitLineIndex));
+				// they have to be added in order or they won't be put at the index that matches their Id
 				addSplitEdge(newEdge);
+				if(otherNewEdge != null) {
+					addSplitEdge(otherNewEdge);
+				}
 				
 				// figure out which points are associated with which NodeId
 				// and put them in the nodeIdByPoint map
 				for(int p = 0; p < projectedPoints.size(); p++) {
 					if(splitLine.getStartPoint().equals(projectedPoints.get(p))) {
 						nodeIdByPoint.put(points.get(pointIndexesForEdge.get(p)), fromNodeId);
-						break;
+						continue;
 					}
 					if(splitLine.getEndPoint().equals(projectedPoints.get(p))) {
 						nodeIdByPoint.put(points.get(pointIndexesForEdge.get(p)), toNodeId);
+						continue;
 					}
 				}
 			}
@@ -155,6 +168,7 @@ public class ProxyGraph implements iBasicGraph {
 				for(int splitLineIndex = 0; splitLineIndex < splitLines.size(); splitLineIndex++) {
 					double dist = c.getLocation().distance(splitLines.get(splitLineIndex));
 					if(dist < closestSplitDistance) {
+						closestSplitDistance = dist;
 						closestSplitIndex = splitLineIndex;
 					}
 				}
@@ -188,53 +202,86 @@ public class ProxyGraph implements iBasicGraph {
 	 * @param edgeId a valid edgeId, split or base
 	 * @return the base edgeId that can be looked up in the baseGraph
 	 */
-	private int mapEdgeId(int edgeId) {
+	public int getBaseEdgeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).baseEdgeId();
 		}
 		return edgeId;
 	}
 	
-	@Override
 	public int getFromNodeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).fromNodeId();
 		}
-		return baseGraph.getFromNodeId(mapEdgeId(edgeId));
+		return baseGraph.getFromNodeId(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public int getToNodeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).toNodeId();
 		}
-		return baseGraph.getToNodeId(mapEdgeId(edgeId));
+		return baseGraph.getToNodeId(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public int getOtherNodeId(int edgeId, int nodeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			SplitEdge edge = getSplitEdge(edgeId);
 			return edge.fromNodeId() == nodeId ? edge.toNodeId() : edge.fromNodeId();
 		}
-		return baseGraph.getOtherNodeId(mapEdgeId(edgeId), nodeId);
+		return baseGraph.getOtherNodeId(getBaseEdgeId(edgeId), nodeId);
 	}
 
-	@Override
+	/**
+	 * If the edgeId is a splitEdge, it returns the other part of the splitEdge 
+	 * on the other side of the given nodeId. 
+	 * If the given edgeId is not splitEdge, or the given nodeId is not splitNode,
+	 * return NO_EDGE;
+	 * @param nodeId
+	 * @param edgeId
+	 * @return the other half of the splitEdge that is on the other side of the node, or NO_EDGE
+	 */
+	public int otherSplitEdge(int nodeId, int edgeId) {
+		if(edgeId >= firstSplitEdgeId) {
+			List<SplitEdge> splitEdges = splitNodes.get(nodeId);
+			int baseEdgeId = getSplitEdge(edgeId).baseEdgeId();
+			for(SplitEdge splitEdge : splitEdges) {
+				if(splitEdge.newEdgeId() != edgeId && splitEdge.baseEdgeId() == baseEdgeId) {
+					return splitEdge.newEdgeId();
+				}
+			}
+		}
+		return BasicGraphInternal.NO_EDGE;
+	}
+	
 	public int nextEdge(int nodeId, int edgeId) {
-		List<SplitEdge> edges = splitNodes.get(nodeId);
-		if(edges != null) {
-			// if the nodeId < 0 it is a split node, there is only one other outgoing edge 
+		List<SplitEdge> splitEdges = splitNodes.get(nodeId);
+		if(splitEdges != null) {
+			// if the nodeId < 0 it is a split node, there are no more than two outgoing edges 
 			if(nodeId < 0) {
-				for(SplitEdge edge : edges) {
-					if(edge.fromNodeId() == nodeId && edge.newEdgeId() != edgeId) {
-						return edge.newEdgeId();
+				// identify the up to two outgoing edges
+				int firstEdgeId = BasicGraphInternal.NO_EDGE;
+				int lastEdgeId = BasicGraphInternal.NO_EDGE;
+				for(SplitEdge edge : splitEdges) {
+					if(edge.fromNodeId() == nodeId) {
+						if (firstEdgeId == BasicGraphInternal.NO_EDGE || edge.newEdgeId() < firstEdgeId) {
+							firstEdgeId = edge.newEdgeId();
+						} else if (lastEdgeId == BasicGraphInternal.NO_EDGE || edge.newEdgeId() > lastEdgeId){
+							lastEdgeId = edge.newEdgeId();
+						}
 					}
 				}
+				// return the appropriate edgeId
+				if(edgeId == BasicGraphInternal.NO_EDGE) {
+					return firstEdgeId;
+				}
+				if(edgeId == firstEdgeId && firstEdgeId != lastEdgeId) {
+					return lastEdgeId;
+				}
+				return BasicGraphInternal.NO_EDGE;
 			} else {
 				// this is a regular node that is at the end of a split segment
 				// check what the next edge would normally be
-				int nextEdgeId = baseGraph.nextEdge(nodeId, mapEdgeId(edgeId));
+				int nextEdgeId = baseGraph.nextEdge(nodeId, getBaseEdgeId(edgeId));
 				List<Integer> newEdgeIds = baseEdgeToNewEdgeLookup.get(nextEdgeId);
 				if(newEdgeIds != null) {
 					// the next edge is a split edge, find the right split
@@ -246,18 +293,16 @@ public class ProxyGraph implements iBasicGraph {
 				}
 			}
 		}
-		return baseGraph.nextEdge(nodeId, mapEdgeId(edgeId));
+		return baseGraph.nextEdge(nodeId, getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public int getOtherEdgeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).otherEdgeId();
 		}
-		return baseGraph.getOtherEdgeId(mapEdgeId(edgeId));
+		return baseGraph.getOtherEdgeId(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public LineString getLineString(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).lineString();
@@ -265,7 +310,10 @@ public class ProxyGraph implements iBasicGraph {
 		return baseGraph.getLineString(edgeId);
 	}
 
-	@Override
+	public LineString getBaseLineString(int edgeId) {
+		return baseGraph.getLineString(getBaseEdgeId(edgeId));
+	}
+
 	public double getLength(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			return getSplitEdge(edgeId).lineString().getLength();
@@ -273,148 +321,130 @@ public class ProxyGraph implements iBasicGraph {
 		return baseGraph.getLength(edgeId);
 	}
 
-	@Override
 	public TrafficImpactor getToImpactor(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			SplitEdge splitEdge = getSplitEdge(edgeId);
 			if(baseGraph.getReversed(splitEdge.baseEdgeId())) {
-				if(splitEdge.fromNodeId() < 0) return null;
+				if(splitEdge.fromNodeId() < 0) return TrafficImpactor.NONE;
 			} else {
-				if(splitEdge.toNodeId() < 0) return null;
+				if(splitEdge.toNodeId() < 0) return TrafficImpactor.NONE;
 			}
 		}
-		return baseGraph.getToImpactor(mapEdgeId(edgeId));
+		return baseGraph.getToImpactor(getBaseEdgeId(edgeId));
 	}
 
 	public int findNodeId(Point p) {
-		return nodeIdByPoint.get(p);
+		Integer nodeId = nodeIdByPoint.get(p);
+		if(nodeId == null) {
+			return BasicGraphInternal.NO_NODE;
+		}
+		return nodeId;
 	}
 
-	@Override
 	public TurnDirection lookupTurn(int edgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
 			VehicleType vehicleType, boolean enabled) {
 		// no turn costs or restrictions on internal splits
-		if(walker.getNodeId() < 0) {
+		if(walker.nodeId() < 0) {
 			return TurnDirection.CENTER;
 		}
 		// for external ends fallback to the baseGraph
-		return baseGraph.lookupTurn(mapEdgeId(edgeId), walker, currentDateTime, vehicleType, enabled);
+		return baseGraph.lookupTurn(this, getBaseEdgeId(edgeId), walker, currentDateTime, vehicleType, enabled);
 	}
 
-	@Override
 	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			getSplitEdge(edgeId).restrictions().get(restrictionSource);
 		}
-		return baseGraph.lookupRestriction(restrictionSource, mapEdgeId(edgeId));
+		return baseGraph.lookupRestriction(restrictionSource, getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public List<RoadEvent> lookupEvent(int edgeId, LocalDateTime currentDateTime) {
 		if(edgeId >= firstSplitEdgeId) {
 			// TODO how can we still apply a schedule if we split the seg?
 		}
-		return baseGraph.lookupEvent(mapEdgeId(edgeId), currentDateTime);
+		return baseGraph.lookupEvent(getBaseEdgeId(edgeId), currentDateTime);
 	}
 
-	@Override
 	public int[] lookupSchedule(int edgeId, LocalDateTime currentDateTime) {
 		if(edgeId >= firstSplitEdgeId) {
 			// TODO how can we still apply a schedule if we split the seg?
 		}
-		return baseGraph.lookupSchedule(mapEdgeId(edgeId), currentDateTime);
+		return baseGraph.lookupSchedule(getBaseEdgeId(edgeId), currentDateTime);
 	}
 
-	@Override
 	public FerryInfo getFerryInfo(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			// TODO how can we still apply ferryInfo if we split the ferry seg?
 		}
-		return baseGraph.getFerryInfo(mapEdgeId(edgeId));
+		return baseGraph.getFerryInfo(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public double getToAngleRads(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			// TODO internal split angles need to be calculated
 		}
-		return baseGraph.getToAngleRads(mapEdgeId(edgeId));
+		return baseGraph.getToAngleRads(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public double getFromAngleRads(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			// TODO internal split angles need to be calculated
 		}
-		return baseGraph.getFromAngleRads(mapEdgeId(edgeId));
+		return baseGraph.getFromAngleRads(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public boolean isMidRestriction(int edgeId) {
-		return baseGraph.isMidRestriction(mapEdgeId(edgeId));
+		return baseGraph.isMidRestriction(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public XingClass getXingClass(int edgeId) {
-		return baseGraph.getXingClass(mapEdgeId(edgeId));
+		return baseGraph.getXingClass(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public String getLocality(int edgeId) {
-		return baseGraph.getLocality(mapEdgeId(edgeId));
+		return baseGraph.getLocality(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public String getOwnership(int edgeId) {
-		return baseGraph.getOwnership(mapEdgeId(edgeId));
+		return baseGraph.getOwnership(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public String getName(int edgeId) {
-		return baseGraph.getName(mapEdgeId(edgeId));
+		return baseGraph.getName(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public int getSegmentId(int edgeId) {
-		return baseGraph.getSegmentId(mapEdgeId(edgeId));
+		return baseGraph.getSegmentId(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public boolean isTruckRoute(int edgeId) {
-		return baseGraph.isTruckRoute(mapEdgeId(edgeId));
+		return baseGraph.isTruckRoute(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public double getLocalDistortion(int edgeId, VehicleType vehicleType) {
-		return baseGraph.getLocalDistortion(mapEdgeId(edgeId), vehicleType);
+		return baseGraph.getLocalDistortion(getBaseEdgeId(edgeId), vehicleType);
 	}
 
-	@Override
 	public RoadClass getRoadClass(int edgeId) {
-		return baseGraph.getRoadClass(mapEdgeId(edgeId));
+		return baseGraph.getRoadClass(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public short getSpeedLimit(int edgeId) {
-		return baseGraph.getSpeedLimit(mapEdgeId(edgeId));
+		return baseGraph.getSpeedLimit(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public short getEffectiveSpeed(int edgeId, LocalDateTime dateTime) {
-		return baseGraph.getEffectiveSpeed(mapEdgeId(edgeId), dateTime);
+		return baseGraph.getEffectiveSpeed(getBaseEdgeId(edgeId), dateTime);
 	}
 
-	@Override
 	public boolean getReversed(int edgeId) {
-		return baseGraph.getReversed(mapEdgeId(edgeId));
+		return baseGraph.getReversed(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public boolean isDeadEnded(int edgeId) {
-		return baseGraph.isDeadEnded(mapEdgeId(edgeId));
+		return baseGraph.isDeadEnded(getBaseEdgeId(edgeId));
 	}
 
-	@Override
 	public int numEdges() {
 		return nextEdgeId;
 	}

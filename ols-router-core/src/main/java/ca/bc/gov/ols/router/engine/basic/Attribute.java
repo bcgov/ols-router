@@ -9,13 +9,13 @@ public enum Attribute {
 	locality((g,i) -> g.getLocality(i)),
 	ownership((g,i) -> g.getOwnership(i));
 
-	private BiFunction<iBasicGraph,Integer,Object> method;
+	private BiFunction<QueryGraph,Integer,Object> method;
 	
-	private Attribute(BiFunction<iBasicGraph,Integer,Object> method) {
+	private Attribute(BiFunction<QueryGraph,Integer,Object> method) {
 		this.method = method;
 	}
 	
-	public Object get(iBasicGraph graph, Integer edgeId) {
+	public Object get(QueryGraph graph, Integer edgeId) {
 		return method.apply(graph, edgeId);
 	}
 	

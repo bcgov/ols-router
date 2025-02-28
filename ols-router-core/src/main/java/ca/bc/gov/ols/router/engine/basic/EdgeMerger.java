@@ -50,7 +50,7 @@ import ca.bc.gov.ols.router.restrictions.LaneBasedRestriction;
 public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
 	
-	private final iBasicGraph graph;
+	private final QueryGraph graph;
 	private final EdgeList[] edgeLists;
 	private final RoutingParameters params;
 	private boolean calcRoute = false;
@@ -66,7 +66,7 @@ public class EdgeMerger {
 	private List<Integer> restrictions;
 	private EnumMap<Attribute,Object> partitionValues = null;
 	
-	public EdgeMerger(EdgeList[] edgeLists, iBasicGraph graph, RoutingParameters params) {
+	public EdgeMerger(EdgeList[] edgeLists, QueryGraph graph, RoutingParameters params) {
 		this.edgeLists = edgeLists;
 		this.graph = graph;
 		partitionAttributes = params.getPartition();
@@ -100,7 +100,14 @@ public class EdgeMerger {
 				int edgeId = edges.edgeId(edgeIdx);
 				LineString ls;
 				String curName = null;
-				ls = graph.getLineString(edgeId);
+				// if Edge is NO_EDGE it means these two WayPoints were within MinRoutingDistance of eachother
+				if(edgeId == BasicGraphInternal.NO_EDGE) {
+					Coordinate startCoord = graph.getLineString(edges.getStartEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
+					Coordinate endCoord = graph.getLineString(edges.getEndEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
+					ls = gf.createLineString(new Coordinate[] {startCoord,endCoord});
+				} else {
+					ls = graph.getLineString(edgeId);
+				}
 	
 				CoordinateSequence curCoords = ls.getCoordinateSequence();
 				CardinalDirection heading = null;
@@ -110,23 +117,8 @@ public class EdgeMerger {
 					firstOffset = 0;
 				}
 				
-				if(!partitionAttributes.isEmpty()) {
-					boolean changed = false;
-					for(Attribute attr : partitionAttributes) {
-						Object val = attr.get(graph, edgeId);
-						// always include the first edge
-						if(edgeListIdx == 0 && edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
-							changed = true;
-							partitionValues.put(attr, val);
-						}
-					}
-					if(changed) {
-						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionAttributes, graph, edgeId));
-					}
-				}
-				
 				// if we traversed the edge forward
-				if(!graph.getReversed(edgeId)) {
+				if(edgeId == BasicGraphInternal.NO_EDGE || !graph.getReversed(edgeId)) {
 					// we add the coordinates in forward order
 					heading = CardinalDirection.getHeading(curCoords.getCoordinate(0), curCoords.getCoordinate(1));
 					// skip the first coordinate as it will be the last coordinate of the previous linestring
@@ -141,6 +133,26 @@ public class EdgeMerger {
 						coords.add(curCoords.getCoordinate(coordIdx));
 					}				
 				}
+
+				if(edgeId == BasicGraphInternal.NO_EDGE) {
+					continue;
+				}
+				
+				if(!partitionAttributes.isEmpty()) {
+					boolean changed = false;
+					for(Attribute attr : partitionAttributes) {
+						Object val = attr.get(graph, edgeId);
+						// always include the first edge
+						if(edgeListIdx == 0 && edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
+							changed = true;
+							partitionValues.put(attr, val);
+						}
+					}
+					if(changed) {
+						partitions.add(new Partition(Math.max(0, coords.size()-curCoords.size()), partitionAttributes, graph, edgeId));
+					}
+				}
+				
 				if(calcDirections) {
 					curName = graph.getName(edgeId);
 					if(curDir == null || curDir.getStreetName() != curName) {
@@ -416,8 +428,8 @@ public class EdgeMerger {
 		return tlids;
 	}
 
-	public void calcDistance() {
-		mergeEdges(null);
+	public void calcDistance(GeometryFactory gf) {
+		mergeEdges(gf);
 	}
 	
 	public void calcRoute(GeometryFactory gf) {

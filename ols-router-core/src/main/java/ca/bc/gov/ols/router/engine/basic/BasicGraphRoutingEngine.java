@@ -104,7 +104,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			StopWatch sw = new StopWatch();
 			sw.start();
 			EdgeMerger em = doRoute(params);
-			em.calcDistance();
+			em.calcDistance(gf);
 			RouterDistanceResponse response = new RouterDistanceResponse(params, graph.getDates(), em.getDist(), em.getTime());
 			sw.stop();
 			response.setExecutionTime(sw.getElapsedTime());
@@ -207,28 +207,28 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	}
 
 	private EdgeMerger doRoute(RoutingParameters params) {
-		List<Point> points = params.getFullPoints();
-		return doCoreRoute(params);
+		QueryGraph queryGraph = new QueryGraph(graph, params);
+		WayPoint[] wayPoints = getWayPoints(queryGraph, params.getFullPoints(), params.isCorrectSide(), false);		
+		return doCoreRoute(params, queryGraph, wayPoints);
 	}
 
 	private EdgeMerger doOptimizedRoute(RoutingParameters params, StopWatch routingTimer, StopWatch optimizationTimer,
 			int[] visitOrder) throws Throwable {
-		WayPoint[] edgeSplits = optimizeRoute(params, visitOrder, routingTimer, optimizationTimer);
+		QueryGraph queryGraph = new QueryGraph(graph, params);
+		WayPoint[] wayPoints = optimizeRoute(params, queryGraph, visitOrder, routingTimer, optimizationTimer);
 		// do a final route on the resulting optimally-ordered points
-		return doCoreRoute(params);
+		return doCoreRoute(params, queryGraph, wayPoints);
 	}
 
-	private EdgeMerger doCoreRoute(RoutingParameters params) {
-		ProxyGraph proxyGraph = new ProxyGraph(graph, params);
-		WayPoint[] wayPoints = getWayPoints(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);		
+	private EdgeMerger doCoreRoute(RoutingParameters params, QueryGraph queryGraph, WayPoint[] wayPoints) {
 		EdgeList[] edgeLists = new EdgeList[wayPoints.length-1];
 		double timeOffset = 0;
 		for(int i = 1; i < wayPoints.length; i++) {
-			DijkstraShortestPath dsp = new DijkstraShortestPath(proxyGraph, params);
+			DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
 			edgeLists[i-1] = dsp.findShortestPath(wayPoints[i-1], wayPoints[i], timeOffset);
 			timeOffset += edgeLists[i-1].time(0);
 		}
-		return new EdgeMerger(edgeLists, proxyGraph, params);
+		return new EdgeMerger(edgeLists, queryGraph, params);
 	}
 
 
@@ -240,17 +240,18 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			RouterDistanceBetweenPairsResponse response = new RouterDistanceBetweenPairsResponse(params, graph.getDates());
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
-			WayPoint[] fromEdgeSplits = getWayPoints(fromPoints, params.getSnapDistance(), params.isCorrectSide(), true);
-			WayPoint[] toEdgeSplits = getWayPoints(toPoints, params.getSnapDistance(), params.isCorrectSide(), true);
+			QueryGraph queryGraph = new QueryGraph(graph, params); // TODO doesn't handle to/from points
+			WayPoint[] fromEdgeSplits = getWayPoints(queryGraph, fromPoints, params.isCorrectSide(), true);
+			WayPoint[] toEdgeSplits = getWayPoints(queryGraph, toPoints, params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
-				DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
+				DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
 				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
 				for(EdgeList edgeList : edgeLists) {
 					if(edgeList == null) {
 						response.addResult("No Route Found.");
 					} else {
-						EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeList}, graph, params);
-						em.calcDistance();
+						EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeList}, queryGraph, params);
+						em.calcDistance(gf);
 						response.addResult(em.getDist(), em.getTime());
 					}
 				}
@@ -278,9 +279,9 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return null;
 	}
 
-	private WayPoint[] optimizeRoute(RoutingParameters params, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
+	private WayPoint[] optimizeRoute(RoutingParameters params, QueryGraph queryGraph, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		WayPoint[] edgeSplits = getWayPoints(params.getPoints(), params.getSnapDistance(), params.isCorrectSide(), false);
+		WayPoint[] edgeSplits = getWayPoints(queryGraph, params.getPoints(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
@@ -293,7 +294,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		VehicleRoutingTransportCostsMatrix.Builder costMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder.newInstance(false);
 		routingTimer.start();
 		for(int fromIndex = 0; fromIndex < params.getPoints().size(); fromIndex++) {
-			DijkstraShortestPath dsp = new DijkstraShortestPath(graph, params);
+			DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
 			EdgeList[] edgeLists = dsp.findShortestPaths(edgeSplits[fromIndex], edgeSplits, 0);
 			// add the route costs into the cost matrix
 			for(int toIndex = 0; toIndex < edgeLists.length; toIndex++) {
@@ -301,8 +302,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 					// don't add costs from/to the same place (should be 0 anyway)
 					continue;
 				}
-				EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeLists[toIndex]}, graph, params);
-				em.calcDistance();
+				EdgeMerger em = new EdgeMerger(new EdgeList[] {edgeLists[toIndex]}, queryGraph, params);
+				em.calcDistance(gf);
 				costMatrixBuilder.addTransportDistance(""+fromIndex, ""+toIndex, em.getDist());
 				costMatrixBuilder.addTransportTime(""+fromIndex, ""+toIndex, em.getTime());
 			}
@@ -348,44 +349,67 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		return optimizedEdgeSplits;
 	}
 	
-	private WayPoint[] getWayPoints(List<Point> points, int snapDistance, boolean correctSide, boolean allowNullEdges) {
-		WayPoint[] edgeSplits = new WayPoint[points.size()];
+	private WayPoint[] getWayPoints(QueryGraph queryGraph, List<Point> points, boolean correctSide, boolean allowNullEdges) {
+		WayPoint[] wayPoints = new WayPoint[points.size()];
 		int i = 0;
 		for(Point p : points) {
-			int edgeId = graph.findClosestEdge(p, snapDistance);
-			int[] edgeIds = null;
-			if(edgeId == BasicGraphInternal.NO_EDGE) {
-				//throw new RuntimeException("ERROR: point not near any edge");
+			int nodeId = queryGraph.findNodeId(p);
+			if(nodeId == BasicGraphInternal.NO_NODE) {
 				if(!allowNullEdges) {
 					throw new IllegalArgumentException("Point (" + p.getX() + "," + p.getY() + ") is too far from any edge.");
 				}
-				edgeSplits[i++] = null;
-			} else {
-				int otherEdgeId = graph.getOtherEdgeId(edgeId);
-				if(otherEdgeId == BasicGraphInternal.NO_EDGE) {
-					// this is a 1-way segment, doesn't matter which side
-					edgeIds = new int[] {edgeId};
+				wayPoints[i++] = null;
+				continue;
+			}
+			ArrayList<Integer> outgoingEdgeIds = new ArrayList<>();
+			ArrayList<Integer> incomingEdgeIds = new ArrayList<>();
+			for(int outgoingEdgeId = queryGraph.nextEdge(nodeId, BasicGraphInternal.NO_EDGE); 
+					outgoingEdgeId != BasicGraphInternal.NO_EDGE;
+					outgoingEdgeId = queryGraph.nextEdge(nodeId, outgoingEdgeId)) {
+				// the incoming Edge is the reverse edge between the same nodes as the outgoing Edge
+				int incomingEdgeId = queryGraph.getOtherEdgeId(outgoingEdgeId);
+				// the incoming splitEdge is the other half of the outgoing edge that was split at this node
+				int incomingSplitEdgeId = queryGraph.otherSplitEdge(nodeId, outgoingEdgeId);
+				if(incomingEdgeId == BasicGraphInternal.NO_EDGE) {
+					// this is a 1-way segment, doesn't matter which side the point is on
+					outgoingEdgeIds.add(outgoingEdgeId);
+					if(incomingSplitEdgeId != BasicGraphInternal.NO_EDGE) {
+						incomingEdgeIds.add(incomingSplitEdgeId);
+					}
 				} else {
 					// this is a 2-way segment 
-					if(correctSide && !graph.isDeadEnded(edgeId)) {
+					if(correctSide && !queryGraph.isDeadEnded(outgoingEdgeId)) {
 						// need to check which one is the right side
-						int orientation = computeSide(graph.getLineString(edgeId), p);
-						if(orientation == -1 ^ graph.getReversed(edgeId)) {
+						int orientation = computeSide(queryGraph.getBaseLineString(outgoingEdgeId), p);
+						if(orientation == -1 ^ queryGraph.getReversed(outgoingEdgeId)) {
 							// the point is on the right of the forward linestring, or the left of the reversed seg
-							edgeIds = new int[] {edgeId};
+							outgoingEdgeIds.add(outgoingEdgeId);
+							if(incomingSplitEdgeId != BasicGraphInternal.NO_EDGE) {
+								incomingEdgeIds.add(incomingSplitEdgeId);
+							}
 						} else {
 							// the point is on the left of the forward seg, or the right of reversed seg
-							edgeIds = new int[] {otherEdgeId};
+							incomingEdgeIds.add(incomingEdgeId);
+							if(incomingSplitEdgeId != BasicGraphInternal.NO_EDGE) {
+								outgoingEdgeIds.add(queryGraph.getOtherEdgeId(incomingSplitEdgeId));
+							}
 						}
 					} else {
 						// we're not correct-side routing, so include both direction edges
-						edgeIds = new int[] {edgeId, otherEdgeId};
+						outgoingEdgeIds.add(outgoingEdgeId);
+//						if(incomingSplitEdgeId != BasicGraphInternal.NO_EDGE) {
+//							outgoingEdgeIds.add(queryGraph.getOtherEdgeId(incomingSplitEdgeId));
+//						}
+						incomingEdgeIds.add(incomingEdgeId);
+//						if(incomingSplitEdgeId != BasicGraphInternal.NO_EDGE) {
+//							incomingEdgeIds.add(incomingSplitEdgeId);
+//						}
 					}
 				}
-				edgeSplits[i++] = new WayPoint(edgeIds, p);
 			}
+			wayPoints[i++] = new WayPoint(outgoingEdgeIds, incomingEdgeIds, p);
 		}
-		return edgeSplits;
+		return wayPoints;
 	}
 
 	@Override
