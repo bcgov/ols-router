@@ -341,14 +341,14 @@ public class QueryGraph {
 		return nodeId;
 	}
 
-	public TurnDirection lookupTurn(int edgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
+	public TurnDirection lookupTurn(DijkstraWalker walker, LocalDateTime currentDateTime,
 			VehicleType vehicleType, boolean enabled) {
 		// no turn costs or restrictions on internal splits
-		if(walker.nodeId() < 0) {
+		if(walker.from() != null && walker.from().nodeId() < 0) {
 			return TurnDirection.CENTER;
 		}
 		// for external ends fallback to the baseGraph
-		return baseGraph.lookupTurn(this, getBaseEdgeId(edgeId), walker, currentDateTime, vehicleType, enabled);
+		return baseGraph.lookupTurn(this, walker, currentDateTime, vehicleType, enabled);
 	}
 
 	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {

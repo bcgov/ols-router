@@ -227,7 +227,7 @@ public class DijkstraShortestPath {
 			
 			TurnDirection turnDir = TurnDirection.CENTER;
 			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
-				turnDir = graph.lookupTurn(edgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
+				turnDir = graph.lookupTurn(walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
 			}
 			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
 
