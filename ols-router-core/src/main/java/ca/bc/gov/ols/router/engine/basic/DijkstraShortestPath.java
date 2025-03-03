@@ -128,13 +128,13 @@ public class DijkstraShortestPath {
 			double length = graph.getLength(startEdgeId);
 			double time = length * 3.6 / speedFunction.apply(startEdgeId, startTime);
 			double cost = costFunction.apply(startEdgeId, time, length);
-			if(params.isEnabled(RouteOption.XING_COSTS)) {
-				double xingCost = params.getXingCost(graph.getToImpactor(startEdgeId), graph.getXingClass(startEdgeId));
-				time += xingCost;
-				if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
-					cost += xingCost;
-				}
-			}
+//			if(params.isEnabled(RouteOption.XING_COSTS)) {
+//				double xingCost = params.getXingCost(graph.getToImpactor(startEdgeId), graph.getXingClass(startEdgeId));
+//				time += xingCost;
+//				if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
+//					cost += xingCost;
+//				}
+//			}
 			DijkstraWalker startWalker = new DijkstraWalker(startEdgeId, graph.getToNodeId(startEdgeId), 
 					cost, time, length, 0, null);
 			queue.add(startWalker);
@@ -231,11 +231,19 @@ public class DijkstraShortestPath {
 			}
 			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
 
-			// use the turnDirection to calculate the turn cost, if turncosts are on
-			double turnCost = 0; 
-			if(params.isEnabled(RouteOption.TURN_COSTS)) {
-				turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.edgeId()));
+			// if there was a previous segment, add the turn and crossing costs
+			double turnCost = 0;
+			if(walker.from() != null) {
+				// use the turnDirection to calculate the turn cost, if turncosts are on
+				if(params.isEnabled(RouteOption.TURN_COSTS) ) {
+					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
+				}
+				if(params.isEnabled(RouteOption.XING_COSTS)) {
+					double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
+					turnCost += xingCost;
+				}
 			}
+
 
 			// if this is an end edge
 			if(endEdges != null) {
@@ -271,13 +279,6 @@ public class DijkstraShortestPath {
 				double time = walker.time() + edgeTime;
 				double dist = walker.dist() + length;
 				double cost = walker.cost() + costFunction.apply(nextEdgeId, edgeTime, length);
-				if(params.isEnabled(RouteOption.XING_COSTS)) {
-					double xingCost = params.getXingCost(graph.getToImpactor(nextEdgeId), graph.getXingClass(nextEdgeId));
-					time += xingCost;
-					if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
-						cost += xingCost;
-					}
-				}
 
 				DijkstraWalker newWalker = new DijkstraWalker(nextEdgeId, graph.getOtherNodeId(nextEdgeId, nodeId), cost, time, dist, waitTime, walker);
 				// if we haven't found all paths or this path is still shorter than the worst shortest found

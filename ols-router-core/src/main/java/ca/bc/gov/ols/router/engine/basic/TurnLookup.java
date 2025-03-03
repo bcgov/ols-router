@@ -81,7 +81,7 @@ public class TurnLookup {
 						// not a match, start on next entry
 						continue entry;
 					}
-					if(turnDir == null) {
+					if(idx < restrictionEntry.ids.length - 1 && turnDir == null) {
 						turnDir = restrictionEntry.turnDir;
 						if(!useRestrictions && turnDir != null) return turnDir;
 					}
