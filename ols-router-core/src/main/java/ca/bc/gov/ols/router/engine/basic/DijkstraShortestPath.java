@@ -119,7 +119,7 @@ public class DijkstraShortestPath {
 		}
 
 		// setup the cost data structure and queue
-		boolean[] edgeIdVisisted = new boolean[graph.numEdges()];
+		boolean[] edgeIdVisited = new boolean[graph.numEdges()];
 		Queue<DijkstraWalker> queue = new PriorityQueue<DijkstraWalker>();
 		int checkedEdgeCount = 0;
 
@@ -156,7 +156,10 @@ public class DijkstraShortestPath {
 			int edgeId = walker.edgeId();
 			// if we've already been to this non-end, non-internal edge, or it is part of a loop
 			List<Integer> endEdges = endEdgesById.get(edgeId);
-			if(edgeIdVisisted[edgeId] && ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) || !graph.isMidRestriction(edgeId))) || isLoop(edgeId, walker))) {
+			if(edgeIdVisited[edgeId] 
+					&& ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) 
+							|| !graph.isMidRestriction(edgeId))) 
+					|| isLoop(walker))) {
 				// skip it
 				continue nextEdge;
 			}
@@ -286,7 +289,7 @@ public class DijkstraShortestPath {
 					queue.add(newWalker);
 				}
 			}
-			edgeIdVisisted[edgeId] = true;
+			edgeIdVisited[edgeId] = true;
 
 		}
 		logger.debug("{} edges checked to find the the shortest path", checkedEdgeCount);
@@ -314,7 +317,9 @@ public class DijkstraShortestPath {
 		return paths;
 	}
 	
-	private boolean isLoop(int edgeId, DijkstraWalker walker) {
+	private boolean isLoop(DijkstraWalker walker) {
+		int edgeId = walker.edgeId();
+		walker = walker.from();
 		for(int count = 1; count < 6 && walker != null; count++) {
 			if(walker.edgeId() == edgeId) {
 				return true;
