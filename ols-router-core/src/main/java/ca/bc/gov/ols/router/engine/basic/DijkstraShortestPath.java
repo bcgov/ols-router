@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -157,6 +155,8 @@ public class DijkstraShortestPath {
 				logger.error("Infinite routing loop encountered, investigation required!");
 				break;
 			}
+			edgeIdVisited[walker.edgeId()] = true;
+
 
 			// Length/Angle Based Restrictions - not required at this time
 			// TODO make the maximum standard vehicle length of 12.5 a config parameter
@@ -176,30 +176,30 @@ public class DijkstraShortestPath {
 				}
 			}
 			
-			// TODO Handle alternate time zones
-			LocalDateTime currentDateTime = null;
-			if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
-				currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.time())), RouterConfig.DEFAULT_TIME_ZONE);
-			}
+//			// TODO Handle alternate time zones
+//			LocalDateTime currentDateTime = null;
+//			if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
+//				currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.time())), RouterConfig.DEFAULT_TIME_ZONE);
+//			}
 			
-			TurnDirection turnDir = TurnDirection.CENTER;
-			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
-				turnDir = graph.lookupTurn(walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
-			}
-			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
-
-			// if there was a previous segment, add the turn and crossing costs
-			double turnCost = 0;
-			if(walker.from() != null) {
-				// use the turnDirection to calculate the turn cost, if turncosts are on
-				if(params.isEnabled(RouteOption.TURN_COSTS) ) {
-					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
-				}
-				if(params.isEnabled(RouteOption.XING_COSTS)) {
-					double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
-					turnCost += xingCost;
-				}
-			}
+//			TurnDirection turnDir = TurnDirection.CENTER;
+//			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
+//				turnDir = graph.lookupTurn(walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
+//			}
+//			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
+//
+//			// if there was a previous segment, add the turn and crossing costs
+//			double turnCost = 0;
+//			if(walker.from() != null) {
+//				// use the turnDirection to calculate the turn cost, if turncosts are on
+//				if(params.isEnabled(RouteOption.TURN_COSTS) ) {
+//					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
+//				}
+//				if(params.isEnabled(RouteOption.XING_COSTS)) {
+//					double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
+//					turnCost += xingCost;
+//				}
+//			}
 
 			// if this is an end edge
 			List<Integer> endEdges = endEdgesById.get(walker.edgeId());
@@ -244,9 +244,12 @@ public class DijkstraShortestPath {
 				}
 
 				// figure out the wait time for the nextEdge
+				LocalDateTime currentDateTime = null;
 				int overrideTravelSeconds = -1;
 				int waitTime = 0;
 				if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
+					// TODO Handle alternate time zones
+					currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.time())), RouterConfig.DEFAULT_TIME_ZONE);
 					if(params.isEnabled(RouteOption.EVENTS)) {
 						List<RoadEvent> events = graph.lookupEvent(nextEdgeId, currentDateTime);
 						for(RoadEvent event : events) {
@@ -280,6 +283,25 @@ public class DijkstraShortestPath {
 					}
 				}
 				
+				TurnDirection turnDir = TurnDirection.CENTER;
+				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
+					turnDir = graph.lookupTurn(nextEdgeId, walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
+				}
+				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
+
+				// if there was a previous segment, add the turn and crossing costs
+				double turnCost = 0;
+				if(walker.from() != null) {
+					// use the turnDirection to calculate the turn cost, if turncosts are on
+					if(params.isEnabled(RouteOption.TURN_COSTS) ) {
+						turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
+					}
+					if(params.isEnabled(RouteOption.XING_COSTS)) {
+						double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
+						turnCost += xingCost;
+					}
+				}
+
 				// store the cost to get to the far side of the nextEdge
 				double length = graph.getLength(nextEdgeId);
 				double edgeTime = waitTime;
@@ -292,8 +314,6 @@ public class DijkstraShortestPath {
 				double time = walker.time() + edgeTime;
 				double dist = walker.dist() + length;
 				double cost = walker.cost() + costFunction.apply(nextEdgeId, edgeTime, length);
-
-				edgeIdVisited[nextEdgeId] = true;
 
 				// if we haven't found all paths or this path is still shorter than the worst shortest found
 				if(pathsFinished < minPaths || cost < worstPathCost) {

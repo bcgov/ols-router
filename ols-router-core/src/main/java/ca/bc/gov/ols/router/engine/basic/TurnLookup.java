@@ -57,31 +57,29 @@ public class TurnLookup {
 		return midRestrictionEdges.contains(edgeId);
 	}
 	
-	public TurnDirection lookupTurn(QueryGraph queryGraph, final DijkstraWalker fromWalker, 
+	public TurnDirection lookupTurn(QueryGraph queryGraph, final int toEdge, final DijkstraWalker fromWalker, 
 			final LocalDateTime dateTime, final VehicleType vehicleType, boolean useRestrictions) {
-		ArrayList<TurnRestrictionEntry> restrictionList = turnRestrictionMap.get(queryGraph.getBaseEdgeId(fromWalker.edgeId()));
+		ArrayList<TurnRestrictionEntry> restrictionList = turnRestrictionMap.get(queryGraph.getBaseEdgeId(toEdge));
 		TurnDirection turnDir = null;
 		if(restrictionList != null) {
 			entry:
 			for(TurnRestrictionEntry restrictionEntry : restrictionList) {
 				// loop through the ids while walking back through the path and confirm the match
 				DijkstraWalker walker = fromWalker;
-				for(int idx = restrictionEntry.ids.length - 1; idx >= 0; idx -= 2) {
+				for(int idx = restrictionEntry.ids.length - 3; idx >= 0; idx -= 2) {
+					// skip over split nodes
+					while(walker != null && walker.nodeId() < 0) {
+						walker = walker.from();
+					}
 					// if we get to the beginning of the path
 					if(walker == null) {
 						continue entry;
 					}
-					// skip over split nodes
-					while(walker.from() != null && walker.from().nodeId() < 0) {
-						walker = walker.from();
-					}
-					if(queryGraph.getBaseEdgeId(walker.edgeId()) != restrictionEntry.ids[idx] 
-							|| (idx > 0 && (walker.from() == null 
-									|| walker.from().nodeId() != restrictionEntry.ids[idx-1]))) {
+					if(queryGraph.getBaseEdgeId(walker.edgeId()) != restrictionEntry.ids[idx] || walker.nodeId() != restrictionEntry.ids[idx+1]) {
 						// not a match, start on next entry
 						continue entry;
 					}
-					if(idx < restrictionEntry.ids.length - 1 && turnDir == null) {
+					if(turnDir == null) {
 						turnDir = restrictionEntry.turnDir;
 						if(!useRestrictions && turnDir != null) return turnDir;
 					}
