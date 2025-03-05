@@ -321,7 +321,7 @@ class EdgeData {
 		this.fromAngle = (float) Angle.angle(ls.getCoordinateN(0), ls.getCoordinateN(1));
 		int numCoords = ls.getNumPoints();
 		this.toAngle = (float) Angle.angle(ls.getCoordinateN(numCoords-1), ls.getCoordinateN(numCoords-2));
-		this.speedLimit = speedLimit;
+		this.speedLimit = speedLimit > 0 ? speedLimit : 1; // speedLimit cannot be 0
 		this.leftLocality = leftLocality;
 		this.rightLocality = rightLocality;
 		this.name = name;

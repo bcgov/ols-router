@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.function.BiFunction;
@@ -76,7 +78,7 @@ public class DijkstraShortestPath {
 		// and populate them
 		for(int endWpIdx = 0; endWpIdx < endWps.length; endWpIdx++) {
 			WayPoint endWp = endWps[endWpIdx];
-			if(endWp == null) {
+			if(endWp == null || endWp.incomingEdgeIds().isEmpty()) {
 				nullToEdges++;
 			} else {
 				for(int edgeId : endWp.incomingEdgeIds()) {
@@ -92,6 +94,9 @@ public class DijkstraShortestPath {
 		}
 		
 		int minPaths = Math.min(params.getMaxPairs(), endWps.length - nullToEdges);
+		if(minPaths == 0) {
+			throw new IllegalArgumentException("Unrouteable waypoint.");
+		}
 		EdgeList[] paths = new EdgeList[endWps.length];
 		int pathsFinished = 0;
 		double worstPathCost = 0;
@@ -143,6 +148,7 @@ public class DijkstraShortestPath {
 		
 		// traverse network looking for the cheapest paths
 		DijkstraWalker walker;
+		
 		nextEdge:
 		while((walker = queue.poll()) != null) {
 			checkedEdgeCount++;
@@ -150,25 +156,6 @@ public class DijkstraShortestPath {
 			if(checkedEdgeCount > graph.numEdges() * 2) {
 				logger.error("Infinite routing loop encountered, investigation required!");
 				break;
-			}
-
-			int nodeId = walker.nodeId();
-			int edgeId = walker.edgeId();
-			// if we've already been to this non-end, non-internal edge, or it is part of a loop
-			List<Integer> endEdges = endEdgesById.get(edgeId);
-			if(edgeIdVisited[edgeId] 
-					&& ((endEdges == null  && (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) 
-							|| !graph.isMidRestriction(edgeId))) 
-					|| isLoop(walker))) {
-				// skip it
-				continue nextEdge;
-			}
-
-			// TODO possibly allow U-turns in some situations/params
-			if(walker.from() != null && edgeId == graph.getOtherEdgeId(walker.from().edgeId())) {
-				// this is a U-turn
-				//turnDir = TurnDirection.UTURN;
-				continue nextEdge;
 			}
 
 			// Length/Angle Based Restrictions - not required at this time
@@ -181,7 +168,7 @@ public class DijkstraShortestPath {
 
 			// filter the edge based on restrictions
 			if(!params.getRestrictionValues().isEmpty()) {
-				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), edgeId);
+				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), walker.edgeId());
 				for(Constraint c : constraints) {
 					if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 						continue nextEdge;
@@ -191,41 +178,8 @@ public class DijkstraShortestPath {
 			
 			// TODO Handle alternate time zones
 			LocalDateTime currentDateTime = null;
-			int overrideTravelSeconds = -1;
-			int waitTime = 0;
 			if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
 				currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.time())), RouterConfig.DEFAULT_TIME_ZONE);
-				if(params.isEnabled(RouteOption.EVENTS)) {
-					List<RoadEvent> events = graph.lookupEvent(edgeId, currentDateTime);
-					for(RoadEvent event : events) {
-						int t = event.getDelay(currentDateTime);
-						if(t == -1) {
-							waitTime = -1;
-							break;
-						}
-						waitTime = Math.max(waitTime, t);
-					}
-					if(waitTime < 0) {
-						// this segment is inaccessible due to an event
-						continue nextEdge;
-					}
-					// TODO handle other types of events (slow-downs due to partial lane closures, etc.)
-				}
-				if(params.isEnabled(RouteOption.SCHEDULING)) {
-					int[] waitAndTravelTime = graph.lookupSchedule(edgeId, currentDateTime);
-					
-					if(waitAndTravelTime[1] > 0) {
-						waitTime = waitAndTravelTime[0]; 
-						overrideTravelSeconds = waitAndTravelTime[1];
-						//logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
-					}
-				}
-			}
-			if(!params.isEnabled(RouteOption.TIME_DEPENDENCY) || !params.isEnabled(RouteOption.SCHEDULING)) {
-				FerryInfo info = graph.getFerryInfo(edgeId);
-				if(info != null && info.getMinWaitTime() > 0) {
-					waitTime = info.getMinWaitTime();
-				}
 			}
 			
 			TurnDirection turnDir = TurnDirection.CENTER;
@@ -247,8 +201,8 @@ public class DijkstraShortestPath {
 				}
 			}
 
-
 			// if this is an end edge
+			List<Integer> endEdges = endEdgesById.get(walker.edgeId());
 			if(endEdges != null) {
 				// for each end point on this edge
 				for(int endEdgeIdx : endEdges) {
@@ -265,12 +219,68 @@ public class DijkstraShortestPath {
 					}
 				}
 			}
-				
-			for(int nextEdgeId = graph.nextEdge(nodeId, BasicGraphInternal.NO_EDGE); 
-					nextEdgeId != BasicGraphInternal.NO_EDGE; 
-					nextEdgeId = graph.nextEdge(nodeId, nextEdgeId)) {
 			
-				// store the cost to get to the far side of this edge
+			// loop over possible edges to traverse to next
+			for(int nextEdgeId = graph.nextEdge(walker.nodeId(), BasicGraphInternal.NO_EDGE); 
+					nextEdgeId != BasicGraphInternal.NO_EDGE; 
+					nextEdgeId = graph.nextEdge(walker.nodeId(), nextEdgeId)) {
+			
+				// not sure that we even need to check if it is an end, given the new waypoint logic
+				// if we've already been to this non-end, non-internal-restriction edge, or it is part of a loop
+				//List<Integer> nextEndEdges = endEdgesById.get(nextEdgeId);
+				if(edgeIdVisited[nextEdgeId] 
+						//&& ((nextEndEdges == null 
+						&& (!params.isEnabled(RouteOption.TURN_RESTRICTIONS) 
+								|| !graph.isMidRestriction(nextEdgeId) || isLoop(nextEdgeId, walker))) {
+					// skip it
+					continue;
+				}
+
+				// TODO possibly allow U-turns in some situations/params
+				if(nextEdgeId == graph.getOtherEdgeId(walker.edgeId())) {
+					// this is a U-turn
+					//turnDir = TurnDirection.UTURN;
+					continue;
+				}
+
+				// figure out the wait time for the nextEdge
+				int overrideTravelSeconds = -1;
+				int waitTime = 0;
+				if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
+					if(params.isEnabled(RouteOption.EVENTS)) {
+						List<RoadEvent> events = graph.lookupEvent(nextEdgeId, currentDateTime);
+						for(RoadEvent event : events) {
+							int t = event.getDelay(currentDateTime);
+							if(t == -1) {
+								waitTime = -1;
+								break;
+							}
+							waitTime = Math.max(waitTime, t);
+						}
+						if(waitTime < 0) {
+							// this segment is inaccessible due to an event
+							continue;
+						}
+						// TODO handle other types of events (slow-downs due to partial lane closures, etc.)
+					}
+					if(params.isEnabled(RouteOption.SCHEDULING)) {
+						int[] waitAndTravelTime = graph.lookupSchedule(nextEdgeId, currentDateTime);
+						
+						if(waitAndTravelTime[1] > 0) {
+							waitTime = waitAndTravelTime[0]; 
+							overrideTravelSeconds = waitAndTravelTime[1];
+							//logger.info("Ferry schedule travel time: {}", overrideTravelSeconds);
+						}
+					}
+				}
+				if(!params.isEnabled(RouteOption.TIME_DEPENDENCY) || !params.isEnabled(RouteOption.SCHEDULING)) {
+					FerryInfo info = graph.getFerryInfo(nextEdgeId);
+					if(info != null && info.getMinWaitTime() > 0) {
+						waitTime += info.getMinWaitTime();
+					}
+				}
+				
+				// store the cost to get to the far side of the nextEdge
 				double length = graph.getLength(nextEdgeId);
 				double edgeTime = waitTime;
 				if(overrideTravelSeconds > 0) {
@@ -283,28 +293,30 @@ public class DijkstraShortestPath {
 				double dist = walker.dist() + length;
 				double cost = walker.cost() + costFunction.apply(nextEdgeId, edgeTime, length);
 
-				DijkstraWalker newWalker = new DijkstraWalker(nextEdgeId, graph.getOtherNodeId(nextEdgeId, nodeId), cost, time, dist, waitTime, walker);
+				edgeIdVisited[nextEdgeId] = true;
+
 				// if we haven't found all paths or this path is still shorter than the worst shortest found
 				if(pathsFinished < minPaths || cost < worstPathCost) {
+					DijkstraWalker newWalker = new DijkstraWalker(nextEdgeId, graph.getOtherNodeId(nextEdgeId, walker.nodeId()), cost, time, dist, waitTime, walker);
 					queue.add(newWalker);
 				}
 			}
-			edgeIdVisited[edgeId] = true;
 
 		}
 		logger.debug("{} edges checked to find the the shortest path", checkedEdgeCount);
 		
 		// make a list of all the toEdgeIndexes
-		Integer[] toEdgeIdxs = new Integer[endWps.length];
-		for(int i = 0; i < toEdgeIdxs.length; i++) {
-			toEdgeIdxs[i] = i;
+		Integer[] endWpIdxs = new Integer[endWps.length];
+		for(int i = 0; i < endWpIdxs.length; i++) {
+			endWpIdxs[i] = i;
 		}
 		// if we don't need to calculate all paths, sort them by cost
-		if(minPaths < endWps.length-nullToEdges) {
-			Arrays.sort(toEdgeIdxs, Comparator.comparingDouble(idx -> costByEndWpIdx[idx].cost()));
+		if(params.getMaxPairs() < endWps.length || nullToEdges > 0) {
+			Arrays.sort(endWpIdxs, Comparator.comparingDouble(
+					idx -> costByEndWpIdx[idx] == null ? Double.MAX_VALUE : costByEndWpIdx[idx].cost()));
 		}
 		int calcPaths = 0;
-		for(Integer toEdgeIdx : toEdgeIdxs) {
+		for(Integer toEdgeIdx : endWpIdxs) {
 			if(calcPaths < minPaths) {
 				if(paths[toEdgeIdx] == null) {
 					paths[toEdgeIdx] = walkback(startWp, endWps[toEdgeIdx], costByEndWpIdx[toEdgeIdx]);
@@ -316,9 +328,12 @@ public class DijkstraShortestPath {
 		}
 		return paths;
 	}
-	
-	private boolean isLoop(DijkstraWalker walker) {
-		int edgeId = walker.edgeId();
+
+	// This loop check is necessary to prevent from walking in circles around the middle of a
+	// double-divided intersection, where often all of the internal segments would be in the
+	// middle of U-turn restrictions and thus re-visitable. 
+	// It makes the assumption that no more than 6 segments would ever be involved in such a loop
+	private boolean isLoop(int edgeId, DijkstraWalker walker) {
 		walker = walker.from();
 		for(int count = 1; count < 6 && walker != null; count++) {
 			if(walker.edgeId() == edgeId) {
