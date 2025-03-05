@@ -87,7 +87,7 @@ public class DijkstraShortestPath {
 					}
 					edges.add(endWpIdx);
 				}
-				costByEndWpIdx[endWpIdx] = new DijkstraWalker(endWp.incomingEdgeIds().get(0), BasicGraphInternal.NO_NODE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, 0, null);
+				costByEndWpIdx[endWpIdx] = new DijkstraWalker(endWp.incomingEdgeIds().get(0), BasicGraphInternal.NO_NODE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, 0, null, 0, 0);
 			}
 		}
 		
@@ -114,7 +114,7 @@ public class DijkstraShortestPath {
 					if( startNodeId == endNodeId 
 							|| (graph.getBaseEdgeId(startEdgeId) == graph.getBaseEdgeId(endEdgeId)
 								&& distance < params.getMinRoutingDistance())) {
-						costByEndWpIdx[endWpIdx] = new DijkstraWalker(BasicGraphInternal.NO_EDGE, BasicGraphInternal.NO_NODE, 0, 0, distance, 0, null);
+						costByEndWpIdx[endWpIdx] = new DijkstraWalker(BasicGraphInternal.NO_EDGE, BasicGraphInternal.NO_NODE, 0, 0, distance, 0, null, 0, 0);
 						pathsFinished++;
 					}
 				}
@@ -131,15 +131,16 @@ public class DijkstraShortestPath {
 			double length = graph.getLength(startEdgeId);
 			double time = length * 3.6 / speedFunction.apply(startEdgeId, startTime);
 			double cost = costFunction.apply(startEdgeId, time, length);
-//			if(params.isEnabled(RouteOption.XING_COSTS)) {
-//				double xingCost = params.getXingCost(graph.getToImpactor(startEdgeId), graph.getXingClass(startEdgeId));
-//				time += xingCost;
-//				if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
-//					cost += xingCost;
-//				}
-//			}
+			double xingCost = 0;
+			if(params.isEnabled(RouteOption.XING_COSTS)) {
+				xingCost = params.getXingCost(graph.getToImpactor(startEdgeId), graph.getXingClass(startEdgeId));
+				time += xingCost;
+				if(params.getCriteria().equals(RoutingCriteria.FASTEST)) {
+					cost += xingCost;
+				}
+			}
 			DijkstraWalker startWalker = new DijkstraWalker(startEdgeId, graph.getToNodeId(startEdgeId), 
-					cost, time, length, 0, null);
+					cost, time, length, 0, null, 0, xingCost);
 			queue.add(startWalker);
 			//costByEdgeId.put(startEdgeId, startWalker);
 		}
@@ -155,8 +156,6 @@ public class DijkstraShortestPath {
 				logger.error("Infinite routing loop encountered, investigation required!");
 				break;
 			}
-			edgeIdVisited[walker.edgeId()] = true;
-
 
 			// Length/Angle Based Restrictions - not required at this time
 			// TODO make the maximum standard vehicle length of 12.5 a config parameter
@@ -176,31 +175,6 @@ public class DijkstraShortestPath {
 				}
 			}
 			
-//			// TODO Handle alternate time zones
-//			LocalDateTime currentDateTime = null;
-//			if(params.isEnabled(RouteOption.TIME_DEPENDENCY)) {
-//				currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset + walker.time())), RouterConfig.DEFAULT_TIME_ZONE);
-//			}
-			
-//			TurnDirection turnDir = TurnDirection.CENTER;
-//			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) || params.isEnabled(RouteOption.TURN_COSTS)) {
-//				turnDir = graph.lookupTurn(walker, currentDateTime, params.getVehicleType(), params.isEnabled(RouteOption.TURN_RESTRICTIONS));
-//			}
-//			if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
-//
-//			// if there was a previous segment, add the turn and crossing costs
-//			double turnCost = 0;
-//			if(walker.from() != null) {
-//				// use the turnDirection to calculate the turn cost, if turncosts are on
-//				if(params.isEnabled(RouteOption.TURN_COSTS) ) {
-//					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
-//				}
-//				if(params.isEnabled(RouteOption.XING_COSTS)) {
-//					double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
-//					turnCost += xingCost;
-//				}
-//			}
-
 			// if this is an end edge
 			List<Integer> endEdges = endEdgesById.get(walker.edgeId());
 			if(endEdges != null) {
@@ -289,17 +263,15 @@ public class DijkstraShortestPath {
 				}
 				if(params.isEnabled(RouteOption.TURN_RESTRICTIONS) && turnDir == null) continue;
 
-				// if there was a previous segment, add the turn and crossing costs
+				// add the turn and crossing costs
 				double turnCost = 0;
-				if(walker.from() != null) {
-					// use the turnDirection to calculate the turn cost, if turncosts are on
-					if(params.isEnabled(RouteOption.TURN_COSTS) ) {
-						turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.from().edgeId()));
-					}
-					if(params.isEnabled(RouteOption.XING_COSTS)) {
-						double xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.from().edgeId()));
-						turnCost += xingCost;
-					}
+				double xingCost = 0;
+				// use the turnDirection to calculate the turn cost, if turncosts are on
+				if(params.isEnabled(RouteOption.TURN_COSTS) ) {
+					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.edgeId()));
+				}
+				if(params.isEnabled(RouteOption.XING_COSTS)) {
+					xingCost = params.getXingCost(graph.getToImpactor(walker.edgeId()), graph.getXingClass(walker.edgeId()));
 				}
 
 				// store the cost to get to the far side of the nextEdge
@@ -310,15 +282,18 @@ public class DijkstraShortestPath {
 				} else {
 					edgeTime += length * 3.6 / speedFunction.apply(nextEdgeId, currentDateTime);
 				}
-				edgeTime += turnCost;
+				edgeTime += turnCost + xingCost;
 				double time = walker.time() + edgeTime;
 				double dist = walker.dist() + length;
 				double cost = walker.cost() + costFunction.apply(nextEdgeId, edgeTime, length);
 
 				// if we haven't found all paths or this path is still shorter than the worst shortest found
 				if(pathsFinished < minPaths || cost < worstPathCost) {
-					DijkstraWalker newWalker = new DijkstraWalker(nextEdgeId, graph.getOtherNodeId(nextEdgeId, walker.nodeId()), cost, time, dist, waitTime, walker);
+					DijkstraWalker newWalker = new DijkstraWalker(nextEdgeId, graph.getOtherNodeId(nextEdgeId, walker.nodeId()), cost, time, dist, waitTime, walker, turnCost, xingCost);
 					queue.add(newWalker);
+					// it is important to mark segments as visited at the time they are put in the queue
+					// to prevent them from entering the queue multiple times before being marked as visited
+					edgeIdVisited[nextEdgeId] = true;
 				}
 			}
 

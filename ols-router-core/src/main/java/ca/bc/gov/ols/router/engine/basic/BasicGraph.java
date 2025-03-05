@@ -282,10 +282,5 @@ public class BasicGraph implements SegmentIdLookup {
 		return scheduleLookup.getFerryInfo(edgeId);
 	}
 
-	public TurnDirection lookupTurn(QueryGraph queryGraph, int nextEdgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
-			VehicleType vehicleType, boolean enabled) {
-		return turnCostLookup.lookupTurn(queryGraph, nextEdgeId, walker, currentDateTime, vehicleType, enabled);
-	}
-
 }
 

@@ -18,8 +18,10 @@ public record DijkstraWalker(
 		double time, // the cumulative time from start to the nodeId
 		double dist, // the cumulative distance from start to the nodeId
 		int waitTime, // the cumulative waitTime from start to the nodeId
-		DijkstraWalker from
-	) implements Comparable<DijkstraWalker> { // a reference to the previous step
+		DijkstraWalker from, // a reference to the previous step
+		double turnCost,
+		double xingCost
+	) implements Comparable<DijkstraWalker> { 
 	
 	@Override
 	public int compareTo(DijkstraWalker other) {

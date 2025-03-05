@@ -347,8 +347,7 @@ public class QueryGraph {
 		if(walker.nodeId() < 0) {
 			return TurnDirection.CENTER;
 		}
-		// for external ends fallback to the baseGraph
-		return baseGraph.lookupTurn(this, nextEdgeId, walker, currentDateTime, vehicleType, enabled);
+		return baseGraph.getTurnLookup().lookupTurn(this, nextEdgeId, walker, currentDateTime, vehicleType, enabled);
 	}
 
 	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {
@@ -360,7 +359,7 @@ public class QueryGraph {
 
 	public List<RoadEvent> lookupEvent(int edgeId, LocalDateTime currentDateTime) {
 		if(edgeId >= firstSplitEdgeId) {
-			// TODO how can we still apply a schedule if we split the seg?
+			// TODO how can we still apply an event if we split the seg?
 		}
 		return baseGraph.lookupEvent(getBaseEdgeId(edgeId), currentDateTime);
 	}
