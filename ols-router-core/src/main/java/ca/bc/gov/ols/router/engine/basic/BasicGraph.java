@@ -39,7 +39,7 @@ import gnu.trove.map.TIntObjectMap;
 public class BasicGraph implements SegmentIdLookup {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraph.class.getCanonicalName());
 	
-	private BasicGraphInternal internalGraph;
+	protected BasicGraphInternal internalGraph;
 	private RouterConfig config;
 	private IntObjectArrayMap<int[]> edgeIdBySegId;
 	private TurnLookup turnCostLookup;
