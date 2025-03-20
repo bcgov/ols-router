@@ -248,7 +248,7 @@ public class QueryGraph {
 			List<SplitEdge> splitEdges = splitNodes.get(nodeId);
 			int baseEdgeId = getSplitEdge(edgeId).baseEdge.id;
 			for(SplitEdge splitEdge : splitEdges) {
-				if(splitEdge.id != edgeId && splitEdge.id == baseEdgeId) {
+				if(splitEdge.id != edgeId && splitEdge.baseEdge.id == baseEdgeId) {
 					return splitEdge.id;
 				}
 			}
