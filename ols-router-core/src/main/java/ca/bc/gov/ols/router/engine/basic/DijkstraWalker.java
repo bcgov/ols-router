@@ -12,8 +12,7 @@ import java.util.List;
  * Represents one step in a graph traversal.
  */
 public record DijkstraWalker(
-		int edgeId, // the edge just traversed
-		int nodeId, // the node just arrived at
+		Edge edge, // the edge just traversed
 		double cost, // the cumulative cost from start to the nodeId
 		double time, // the cumulative time from start to the nodeId
 		double dist, // the cumulative distance from start to the nodeId
@@ -35,7 +34,7 @@ public record DijkstraWalker(
 	}
 	
 	private void buildEdgeChain(List<Integer> chain) {
-		chain.add(edgeId);
+		chain.add(edge.id);
 		if(from != null) {
 			from.buildEdgeChain(chain);
 		}

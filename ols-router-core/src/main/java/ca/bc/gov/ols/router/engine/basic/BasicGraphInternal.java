@@ -80,7 +80,7 @@ public class BasicGraphInternal {
 
 	private int createEdge(int fromNodeId, int toNodeId, EdgeData data, boolean reversed) {
 		int edgeId = nextEdgeId++; 
-		Edge forwardEdge = new Edge(fromNodeId, toNodeId, data, reversed);
+		Edge forwardEdge = new Edge(edgeId, fromNodeId, toNodeId, data, reversed);
 		edges.put(edgeId, forwardEdge);
 		spatialIndex.insert(data.ls.getEnvelopeInternal(), edgeId);
 		insertEdge(fromNodeId, edgeId);
@@ -135,6 +135,10 @@ public class BasicGraphInternal {
 	@SuppressWarnings("unchecked")
 	public List<Integer> findEdgesWithin(Envelope env) {
 		return spatialIndex.query(env);
+	}
+	
+	public Edge getEdge(int edgeId) {
+		return edges.get(edgeId);
 	}
 
 	public int getSegmentId(int edgeId) {
@@ -343,6 +347,7 @@ class EdgeData {
 }
 
 class Edge {
+	final int id;
 	final int fromNodeId;
 	final int toNodeId;
 	int nextFromEdgeId = BasicGraphInternal.NO_EDGE;
@@ -351,7 +356,8 @@ class Edge {
 	final boolean reversed;
 	int otherEdgeId = BasicGraphInternal.NO_EDGE;
 
-	public Edge(int fromNodeId, int toNodeId, EdgeData data, boolean reversed) {
+	public Edge(int id, int fromNodeId, int toNodeId, EdgeData data, boolean reversed) {
+		this.id = id;
 		this.fromNodeId = fromNodeId;
 		this.toNodeId = toNodeId;
 		this.data = data;

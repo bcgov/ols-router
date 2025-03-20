@@ -68,14 +68,14 @@ public class TurnLookup {
 				DijkstraWalker walker = fromWalker;
 				for(int idx = restrictionEntry.ids.length - 3; idx >= 0; idx -= 2) {
 					// skip over split nodes
-					while(walker != null && walker.nodeId() < 0) {
+					while(walker != null && walker.edge().toNodeId < 0) {
 						walker = walker.from();
 					}
 					// if we get to the beginning of the path
 					if(walker == null) {
 						continue entry;
 					}
-					if(queryGraph.getBaseEdgeId(walker.edgeId()) != restrictionEntry.ids[idx] || walker.nodeId() != restrictionEntry.ids[idx+1]) {
+					if(queryGraph.getBaseEdgeId(walker.edge().id) != restrictionEntry.ids[idx] || walker.edge().toNodeId != restrictionEntry.ids[idx+1]) {
 						// not a match, start on next entry
 						continue entry;
 					}

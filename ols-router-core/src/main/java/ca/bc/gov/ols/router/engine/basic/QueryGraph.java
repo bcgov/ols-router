@@ -2,6 +2,7 @@ package ca.bc.gov.ols.router.engine.basic;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -23,15 +24,6 @@ import ca.bc.gov.ols.router.restrictions.Constraint;
 import ca.bc.gov.ols.util.LineStringSplitter;
 import ca.bc.gov.ols.util.MapList;
 
-
-record SplitEdge(
-		int newEdgeId, 
-		int baseEdgeId,
-		int otherEdgeId,
-		int fromNodeId, 
-		int toNodeId,
-		LineString lineString,
-		MapList<RestrictionSource,Constraint> restrictions) {}
 
 /**
  * Used to model a "virtual" graph that behaves like regular graph, 
@@ -131,9 +123,11 @@ public class QueryGraph {
 				SplitEdge otherNewEdge = null;
 				if(otherBaseEdgeId != BasicGraphInternal.NO_EDGE) {
 					otherSplitEdgeId = nextEdgeId++;
-					otherNewEdge = new SplitEdge(otherSplitEdgeId, otherBaseEdgeId, splitEdgeId, toNodeId, fromNodeId, splitLine, otherSplitRestrictions.get(splitLineIndex));				
+					otherNewEdge = new SplitEdge(otherSplitEdgeId, internalGraph.getEdge(otherBaseEdgeId), splitEdgeId, toNodeId, fromNodeId, 
+							splitLine, otherSplitRestrictions.get(splitLineIndex));				
 				}
-				SplitEdge newEdge = new SplitEdge(splitEdgeId, baseEdgeId, otherSplitEdgeId, fromNodeId, toNodeId, splitLine, splitRestrictions.get(splitLineIndex));
+				SplitEdge newEdge = new SplitEdge(splitEdgeId, internalGraph.getEdge(baseEdgeId), otherSplitEdgeId, fromNodeId, toNodeId, 
+						splitLine, splitRestrictions.get(splitLineIndex));
 				// they have to be added in order or they won't be put at the index that matches their Id
 				addSplitEdge(newEdge);
 				if(otherNewEdge != null) {
@@ -182,9 +176,9 @@ public class QueryGraph {
 	
 	private void addSplitEdge(SplitEdge splitEdge) {
 		splitEdges.add(splitEdge);
-		baseEdgeToNewEdgeLookup.add(splitEdge.baseEdgeId(), splitEdge.newEdgeId());
-		splitNodes.add(splitEdge.fromNodeId(), splitEdge);
-		splitNodes.add(splitEdge.toNodeId(), splitEdge);
+		baseEdgeToNewEdgeLookup.add(splitEdge.baseEdge.id, splitEdge.id);
+		splitNodes.add(splitEdge.fromNodeId, splitEdge);
+		splitNodes.add(splitEdge.toNodeId, splitEdge);
 	}
 	
 	/**
@@ -206,21 +200,28 @@ public class QueryGraph {
 	 */
 	public int getBaseEdgeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).baseEdgeId();
+			return getSplitEdge(edgeId).baseEdge.id;
 		}
 		return edgeId;
 	}
 	
+	public Edge getEdge(int edgeId) {
+		if(edgeId >= firstSplitEdgeId) {
+			return getSplitEdge(edgeId);
+		}
+		return internalGraph.getEdge(edgeId);
+	}
+	
 	public int getFromNodeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).fromNodeId();
+			return getSplitEdge(edgeId).fromNodeId;
 		}
 		return internalGraph.getFromNodeId(getBaseEdgeId(edgeId));
 	}
 
 	public int getToNodeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).toNodeId();
+			return getSplitEdge(edgeId).toNodeId;
 		}
 		return internalGraph.getToNodeId(getBaseEdgeId(edgeId));
 	}
@@ -228,7 +229,7 @@ public class QueryGraph {
 	public int getOtherNodeId(int edgeId, int nodeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			SplitEdge edge = getSplitEdge(edgeId);
-			return edge.fromNodeId() == nodeId ? edge.toNodeId() : edge.fromNodeId();
+			return edge.fromNodeId == nodeId ? edge.toNodeId : edge.fromNodeId;
 		}
 		return internalGraph.getOtherNodeId(getBaseEdgeId(edgeId), nodeId);
 	}
@@ -245,10 +246,10 @@ public class QueryGraph {
 	public int otherSplitEdge(int nodeId, int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			List<SplitEdge> splitEdges = splitNodes.get(nodeId);
-			int baseEdgeId = getSplitEdge(edgeId).baseEdgeId();
+			int baseEdgeId = getSplitEdge(edgeId).baseEdge.id;
 			for(SplitEdge splitEdge : splitEdges) {
-				if(splitEdge.newEdgeId() != edgeId && splitEdge.baseEdgeId() == baseEdgeId) {
-					return splitEdge.newEdgeId();
+				if(splitEdge.id != edgeId && splitEdge.id == baseEdgeId) {
+					return splitEdge.id;
 				}
 			}
 		}
@@ -264,11 +265,11 @@ public class QueryGraph {
 				int firstEdgeId = BasicGraphInternal.NO_EDGE;
 				int lastEdgeId = BasicGraphInternal.NO_EDGE;
 				for(SplitEdge edge : splitEdges) {
-					if(edge.fromNodeId() == nodeId) {
-						if (firstEdgeId == BasicGraphInternal.NO_EDGE || edge.newEdgeId() < firstEdgeId) {
-							firstEdgeId = edge.newEdgeId();
-						} else if (lastEdgeId == BasicGraphInternal.NO_EDGE || edge.newEdgeId() > lastEdgeId){
-							lastEdgeId = edge.newEdgeId();
+					if(edge.fromNodeId == nodeId) {
+						if (firstEdgeId == BasicGraphInternal.NO_EDGE || edge.id < firstEdgeId) {
+							firstEdgeId = edge.id;
+						} else if (lastEdgeId == BasicGraphInternal.NO_EDGE || edge.id > lastEdgeId){
+							lastEdgeId = edge.id;
 						}
 					}
 				}
@@ -288,7 +289,7 @@ public class QueryGraph {
 				if(newEdgeIds != null) {
 					// the next edge is a split edge, find the right split
 					for(int newEdgeId : newEdgeIds) {
-						if(getSplitEdge(newEdgeId).fromNodeId() == nodeId) {
+						if(getSplitEdge(newEdgeId).fromNodeId == nodeId) {
 							return newEdgeId;
 						}
 					}
@@ -300,14 +301,14 @@ public class QueryGraph {
 
 	public int getOtherEdgeId(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).otherEdgeId();
+			return getSplitEdge(edgeId).otherEdgeId;
 		}
 		return internalGraph.getOtherEdgeId(getBaseEdgeId(edgeId));
 	}
 
 	public LineString getLineString(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).lineString();
+			return getSplitEdge(edgeId).lineString;
 		}
 		return internalGraph.getLineString(edgeId);
 	}
@@ -318,7 +319,7 @@ public class QueryGraph {
 
 	public double getLength(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			return getSplitEdge(edgeId).lineString().getLength();
+			return getSplitEdge(edgeId).lineString.getLength();
 		}
 		return internalGraph.getLength(edgeId);
 	}
@@ -326,10 +327,10 @@ public class QueryGraph {
 	public TrafficImpactor getToImpactor(int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
 			SplitEdge splitEdge = getSplitEdge(edgeId);
-			if(internalGraph.getReversed(splitEdge.baseEdgeId())) {
-				if(splitEdge.fromNodeId() < 0) return TrafficImpactor.NONE;
+			if(internalGraph.getReversed(splitEdge.baseEdge.id)) {
+				if(splitEdge.fromNodeId < 0) return TrafficImpactor.NONE;
 			} else {
-				if(splitEdge.toNodeId() < 0) return TrafficImpactor.NONE;
+				if(splitEdge.toNodeId < 0) return TrafficImpactor.NONE;
 			}
 		}
 		return internalGraph.getToImpactor(getBaseEdgeId(edgeId));
@@ -346,7 +347,7 @@ public class QueryGraph {
 	public TurnDirection lookupTurn(int nextEdgeId, DijkstraWalker walker, LocalDateTime currentDateTime,
 			VehicleType vehicleType, boolean enabled) {
 		// no turn costs or restrictions on internal splits
-		if(walker.nodeId() < 0) {
+		if(walker.edge().toNodeId < 0) {
 			return TurnDirection.CENTER;
 		}
 		return baseGraph.getTurnLookup().lookupTurn(this, nextEdgeId, walker, currentDateTime, vehicleType, enabled);
@@ -354,7 +355,9 @@ public class QueryGraph {
 
 	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {
 		if(edgeId >= firstSplitEdgeId) {
-			getSplitEdge(edgeId).restrictions().get(restrictionSource);
+			List<Constraint> list = getSplitEdge(edgeId).restrictions.get(restrictionSource);
+			if(list == null) return Collections.emptyList();
+			return list;
 		}
 		return baseGraph.lookupRestriction(restrictionSource, getBaseEdgeId(edgeId));
 	}
