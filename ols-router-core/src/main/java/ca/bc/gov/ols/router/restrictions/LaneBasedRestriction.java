@@ -14,14 +14,12 @@ public class LaneBasedRestriction extends AbstractRestriction {
 
 	public final int[] id;
 	public final double[] permitableValue;
-	public final double dist;
 
 	LaneBasedRestriction(final int[] id, final RestrictionSource source, final RestrictionType type, 
-			final double[] permitableValue, final Point location, final int locationId, double dist) {
+			final double[] permitableValue, final Point location, final int locationId) {
 		super(source, type, location, locationId);
 		this.id = id;
 		this.permitableValue = permitableValue;
-		this.dist = dist;
 	}
 	
 	@Override

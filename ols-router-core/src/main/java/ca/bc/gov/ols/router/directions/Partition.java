@@ -4,14 +4,14 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 
 import ca.bc.gov.ols.router.engine.basic.Attribute;
-import ca.bc.gov.ols.router.engine.basic.BasicGraph;
+import ca.bc.gov.ols.router.engine.basic.QueryGraph;
 
 public class Partition {
 	private int index;
 	private EnumMap<Attribute,Object> values;
 	private double distance = 0;
 	
- 	public Partition(int index, EnumSet<Attribute> attributes, BasicGraph graph, int edgeId) {
+ 	public Partition(int index, EnumSet<Attribute> attributes, QueryGraph graph, int edgeId) {
 		this.index = index;
 		values = new EnumMap<Attribute,Object>(Attribute.class);
 		for(Attribute attr : attributes) {

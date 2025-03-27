@@ -76,9 +76,9 @@ public enum DistanceUnit {
 	public String formatForDirections(double dist) {
 		// distance of zero means that this direction has no associated distance
 		// eg. the end point
-		if(dist == 0) {
-			return "";
-		}
+//		if(dist == 0) {
+//			return "";
+//		}
 		
 		// switch to appropriate metric unit, if in metric
 		DistanceUnit unit = this;

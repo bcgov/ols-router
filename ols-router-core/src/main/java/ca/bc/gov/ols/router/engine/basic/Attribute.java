@@ -4,18 +4,18 @@ import java.util.EnumSet;
 import java.util.function.BiFunction;
 
 public enum Attribute {
-	isFerry((g,i) -> g.getScheduleLookup().getFerryInfo(i) != null),
+	isFerry((g,i) -> g.getFerryInfo(i) != null),
 	isTruckRoute((g,i) -> g.isTruckRoute(i)),
 	locality((g,i) -> g.getLocality(i)),
 	ownership((g,i) -> g.getOwnership(i));
 
-	private BiFunction<BasicGraph,Integer,Object> method;
+	private BiFunction<QueryGraph,Integer,Object> method;
 	
-	private Attribute(BiFunction<BasicGraph,Integer,Object> method) {
+	private Attribute(BiFunction<QueryGraph,Integer,Object> method) {
 		this.method = method;
 	}
 	
-	public Object get(BasicGraph graph, Integer edgeId) {
+	public Object get(QueryGraph graph, Integer edgeId) {
 		return method.apply(graph, edgeId);
 	}
 	

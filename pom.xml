@@ -34,7 +34,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<ols-util.version>1.4.0-SNAPSHOT</ols-util.version>
+		<ols-util.version>1.5.0-SNAPSHOT</ols-util.version>
 		<springframework.version>6.0.10</springframework.version>
 		<springframework.security.version>6.1.1</springframework.security.version>
 		<springboot.version>3.1.1</springboot.version>

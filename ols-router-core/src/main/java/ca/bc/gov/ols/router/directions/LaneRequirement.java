@@ -1,11 +1,13 @@
 package ca.bc.gov.ols.router.directions;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.linearref.LengthLocationMap;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 
 import ca.bc.gov.ols.router.api.ApiResponse;
 import ca.bc.gov.ols.router.api.RoutingParameters;
@@ -13,6 +15,9 @@ import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.restrictions.LaneBasedRestriction;
 
 public class LaneRequirement {
+	// restriction locations over this tolerance away from the segment will not be considered
+	// specifically for handling lane restrictions on partial segments at start/end of route
+	private static final double TOLERANCE = 10.0;
 	
 	// private int restrictionId; // there will potentially be many of these, maybe locationId is better if we need it at all
 	private RestrictionType type;
@@ -21,16 +26,28 @@ public class LaneRequirement {
 	private double distance;
 	private boolean[] safeLanes;
 	
-	public LaneRequirement(LaneBasedRestriction lbr, RoutingParameters params, LineString lineString, boolean reversed, double preDist) {
-		this.type = lbr.type;
-		this.location = lbr.getLocation();
-		this.locationId = lbr.getLocationId();
-		this.safeLanes = lbr.getSafeLanes(params);
+	public static LaneRequirement createIfNeeded(LaneBasedRestriction lbr, RoutingParameters params, LineString lineString, boolean reversed, double preDist) {
+		// in the case of the first/last seg, the linestring may be only a partial, 
+		// and the restriction may not apply, in which case we return null
+		if(!lineString.isWithinDistance(lbr.getLocation(), TOLERANCE)) return null;
+		
+		LaneRequirement lr = new LaneRequirement();
+		lr.type = lbr.type;
+		lr.location = lbr.getLocation();
+		lr.locationId = lbr.getLocationId();
+		lr.safeLanes = lbr.getSafeLanes(params);
+		
+		// calculate the distance along the segment to the restriction location
+		LocationIndexedLine locationIndexedLine = new LocationIndexedLine(lineString);
+	    LinearLocation ref = locationIndexedLine.project(lr.location.getCoordinate());
+		double dist = new LengthLocationMap(lineString).getLength(ref);
+	    
 		if(reversed) {
-			this.distance = preDist + lineString.getLength() - lbr.dist;
+			lr.distance = preDist + lineString.getLength() - dist;
 		} else {
-			this.distance = preDist + lbr.dist;
+			lr.distance = preDist + dist;
 		}
+		return lr;
 	}
 
 	public double getDistance() {

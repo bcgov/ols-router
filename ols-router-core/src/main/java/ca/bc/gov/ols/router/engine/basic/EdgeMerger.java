@@ -50,7 +50,7 @@ import ca.bc.gov.ols.router.restrictions.LaneBasedRestriction;
 public class EdgeMerger {
 	private static final Logger logger = LoggerFactory.getLogger(EdgeMerger.class.getCanonicalName());
 	
-	private final BasicGraph graph;
+	private final QueryGraph graph;
 	private final EdgeList[] edgeLists;
 	private final RoutingParameters params;
 	private boolean calcRoute = false;
@@ -66,7 +66,7 @@ public class EdgeMerger {
 	private List<Integer> restrictions;
 	private EnumMap<Attribute,Object> partitionValues = null;
 	
-	public EdgeMerger(EdgeList[] edgeLists, BasicGraph graph, RoutingParameters params) {
+	public EdgeMerger(EdgeList[] edgeLists, QueryGraph graph, RoutingParameters params) {
 		this.edgeLists = edgeLists;
 		this.graph = graph;
 		partitionAttributes = params.getPartition();
@@ -94,25 +94,17 @@ public class EdgeMerger {
 		// for each edgeList (ie. each leg of the route)
 		for(int edgeListIdx = 0; edgeListIdx < edgeLists.length; edgeListIdx++) {
 			EdgeList edges = edgeLists[edgeListIdx];
+
 			// for each edge
 			for(int edgeIdx = edges.size()-1; edgeIdx >= 0; edgeIdx--) {
 				int edgeId = edges.edgeId(edgeIdx);
 				LineString ls;
 				String curName = null;
-				if(edgeIdx == edges.size()-1) {
-					// start edge
-					if(graph.getReversed(edgeId)) {
-						ls = edges.getStartEdge().getFromSplit();
-					} else {
-						ls = edges.getStartEdge().getToSplit();
-					}
-				} else if(edgeIdx == 0) {
-					// end edge
-					if(graph.getReversed(edgeId)) {
-						ls = edges.getEndEdge().getToSplit();
-					} else {
-						ls = edges.getEndEdge().getFromSplit();
-					}
+				// if Edge is NO_EDGE it means these two WayPoints were within MinRoutingDistance of eachother
+				if(edgeId == BasicGraphInternal.NO_EDGE) {
+					Coordinate startCoord = graph.getLineString(edges.getStartEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
+					Coordinate endCoord = graph.getLineString(edges.getEndEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
+					ls = gf.createLineString(new Coordinate[] {startCoord,endCoord});
 				} else {
 					ls = graph.getLineString(edgeId);
 				}
@@ -125,23 +117,8 @@ public class EdgeMerger {
 					firstOffset = 0;
 				}
 				
-				if(!partitionAttributes.isEmpty()) {
-					boolean changed = false;
-					for(Attribute attr : partitionAttributes) {
-						Object val = attr.get(graph, edgeId);
-						// always include the first edge
-						if(edgeListIdx == 0 && edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
-							changed = true;
-							partitionValues.put(attr, val);
-						}
-					}
-					if(changed) {
-						partitions.add(new Partition(Math.max(0, coords.size()-1), partitionAttributes, graph, edgeId));
-					}
-				}
-				
 				// if we traversed the edge forward
-				if(!graph.getReversed(edgeId)) {
+				if(edgeId == BasicGraphInternal.NO_EDGE || !graph.getReversed(edgeId)) {
 					// we add the coordinates in forward order
 					heading = CardinalDirection.getHeading(curCoords.getCoordinate(0), curCoords.getCoordinate(1));
 					// skip the first coordinate as it will be the last coordinate of the previous linestring
@@ -156,12 +133,32 @@ public class EdgeMerger {
 						coords.add(curCoords.getCoordinate(coordIdx));
 					}				
 				}
+
+				if(edgeId == BasicGraphInternal.NO_EDGE) {
+					continue;
+				}
+				
+				if(!partitionAttributes.isEmpty()) {
+					boolean changed = false;
+					for(Attribute attr : partitionAttributes) {
+						Object val = attr.get(graph, edgeId);
+						// always include the first edge
+						if(edgeListIdx == 0 && edgeIdx == edges.size()-1 || !Objects.equals(val, partitionValues.get(attr))) {
+							changed = true;
+							partitionValues.put(attr, val);
+						}
+					}
+					if(changed) {
+						partitions.add(new Partition(Math.max(0, coords.size()-curCoords.size()), partitionAttributes, graph, edgeId));
+					}
+				}
+				
 				if(calcDirections) {
 					curName = graph.getName(edgeId);
 					if(curDir == null || curDir.getStreetName() != curName) {
 						int lastIntCsIdx = coords.size() - (curCoords.size());
 						// determine the next direction
-						if(graph.getScheduleLookup().getFerryInfo(edgeId) != null) {
+						if(graph.getFerryInfo(edgeId) != null) {
 							curDir = new FerryDirection(gf.createPoint(coords.get(lastIntCsIdx)), curName);
 						} else if(curDir == null) {
 							curDir = new StartDirection(gf.createPoint(coords.get(lastIntCsIdx)), curName, heading);
@@ -223,7 +220,7 @@ public class EdgeMerger {
 					curDir.addDistance(edgeDist);
 					curDir.addTime(edgeTime);
 					if(waitTime > 0) {
-						if(graph.getScheduleLookup().getFerryInfo(edgeId) != null) {
+						if(graph.getFerryInfo(edgeId) != null) {
 							curDir.addNotification(new FerryWaitNotification(curName, waitTime));
 						} else {
 							curDir.addNotification(new EventWaitNotification(waitTime));
@@ -232,24 +229,24 @@ public class EdgeMerger {
 					// find and add truck notifications
 					if(params.getVehicleType() == VehicleType.TRUCK) {
 						LocalDateTime currentDateTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(time)), RouterConfig.DEFAULT_TIME_ZONE);
-						List<RoadEvent> events = graph.getEventLookup().lookup(edgeId, currentDateTime); 
+						List<RoadEvent> events = graph.lookupEvent(edgeId, currentDateTime); 
 						events.stream()
 								.filter(e -> e instanceof RoadTruckNoticeEvent)
 								.map(e -> new TruckNotification((RoadTruckNoticeEvent)e))
 								.forEach(curDir::addNotification);
 						
 						// find and add lane-based restriction notifications
-						List<Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
+						List<Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), edgeId);
 						constraints.stream()
 								.filter(c -> c instanceof LaneBasedRestriction && c.constrains(params))
-								.map(c -> new LaneRequirement((LaneBasedRestriction)c, params, graph.getLineString(edgeId), graph.getReversed(edgeId), preDist))
+								.map(c -> LaneRequirement.createIfNeeded((LaneBasedRestriction)c, params, ls, graph.getReversed(edgeId), preDist))
 								.forEach(curDir::addLaneRequirement);
 					}
 					// TODO take note of other interesting properties of the segment and add them as notifications
 				}
 				
 				if(params.isListRestrictions()) {
-					List<Constraint> constraints = graph.getRestrictionLookup(params.getRestrictionSource()).lookup(edgeId);
+					List<Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), edgeId);
 					for(Constraint c : constraints) {
 						restrictions.addAll(c.getIds());
 					}
@@ -431,8 +428,8 @@ public class EdgeMerger {
 		return tlids;
 	}
 
-	public void calcDistance() {
-		mergeEdges(null);
+	public void calcDistance(GeometryFactory gf) {
+		mergeEdges(gf);
 	}
 	
 	public void calcRoute(GeometryFactory gf) {

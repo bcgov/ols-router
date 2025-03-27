@@ -46,7 +46,10 @@ public abstract class Direction {
 		notifications.add(notification);
 	}
 
+	// needs to account for null LaneRquirements in case of
+	// restrictions off the end of partial segs at start/end of route
 	public void addLaneRequirement(LaneRequirement lr) {
+		if(lr == null) return;
 		if(laneRequirements == null) {
 			laneRequirements = new ArrayList<LaneRequirement>(1);
 		}

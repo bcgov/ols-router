@@ -8,64 +8,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class DijkstraWalker implements Comparable<DijkstraWalker>{
-	private final int edgeId;
-	private final int nodeId;
-	private final double cost;
-	private final double time;
-	private final double dist;
-	private final int waitTime;
-	private final DijkstraWalker from;
+/* 
+ * Represents one step in a graph traversal.
+ */
+public record DijkstraWalker(
+		Edge edge, // the edge just traversed
+		double cost, // the cumulative cost from start to the nodeId
+		double time, // the cumulative time from start to the nodeId
+		double dist, // the cumulative distance from start to the nodeId
+		int waitTime, // the cumulative waitTime from start to the nodeId
+		DijkstraWalker from, // a reference to the previous step
+		double turnCost,
+		double xingCost
+	) implements Comparable<DijkstraWalker> { 
 	
-	public DijkstraWalker(int edgeId, int nodeId, double cost, double time, double dist, DijkstraWalker from) {
-		this.edgeId = edgeId;
-		this.nodeId = nodeId;
-		this.cost = cost;
-		this.time = time;
-		this.dist = dist;
-		this.from = from;
-		this.waitTime = 0;
-	}
-
-	public DijkstraWalker(int edgeId, int nodeId, double cost, double time, double dist, DijkstraWalker from, int waitTime) {
-		this.edgeId = edgeId;
-		this.nodeId = nodeId;
-		this.cost = cost;
-		this.time = time;
-		this.dist = dist;
-		this.from = from;
-		this.waitTime = waitTime;
-	}
-
-	public int getEdgeId() {
-		return edgeId;
-	}
-
-	public int getNodeId() {
-		return nodeId;
-	}
-
-	public double getCost() {
-		return cost;
-	}
-
-	public double getTime() {
-		return time;
-	}
-
-	public double getDist() {
-		return dist;
-	}
-
-	public DijkstraWalker getFrom() {
-		return from;
-	}
-
-	public int getWaitTime() {
-		return waitTime;
-	}
-
-
+	@Override
 	public int compareTo(DijkstraWalker other) {
 		return Double.compare(cost, other.cost);
 	}
@@ -77,7 +34,7 @@ public class DijkstraWalker implements Comparable<DijkstraWalker>{
 	}
 	
 	private void buildEdgeChain(List<Integer> chain) {
-		chain.add(edgeId);
+		chain.add(edge.id);
 		if(from != null) {
 			from.buildEdgeChain(chain);
 		}

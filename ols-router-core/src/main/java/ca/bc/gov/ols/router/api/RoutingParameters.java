@@ -80,6 +80,7 @@ public class RoutingParameters {
 	private Map<RestrictionType,Double> restrictionValues = new HashMap<RestrictionType,Double>();
 	private boolean listRestrictions = false;
 	private Set<Integer> excludeRestrictions = Collections.emptySet();
+	private int minRoutingDistance = 0;
 	
 	static {
 		double[] xingCost = RouterConfig.getInstance().getDefaultXingCost();
@@ -526,6 +527,14 @@ public class RoutingParameters {
 		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
 	}
 	
+	public int getMinRoutingDistance() {
+		return minRoutingDistance;
+	}
+
+	public void setMinRoutingDistance(int minRoutingDistance) {
+		this.minRoutingDistance = minRoutingDistance;
+	}
+
 	/**
 	 * Resolves any parameters whose values are dependent on other parameters; called after all parameter setters have been called.
 	 *  

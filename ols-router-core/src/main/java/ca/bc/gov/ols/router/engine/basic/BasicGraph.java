@@ -10,20 +10,22 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ca.bc.gov.ols.enums.RoadClass;
-import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.enums.TrafficImpactor;
+import ca.bc.gov.ols.router.config.RouterConfig;
+import ca.bc.gov.ols.router.data.RoadEvent;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.data.vis.VisLayers;
+import ca.bc.gov.ols.router.restrictions.Constraint;
 import ca.bc.gov.ols.router.restrictions.RestrictionLookup;
 import ca.bc.gov.ols.rowreader.DateType;
 import ca.bc.gov.ols.util.IntObjectArrayMap;
@@ -37,7 +39,7 @@ import gnu.trove.map.TIntObjectMap;
 public class BasicGraph implements SegmentIdLookup {
 	private static final Logger logger = LoggerFactory.getLogger(BasicGraph.class.getCanonicalName());
 	
-	private BasicGraphInternal internalGraph;
+	protected BasicGraphInternal internalGraph;
 	private RouterConfig config;
 	private IntObjectArrayMap<int[]> edgeIdBySegId;
 	private TurnLookup turnCostLookup;
@@ -82,7 +84,6 @@ public class BasicGraph implements SegmentIdLookup {
 	public int[] getEdgesForSegment(int segmentId) {
 		return edgeIdBySegId.get(segmentId);
 	}
-
 		
 	public void setTurnCostLookup(TurnLookup lookup) {
 		turnCostLookup = lookup;
@@ -261,6 +262,25 @@ public class BasicGraph implements SegmentIdLookup {
 		this.edgeIdBySegId = edgeIdBySegId;
 	}
 
+	public boolean isMidRestriction(int edgeId) {
+		return turnCostLookup.isMidRestriction(edgeId);
+	}
+
+	public List<Constraint> lookupRestriction(RestrictionSource restrictionSource, int edgeId) {
+		return restrictionLookupMap.get(restrictionSource).lookup(edgeId);
+	}
+
+	public List<RoadEvent> lookupEvent(int edgeId, LocalDateTime currentDateTime) {
+		return eventLookup.lookup(edgeId, currentDateTime);
+	}
+
+	public int[] lookupSchedule(int edgeId, LocalDateTime currentDateTime) {
+		return scheduleLookup.lookup(edgeId, currentDateTime);
+	}
+
+	public FerryInfo getFerryInfo(int edgeId) {
+		return scheduleLookup.getFerryInfo(edgeId);
+	}
 
 }
 

@@ -7,9 +7,6 @@ import java.util.Map.Entry;
 
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.linearref.LengthLocationMap;
-import org.locationtech.jts.linearref.LinearLocation;
-import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,12 +122,6 @@ public class RestrictionLookupBuilder {
 				RestrictionSource source = r0.source;
 				RestrictionType type = r0.type;
 				
-				// calculate the distance along the segment to the restriction location
-				LineString seg = internalGraph.getLineString(edgeId);
-				LocationIndexedLine locationIndexedLine = new LocationIndexedLine(seg);
-			    LinearLocation ref = locationIndexedLine.project(location.getCoordinate());
-				double dist = new LengthLocationMap(seg).getLength(ref);
-			    
 				int[] id = new int[numLanes];
 				Arrays.fill(id, 0);
 				double[] permitableValue = new double[numLanes];
@@ -153,7 +144,7 @@ public class RestrictionLookupBuilder {
 						messages.add(new RdmStatusMessage(r.id, "Restriction at same location with different type"));
 					}
 				}
-				LaneBasedRestriction lbr = new LaneBasedRestriction(id, source, type, permitableValue, location, locationId, dist);
+				LaneBasedRestriction lbr = new LaneBasedRestriction(id, source, type, permitableValue, location, locationId);
 				addRestrictionInternal(edgeId, lbr);
 			}
 			
