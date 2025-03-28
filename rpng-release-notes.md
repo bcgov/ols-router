@@ -11,6 +11,13 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
+### Route Palnner 2.4.0
+1. Route Planner 2.4.0 is backward compatible with Route Planner 2.x.
+2. Resolve an issue with incorrect distance provided in turn-by-turn directions when an RDM restriction causes a permitted lane warning.
+3. Resolved an issue where a route may not be correct if both the start and end points are located on a bi-directional loop segment.
+4. 
+
+
 ### Route Planner 2.3.2
 1. Route Planner 2.3.2 is backward compatible with Route Planner 2.x.
 2. Updated to resolve an issue where a *route not found* response was provided when using the parameter *correctSide=true* due to road restrictions or one-way streets.
