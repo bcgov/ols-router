@@ -23,7 +23,7 @@ Term | Definition
 <a name="length">length</a> | The length of the truck in metres.
 <a name="listRestrictions">listRestrictions</a> | Include a list of all restriction IDs impacting the direction of travel along the base route. Default is false.
 <a name="maxPairs">maxPairs</a> | Maximum number of (from,to) pairs to return for each point in fromPoints. pairs are selected in nearest to farthest order. For example, given 1 fromPoints, 10 toPoints, and maxPairs=1, betweenPairs will return the pair with the shortest distance or fastest time.
-<a name="minRoutingDistance">minRoutingDistance</a> | When the routing distance between points is less than the value provided for minRoutingDistance (in metres), no route will be calculated.
+<a name="minRoutingDistance">minRoutingDistance</a> | If the routing distance between points is less than the value provided for minRoutingDistance (in metres), no route will be calculated.
 <a name="notifications">notifications</a> | A structured sequence of notifications.
 <a name="outputFormat">outputFormat</a> | Format of representation. Allowed values are json, html, and kml. Default is json.
 <a name="outputSRS">outputSRS</a> | The EPSG code of the spatial reference system used to state the coordination location of a named feature. It is ignored if KML output is specified since KML only supports 4326 (WGS84). <br><br>Allowed values are:<br>**3005:** BC Albers<br>**4326:** WGS 84 (default)<br>**26907-26911:** NAD83/UTM Zones 7N through 11N<br>**32607-32611:** WGS84/UTM Zones 7N through 11N<br>**26707-26711:** NAD27/UTM Zones 7N through 11N
