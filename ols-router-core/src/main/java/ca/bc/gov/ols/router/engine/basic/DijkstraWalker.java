@@ -17,9 +17,7 @@ public record DijkstraWalker(
 		double time, // the cumulative time from start to the nodeId
 		double dist, // the cumulative distance from start to the nodeId
 		int waitTime, // the cumulative waitTime from start to the nodeId
-		DijkstraWalker from, // a reference to the previous step
-		double turnCost,
-		double xingCost
+		DijkstraWalker from // a reference to the previous step
 	) implements Comparable<DijkstraWalker> { 
 	
 	@Override
