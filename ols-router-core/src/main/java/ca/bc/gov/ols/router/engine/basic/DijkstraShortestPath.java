@@ -25,7 +25,6 @@ import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
-import ca.bc.gov.ols.router.data.enums.XingClass;
 import ca.bc.gov.ols.router.restrictions.Constraint;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -99,7 +98,7 @@ public class DijkstraShortestPath {
 					}
 					edges.add(endWpIdx);
 				}
-				costByEndWpIdx[endWpIdx] = new DijkstraWalker(graph.getEdge(endWp.incomingEdgeIds().get(0)), Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, 0, null, 0, 0);
+				costByEndWpIdx[endWpIdx] = new DijkstraWalker(graph.getEdge(endWp.incomingEdgeIds().get(0)), Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, 0, null);
 			}
 		}
 		
@@ -126,7 +125,7 @@ public class DijkstraShortestPath {
 					if( startNodeId == endNodeId 
 							|| (graph.getBaseEdgeId(startEdgeId) == graph.getBaseEdgeId(endEdgeId)
 								&& distance < params.getMinRoutingDistance())) {
-						costByEndWpIdx[endWpIdx] = new DijkstraWalker(null, 0, 0, distance, 0, null, 0, 0);
+						costByEndWpIdx[endWpIdx] = new DijkstraWalker(null, 0, 0, distance, 0, null);
 						pathsFinished++;
 					}
 				}
@@ -151,10 +150,9 @@ public class DijkstraShortestPath {
 					cost += xingCost;
 				}
 			}
-			DijkstraWalker startWalker = new DijkstraWalker(graph.getEdge(startEdgeId), //graph.getToNodeId(startEdgeId), 
-					cost, time, length, 0, null, 0, xingCost);
+			DijkstraWalker startWalker = new DijkstraWalker(graph.getEdge(startEdgeId),
+					cost, time, length, 0, null);
 			queue.add(startWalker);
-			//costByEdgeId.put(startEdgeId, startWalker);
 		}
 		
 		// traverse network looking for the cheapest paths
@@ -279,12 +277,11 @@ public class DijkstraShortestPath {
 				double turnCost = 0;
 				double xingCost = 0;
 				// use the turnDirection to calculate the turn cost, if turncosts are on
-				XingClass xingClass = graph.getXingClass(walker.edge().id);
 				if(useTurnCosts) {
-					turnCost = params.getTurnCost(turnDir, xingClass);
+					turnCost = params.getTurnCost(turnDir, graph.getXingClass(walker.edge().id));
 				}
 				if(useXingCosts) {
-					xingCost = params.getXingCost(graph.getToImpactor(walker.edge().id), xingClass);
+					xingCost = params.getXingCost(graph.getToImpactor(nextEdgeId), graph.getXingClass(nextEdgeId));
 				}
 				Edge nextEdge = graph.getEdge(nextEdgeId);
 				
@@ -303,7 +300,7 @@ public class DijkstraShortestPath {
 
 				// if we haven't found all paths or this path is still shorter than the worst shortest found
 				if(pathsFinished < minPaths || cost < worstPathCost) {
-					DijkstraWalker newWalker = new DijkstraWalker(nextEdge, cost, time, dist, waitTime, walker, turnCost, xingCost);
+					DijkstraWalker newWalker = new DijkstraWalker(nextEdge, cost, time, dist, waitTime, walker);
 					queue.add(newWalker);
 					// it is important to mark segments as visited at the time they are put in the queue
 					// to prevent them from entering the queue multiple times before being marked as visited
