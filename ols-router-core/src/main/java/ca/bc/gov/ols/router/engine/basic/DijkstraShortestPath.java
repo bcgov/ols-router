@@ -112,6 +112,7 @@ public class DijkstraShortestPath {
 		LocalDateTime startTime = LocalDateTime.ofInstant(params.getDeparture().plusSeconds(Math.round(timeOffset)), RouterConfig.DEFAULT_TIME_ZONE);
 				
 		// check all of the endWps for the special case of being the same as the startWp, or very close
+		waypointCheck: // need a way to escape the inner for loops once we have identified a close case
 		for(int endWpIdx = 0; endWpIdx < endWps.length; endWpIdx++) {
 			WayPoint endWp = endWps[endWpIdx];
 			if(endWp == null) continue;
@@ -127,6 +128,7 @@ public class DijkstraShortestPath {
 								&& distance < params.getMinRoutingDistance())) {
 						costByEndWpIdx[endWpIdx] = new DijkstraWalker(null, 0, 0, distance, 0, null);
 						pathsFinished++;
+						continue waypointCheck;
 					}
 				}
 			}
@@ -355,9 +357,10 @@ public class DijkstraShortestPath {
 	}
 
 	private EdgeList walkback(WayPoint startEdge, WayPoint endEdge, DijkstraWalker endWalker) {
-		if(startEdge == null || endEdge == null) {
+		if(startEdge == null || endEdge == null || endWalker.edge() == null) {
 			return null;
 		}
+
 		// store the edges in the cheapest path, in reverse order 
 		EdgeList edges = new EdgeList(100);
 		edges.setStartWayPoint(startEdge);
@@ -365,7 +368,7 @@ public class DijkstraShortestPath {
 
 		for(DijkstraWalker curWalker = endWalker; curWalker != null; curWalker = curWalker.from()) {
 			edges.add(curWalker.edge().id, curWalker.time(), curWalker.dist(), curWalker.waitTime());
-		} 
+		}
 		return edges;
 	}
 
