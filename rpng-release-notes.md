@@ -16,7 +16,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 2. New minRoutingDistance parameter added to specify a minimum distance between start and end points that must exist to calculate a route.
 3. Resolved an issue where a route may not be correct if both the start and end points are located on a bi-directional loop segment.
 4. Bug fix for distance calculation when an RDM (Restriction Data Manger) height restriction causes a permitted lane warning in the turn-by-turn directions.
-5. Bug fix for an issue where restrictions on the first segment of a route were ignored. This bug fix also resolved the issue of unclear messaging in route directions with lane-based restrictions.  
+5. Resolved an issue where restrictions on the first segment of a route were ignored. This bug fix also resolved the issue of unclear messaging in route directions with lane-based restrictions.  
 6. Bug fix for route optimization in KML format, leading to a 500 error.
 
 ### Route Planner 2.3.2
