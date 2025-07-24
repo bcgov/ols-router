@@ -11,7 +11,15 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
-### Route Palnner 2.4.0
+### Route Planner 2.4.1
+1. Route Planner 2.4.1 is backward compatible with Route Planner 2.x.
+2. New minRoutingDistance parameter added to specify a minimum distance between start and end points that must exist to calculate a route.
+3. Improved route calculation when start and end points are on the same bi-directional loop street segment.
+4. Bug fix for distance calculation when an RDM (Restriction Data Manger) height restriction causes a permitted lane warning in the turn-by-turn directions.
+5. Bug fix to improve restriction handling on the first street segment of a route.
+6. Bug fix for route optimization in KML format, leading to a 500 error.
+
+### Route Planner 2.4.0
 1. Route Planner 2.4.0 is backward compatible with Route Planner 2.x.
 2. Resolved an issue with incorrect distance provided in turn-by-turn directions when an RDM restriction causes a permitted lane warning.
 3. Resolved an issue where a route may not be correct if both the start and end points are located on a bi-directional loop segment.
