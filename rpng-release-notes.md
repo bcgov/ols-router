@@ -11,7 +11,7 @@ To see the new API in action, visit [Location Services in Action](https://bcgov.
 
 ## API Changes
 
-### Route Planner 2.4.1 (July 30th, 2025)
+### Route Planner 2.4.1
 1. Route Planner 2.4.1 is backward compatible with Route Planner 2.x.
 2. New minRoutingDistance parameter added to specify a minimum distance between start and end points that must exist to calculate a route.
 3. Resolved an issue where a route may not be correct if both the start and end points are located on a bi-directional loop segment.
