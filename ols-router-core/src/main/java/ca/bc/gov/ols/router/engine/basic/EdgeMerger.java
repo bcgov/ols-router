@@ -102,9 +102,9 @@ public class EdgeMerger {
 				String curName = null;
 				// if Edge is NO_EDGE it means these two WayPoints were within MinRoutingDistance of eachother
 				if(edgeId == BasicGraphInternal.NO_EDGE) {
-					Coordinate startCoord = graph.getLineString(edges.getStartEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
-					Coordinate endCoord = graph.getLineString(edges.getEndEdge().outgoingEdgeIds().get(0)).getCoordinateN(0);
-					ls = gf.createLineString(new Coordinate[] {startCoord,endCoord});
+					Coordinate startCoord = edges.getStartWp().point().getCoordinate();
+					Coordinate endCoord = edges.getEndWp().point().getCoordinate();
+					ls = gf.createLineString(new Coordinate[] {startCoord, endCoord});
 				} else {
 					ls = graph.getLineString(edgeId);
 				}

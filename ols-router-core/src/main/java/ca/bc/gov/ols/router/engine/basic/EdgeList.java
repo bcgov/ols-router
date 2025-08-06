@@ -57,11 +57,11 @@ public class EdgeList {
 		return waitTimes.get(index);
 	}
 
-	public WayPoint getStartEdge() {
+	public WayPoint getStartWp() {
 		return startWp;
 	}
 
-	public WayPoint getEndEdge() {
+	public WayPoint getEndWp() {
 		return endWp;
 	}
 
