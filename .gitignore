@@ -46,4 +46,4 @@ local.properties
 .idea/
 *.iml
 local_data
-vscode
+.vscode
