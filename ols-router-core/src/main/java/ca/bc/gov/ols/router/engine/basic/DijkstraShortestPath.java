@@ -50,8 +50,8 @@ public class DijkstraShortestPath {
 		useScheduling = params.isEnabled(RouteOption.SCHEDULING);
 	}
 	
-	public EdgeList findShortestPath(WayPoint startEdge, WayPoint endEdge, double timeOffset) {	
-		return findShortestPaths(startEdge, new WayPoint[]{endEdge}, timeOffset)[0];
+	public EdgeList findShortestPath(WayPoint startWp, WayPoint endWp, double timeOffset) {	
+		return findShortestPaths(startWp, new WayPoint[]{endWp}, timeOffset)[0];
 	}
 	
 	private double getMultiplier(int edgeId) {
@@ -356,15 +356,24 @@ public class DijkstraShortestPath {
 		return Angle.toDegrees(Angle.diff(graph.getToAngleRads(fromEdgeId), graph.getFromAngleRads(toEdgeId)));			
 	}
 
-	private EdgeList walkback(WayPoint startEdge, WayPoint endEdge, DijkstraWalker endWalker) {
-		if(startEdge == null || endEdge == null || endWalker.edge() == null) {
+	private EdgeList walkback(WayPoint startWp, WayPoint endWp, DijkstraWalker endWalker) {
+		if(startWp == null || endWp == null) {
 			return null;
 		}
 
+		// special case for path < minRoutingDistance, in which case there is no actual edge
+		if(endWalker.edge() == null) {
+			EdgeList edges = new EdgeList(1);
+			edges.setStartWayPoint(startWp);
+			edges.setEndWayPoint(endWp);
+			edges.add(BasicGraphInternal.NO_EDGE, endWalker.time(), endWalker.dist(), endWalker.waitTime());
+			return edges;
+		}
+		
 		// store the edges in the cheapest path, in reverse order 
 		EdgeList edges = new EdgeList(100);
-		edges.setStartWayPoint(startEdge);
-		edges.setEndWayPoint(endEdge);
+		edges.setStartWayPoint(startWp);
+		edges.setEndWayPoint(endWp);
 
 		for(DijkstraWalker curWalker = endWalker; curWalker != null; curWalker = curWalker.from()) {
 			edges.add(curWalker.edge().id, curWalker.time(), curWalker.dist(), curWalker.waitTime());

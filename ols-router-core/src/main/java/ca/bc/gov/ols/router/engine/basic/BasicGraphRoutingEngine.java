@@ -244,11 +244,11 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			List<Point> fromPoints = params.getFromPoints();
 			List<Point> toPoints = params.getToPoints();
 			QueryGraph queryGraph = new QueryGraph(graph, params); // TODO doesn't handle to/from points
-			WayPoint[] fromEdgeSplits = getWayPoints(queryGraph, fromPoints, params.isCorrectSide(), true);
-			WayPoint[] toEdgeSplits = getWayPoints(queryGraph, toPoints, params.isCorrectSide(), true);
+			WayPoint[] fromWayPoints = getWayPoints(queryGraph, fromPoints, params.isCorrectSide(), true);
+			WayPoint[] toWayPoints = getWayPoints(queryGraph, toPoints, params.isCorrectSide(), true);
 			for(int i = 0; i < params.getFromPoints().size(); i++) {
 				DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
-				EdgeList[] edgeLists = dsp.findShortestPaths(fromEdgeSplits[i], toEdgeSplits, 0);
+				EdgeList[] edgeLists = dsp.findShortestPaths(fromWayPoints[i], toWayPoints, 0);
 				for(EdgeList edgeList : edgeLists) {
 					if(edgeList == null) {
 						response.addResult("No Route Found.");
@@ -284,13 +284,13 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 
 	private WayPoint[] optimizeRoute(RoutingParameters params, QueryGraph queryGraph, int[] visitOrder, StopWatch routingTimer, StopWatch optimizationTimer) {
 		params.disableOption(RouteOption.TIME_DEPENDENCY);
-		WayPoint[] edgeSplits = getWayPoints(queryGraph, params.getPoints(), params.isCorrectSide(), false);
+		WayPoint[] wayPoints = getWayPoints(queryGraph, params.getPoints(), params.isCorrectSide(), false);
 
 		// shortcut the 2-point case
 		if(params.getPoints().size() == 2) {
 			visitOrder[0] = 0;
 			visitOrder[1] = 1;
-			return edgeSplits;
+			return wayPoints;
 		}
 		
 		// initialize jsprit cost matrix, non-symmetric
@@ -298,7 +298,7 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		routingTimer.start();
 		for(int fromIndex = 0; fromIndex < params.getPoints().size(); fromIndex++) {
 			DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
-			EdgeList[] edgeLists = dsp.findShortestPaths(edgeSplits[fromIndex], edgeSplits, 0);
+			EdgeList[] edgeLists = dsp.findShortestPaths(wayPoints[fromIndex], wayPoints, 0);
 			// add the route costs into the cost matrix
 			for(int toIndex = 0; toIndex < edgeLists.length; toIndex++) {
 				if(fromIndex == toIndex) {
@@ -334,22 +334,22 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		VehicleRoutingProblemSolution sol = Solutions.bestOf(solutions);
 
 		// reorder the edgeSplits into optimal order
-		WayPoint[] optimizedEdgeSplits = new WayPoint[edgeSplits.length + (params.isRoundTrip() ? 1 : 0)];
-		optimizedEdgeSplits[0] = edgeSplits[0];
+		WayPoint[] optimizedWayPoints = new WayPoint[wayPoints.length + (params.isRoundTrip() ? 1 : 0)];
+		optimizedWayPoints[0] = wayPoints[0];
 		visitOrder[0] = 0;
 		int index = 1;
 		for(VehicleRoute route : sol.getRoutes()) {
 			for(TourActivity activity : route.getActivities()) {
 				int pointIndex = Integer.parseInt(activity.getLocation().getId());
-				optimizedEdgeSplits[index] = edgeSplits[pointIndex];
+				optimizedWayPoints[index] = wayPoints[pointIndex];
 				visitOrder[pointIndex] = index++;
 			}
 		}
 		if(params.isRoundTrip()) {
-			optimizedEdgeSplits[index] = edgeSplits[0];
+			optimizedWayPoints[index] = wayPoints[0];
 		}
 		optimizationTimer.stop();
-		return optimizedEdgeSplits;
+		return optimizedWayPoints;
 	}
 	
 	private WayPoint[] getWayPoints(QueryGraph queryGraph, List<Point> points, boolean correctSide, boolean allowNullEdges) {
