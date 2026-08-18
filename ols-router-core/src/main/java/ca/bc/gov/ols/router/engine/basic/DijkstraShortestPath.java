@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
@@ -177,9 +179,38 @@ public class DijkstraShortestPath {
 			//	continue;
 			//}
 
+
+
+			// IMPORTANT: We now check for road closure restrictions. Road closure is always a hard restriction, 
+			// and it is not necessary to check for other restrictions if a road closure is present.
+			
+
+			// The following code is commented out because we are not currently using ITN restrictions for road closures,
+			// but it is left here for future reference.
+			// List<? extends Constraint> itnConstraints =
+			// 		graph.lookupRestriction(RestrictionSource.ITN, walker.edge().id);
+
+			// for(Constraint constraint : itnConstraints) {
+			// 	if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+			// 			&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
+			// 		continue nextEdge;
+			// 	}
+			// }
+
+			List<? extends Constraint> rdmConstraints =
+					graph.lookupRestriction(RestrictionSource.RDM, walker.edge().id);
+
+			for(Constraint constraint : rdmConstraints) {
+				if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+						&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
+					System.out.println(">>>>>>>>> Skipping edge " + walker.edge().id + " due to road closure restriction");		
+					continue nextEdge;
+				}
+			}
+
 			// filter the edge based on restrictions
 			if(!params.getRestrictionValues().isEmpty()) {
-				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), walker.edge().id);
+				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), walker.edge().id);	
 				for(Constraint c : constraints) {
 					if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 						continue nextEdge;

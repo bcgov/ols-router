@@ -40,17 +40,18 @@ public class RouterApplication {
 		RouterFactory routerFactory = new RouterFactory();
 		routerFactory.setGeometryReprojector(reprojector);
 		router = routerFactory.getRouter();
-		RouterConfig config = router.getConfig();
+		// comment out the scheduled job for now during development
+		// RouterConfig config = router.getConfig();
 		
-		taskScheduler.scheduleAtFixedRate(new Runnable() {
+		// taskScheduler.scheduleAtFixedRate(new Runnable() {
 
-			@Override
-			public void run() {
-				logger.info("scheduled job running!");
-				router.update();
+		// 	@Override
+		// 	public void run() {
+		// 		logger.info("scheduled job running!");
+		// 		router.update();
 
-			}
-		}, Instant.now(), Duration.ofSeconds(config.getRdmUpdateInterval()));
+		// 	}
+		// }, Instant.now(), Duration.ofSeconds(config.getRdmUpdateInterval()));
 	}
 
 	@Bean

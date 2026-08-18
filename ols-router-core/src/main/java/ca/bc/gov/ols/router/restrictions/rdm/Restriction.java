@@ -3,6 +3,7 @@ package ca.bc.gov.ols.router.restrictions.rdm;
 import java.util.List;
 
 import ca.bc.gov.ols.router.api.RoutingParameters;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.restrictions.AbstractRestriction;
 
 public class Restriction extends AbstractRestriction {
@@ -35,6 +36,11 @@ public class Restriction extends AbstractRestriction {
 
 	@Override
 	public boolean prevents(RoutingParameters params) {
+		// road closure prevents all traffic
+		// also, road closure has no value
+		if (getType() == RestrictionType.ROAD_CLOSURE) {
+    		return true;
+		}
 		Double value = params.getRestrictionValue(type);
 		if(value == null) return false;
 		if(type.hasValue) {
@@ -47,6 +53,11 @@ public class Restriction extends AbstractRestriction {
 
 	@Override
 	public boolean constrains(RoutingParameters params) {
+		// road closure prevents all traffic
+		// also, road closure has no value
+		if (getType() == RestrictionType.ROAD_CLOSURE) {
+    		return true;
+		}
 		return false;
 	}
 	
@@ -54,6 +65,9 @@ public class Restriction extends AbstractRestriction {
 	public String getVisDescriptor() {
 		if(type.hasValue) {
 			return "Max " + type.visName + ": " + permitableValue + " " + type.unit + " (" + source + ":" + id + ")";
+		}
+		if (getType() == RestrictionType.ROAD_CLOSURE) {
+    		return "Road Closure (" + source + ":" + id + ")";
 		}
 		return type.visName;
 	}
