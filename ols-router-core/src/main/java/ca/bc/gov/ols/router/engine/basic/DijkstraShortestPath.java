@@ -36,7 +36,7 @@ public class DijkstraShortestPath {
 	private QueryGraph graph;
 	private RoutingParameters params;
 	private final boolean useLDF, useGDF, useTraffic, useXingCosts, useTurnRestrictions, useTurnCosts,
-			useTimeDependency, useEvents, useScheduling;
+			useTimeDependency, useEvents, useScheduling, useRoadClosure;
 	
 	public DijkstraShortestPath(QueryGraph graph, RoutingParameters params) {
 		this.graph = graph;
@@ -50,6 +50,7 @@ public class DijkstraShortestPath {
 		useTimeDependency = params.isEnabled(RouteOption.TIME_DEPENDENCY);
 		useEvents = params.isEnabled(RouteOption.EVENTS);
 		useScheduling = params.isEnabled(RouteOption.SCHEDULING);
+		useRoadClosure = params.isEnabled(RouteOption.ROAD_CLOSURE);
 	}
 	
 	public EdgeList findShortestPath(WayPoint startWp, WayPoint endWp, double timeOffset) {	
@@ -201,7 +202,7 @@ public class DijkstraShortestPath {
 					graph.lookupRestriction(RestrictionSource.RDM, walker.edge().id);
 
 			for(Constraint constraint : rdmConstraints) {
-				if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+				if(useRoadClosure && constraint.getType() == RestrictionType.ROAD_CLOSURE
 						&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
 					System.out.println(">>>>>>>>> Skipping edge " + walker.edge().id + " due to road closure restriction");		
 					continue nextEdge;
