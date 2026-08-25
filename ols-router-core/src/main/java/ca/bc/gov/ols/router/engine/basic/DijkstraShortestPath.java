@@ -53,6 +53,28 @@ public class DijkstraShortestPath {
 		useRoadClosure = params.isEnabled(RouteOption.ROAD_CLOSURE);
 	}
 	
+	// check if the edge is restricted by a road closure restriction. If so, return true, otherwise false.
+	private boolean isRoadClosureRestricted(int edgeId) {
+		if(!useRoadClosure) {
+			return false;
+		}
+		for(Constraint constraint : graph.lookupRestriction(RestrictionSource.RDM, edgeId)) {
+			if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+					&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// check if the edge is restricted by a road class restriction. If so, return true, otherwise false.
+	private boolean isRoadClassExcluded(int edgeId) {
+		if(params.getExcludedRoadClasses().isEmpty()) {
+			return false;
+		}
+		return params.getExcludedRoadClasses().contains(graph.getRoadClass(edgeId));
+	}
+	
 	public EdgeList findShortestPath(WayPoint startWp, WayPoint endWp, double timeOffset) {	
 		return findShortestPaths(startWp, new WayPoint[]{endWp}, timeOffset)[0];
 	}
@@ -144,6 +166,9 @@ public class DijkstraShortestPath {
 
 		// add all the start edges to the Q and cost map
 		for(int startEdgeId : startWp.outgoingEdgeIds()) {
+			if(isRoadClosureRestricted(startEdgeId) || isRoadClassExcluded(startEdgeId)) {
+				continue;
+			}
 			double length = graph.getLength(startEdgeId);
 			double time = length * 3.6 / speedFunction.apply(startEdgeId, startTime);
 			double cost = costFunction.apply(startEdgeId, time, length);
@@ -198,15 +223,9 @@ public class DijkstraShortestPath {
 			// 	}
 			// }
 
-			List<? extends Constraint> rdmConstraints =
-					graph.lookupRestriction(RestrictionSource.RDM, walker.edge().id);
-
-			for(Constraint constraint : rdmConstraints) {
-				if(useRoadClosure && constraint.getType() == RestrictionType.ROAD_CLOSURE
-						&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
-					System.out.println(">>>>>>>>> Skipping edge " + walker.edge().id + " due to road closure restriction");		
-					continue nextEdge;
-				}
+			if(isRoadClosureRestricted(walker.edge().id) || isRoadClassExcluded(walker.edge().id)) {
+				System.out.println(">>>>>>>> Skipping edge " + walker.edge().id + " due to road closure or excluded road class restriction");
+				continue nextEdge;
 			}
 
 			// filter the edge based on restrictions

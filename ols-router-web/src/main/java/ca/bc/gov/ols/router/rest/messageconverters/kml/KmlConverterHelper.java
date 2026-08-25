@@ -102,6 +102,7 @@ public class KmlConverterHelper extends ConverterHelper {
 		writeField("roundTrip", String.valueOf(response.isRoundTrip()));
 		writeField("restrictionValues", formatMap(response.getRestrictionValues()));
 		writeField("excludeRestrictions", String.valueOf(response.getExcludeRestrictions()));
+		writeField("excludedRoadClasses", String.valueOf(response.getExcludedRoadClasses()));
 
 		out.write("</ExtendedData>\r\n"
 				+ "<styleUrl>"

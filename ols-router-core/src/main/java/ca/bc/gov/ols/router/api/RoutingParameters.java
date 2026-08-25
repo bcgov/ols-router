@@ -21,6 +21,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
+import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.enums.TrafficImpactor;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
@@ -80,6 +81,7 @@ public class RoutingParameters {
 	private Map<RestrictionType,Double> restrictionValues = new HashMap<RestrictionType,Double>();
 	private boolean listRestrictions = false;
 	private Set<Integer> excludeRestrictions = Collections.emptySet();
+	private Set<RoadClass> excludedRoadClasses = Collections.emptySet();
 	private int minRoutingDistance = 0;
 	
 	static {
@@ -525,6 +527,28 @@ public class RoutingParameters {
 	
 	public void setExcludeRestrictions(int[] excludeRestrictions) {
 		this.excludeRestrictions = Arrays.stream(excludeRestrictions).boxed().collect(Collectors.toCollection(HashSet::new));
+	}
+	
+	public Set<RoadClass> getExcludedRoadClasses() {
+		return excludedRoadClasses;
+	}
+	
+	public void setExcludedRoadClasses(String excludedRoadClassList) {
+		if(excludedRoadClassList == null || excludedRoadClassList.trim().isEmpty()) {
+			excludedRoadClasses = Collections.emptySet();
+			return;
+		}
+		Set<RoadClass> classes = EnumSet.noneOf(RoadClass.class);
+		for(String rawClass : excludedRoadClassList.split(",")) {
+			if(rawClass == null || rawClass.trim().isEmpty()) {
+				continue;
+			}
+			RoadClass roadClass = RoadClass.convert(rawClass.trim());
+			if(roadClass != null && roadClass != RoadClass.UNKNOWN) {
+				classes.add(roadClass);
+			}
+		}
+		excludedRoadClasses = classes;
 	}
 	
 	public int getMinRoutingDistance() {
