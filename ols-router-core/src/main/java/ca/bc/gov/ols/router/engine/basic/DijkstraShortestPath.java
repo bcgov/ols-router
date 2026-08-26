@@ -148,9 +148,12 @@ public class DijkstraShortestPath {
 				for(int endEdgeId : endWp.incomingEdgeIds()) {
 					// shortcut the case where start and end node are the same
 					// or are on the same seg and within minRoutingDistance
+					// skip the shortcut if the segment is closed, since we don't know where along
+					// the segment the closure applies, so a normal graph search must be used instead
 					if( startNodeId == endNodeId 
 							|| (graph.getBaseEdgeId(startEdgeId) == graph.getBaseEdgeId(endEdgeId)
-								&& distance < params.getMinRoutingDistance())) {
+								&& distance < params.getMinRoutingDistance()
+								&& !isRoadClosureRestricted(startEdgeId) && !isRoadClosureRestricted(endEdgeId))) {
 						costByEndWpIdx[endWpIdx] = new DijkstraWalker(null, 0, 0, distance, 0, null);
 						pathsFinished++;
 						continue waypointCheck;
