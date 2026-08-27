@@ -55,6 +55,7 @@ public class RouterDataLoader {
 		Open511Parser open511parser = new Open511Parser(new GeometryFactory(new PrecisionModel(),4326));
 		graphBuilder.addEvents(open511parser.parseEventResponse(dataSource.getOpen511Reader()));
 		graphBuilder.addRestrictions(dum.loadRdmRestrictions(dataSource.getRestrictionReader()));
+		graphBuilder.addRoadClosures(dum.loadRoadClosures(dataSource.getRoadClosureReader()));
 		
 		graphBuilder.addTraffic(dataSource.getTrafficReader());
 		

@@ -583,8 +583,8 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	 */
 	@Override
 	public synchronized RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status) {
+		BasicGraph newGraph = new BasicGraph(graph);
 		try {
-			BasicGraph newGraph = new BasicGraph(graph);
 			RestrictionLookupBuilder rlb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
 			List<Restriction> newRestrictions = dum.fetchRdmRestrictions();
 			rlb.addRestrictions(newRestrictions);
@@ -593,19 +593,34 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			status.rdmLastSuccessfulUpdate = ZonedDateTime.now().toString();
 			status.rdmSuccessfulUpdateCount++;
 			status.rdmLastRecordCount = newRestrictions.size();
-			return new BasicGraphRoutingEngine(this, newGraph);
 		} catch(IOException ioe) {
 			status.rdmFailedUpdateCount++;
 			status.rdmLastFailedUpdate = ZonedDateTime.now().toString();
 			logger.warn("IO Error trying to update router data: {}", ioe.getMessage());
+			return this;
 		}
-		return this;
+		try {
+			RestrictionLookupBuilder clb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
+			List<Restriction> newClosures = dum.fetchRoadClosures();
+			clb.addRestrictions(newClosures);
+			newGraph.setRestrictionLookup(RestrictionSource.CLOSURE, clb.build());
+			status.closureLastSuccessfulUpdate = ZonedDateTime.now().toString();
+			status.closureSuccessfulUpdateCount++;
+			status.closureLastRecordCount = newClosures.size();
+		} catch(IOException ioe) {
+			status.closureFailedUpdateCount++;
+			status.closureLastFailedUpdate = ZonedDateTime.now().toString();
+			logger.warn("IO Error trying to update road closure data: {}", ioe.getMessage());
+			return this;
+		}
+		return new BasicGraphRoutingEngine(this, newGraph);
 	}
 
 	@Override
 	public List<StatusMessage> getMessages(Type type) {
 		switch(type) {
 		case RDM: return graph.getRestrictionLookup(RestrictionSource.RDM).getMessages();
+		case CLOSURE: return graph.getRestrictionLookup(RestrictionSource.CLOSURE).getMessages();
 		}
 		return Collections.emptyList();
 	}

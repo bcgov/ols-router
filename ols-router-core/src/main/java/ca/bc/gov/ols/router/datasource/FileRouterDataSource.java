@@ -355,6 +355,11 @@ public class FileRouterDataSource implements RouterDataSource {
 	}
 
 	@Override
+	public Reader getRoadClosureReader() throws IOException {
+		return new InputStreamReader(getInputStream("road_closures.json"));
+	}
+
+	@Override
 	public RowReader getTurnClassReader() {
 		return getXsvRowReader("turn_classes");
 	}

@@ -29,6 +29,8 @@ public interface GraphBuilder {
 
 	public default void addRestrictions(List<Restriction> parseRestrictions) {}
 
+	public default void addRoadClosures(List<Restriction> closures) {}
+
 	public default void addEvents(EventResponse eventResponse) {}
 
 	public default void addTraffic(RowReader trafficReader) {}

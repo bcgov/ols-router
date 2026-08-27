@@ -21,6 +21,12 @@ public class SystemStatus {
 	public int rdmFailedUpdateCount = 0;
 	public int rdmLastRecordCount = 0;
 	
+	public String closureLastSuccessfulUpdate = "";
+	public String closureLastFailedUpdate = "";
+	public int closureSuccessfulUpdateCount = 0;
+	public int closureFailedUpdateCount = 0;
+	public int closureLastRecordCount = 0;
+	
 	public void setDates(Map<DateType, ZonedDateTime> dates) {
 		if(dates != null) {
 			dataProcessingTimestamp = String.valueOf(dates.get(DateType.PROCESSING_DATE));

@@ -58,7 +58,7 @@ public class DijkstraShortestPath {
 		if(!useRoadClosure) {
 			return false;
 		}
-		for(Constraint constraint : graph.lookupRestriction(RestrictionSource.RDM, edgeId)) {
+		for(Constraint constraint : graph.lookupRestriction(RestrictionSource.CLOSURE, edgeId)) {
 			if(constraint.getType() == RestrictionType.ROAD_CLOSURE
 					&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
 				return true;

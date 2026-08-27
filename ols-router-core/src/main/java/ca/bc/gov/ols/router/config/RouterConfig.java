@@ -58,7 +58,9 @@ public class RouterConfig {
 	private int defaultSimplifyThreshold = 250;
 	private int rdmUpdateInterval = 3600;
 	private String rdmApiUrl = "https://tst-rdm-public.th.gov.bc.ca/api";
-		
+	private int closureUpdateInterval = 3600;
+	private String closureApiUrl = "https://tst-closures-public.th.gov.bc.ca/api";
+	
 	static {
 		try (InputStream input = Thread.currentThread().getContextClassLoader().getResourceAsStream("app.properties")) {
             Properties props = new Properties();
@@ -156,6 +158,12 @@ public class RouterConfig {
 					break;
 				case "rdmApiUrl":
 					rdmApiUrl = value; 
+					break;
+				case "closureUpdateInterval":
+					closureUpdateInterval = Integer.parseInt(value); 
+					break;
+				case "closureApiUrl":
+					closureApiUrl = value; 
 					break;
 				default:
 					logger.warn("Unused configuration parameter '{}' with value '{}'", name, value);
@@ -264,6 +272,14 @@ public class RouterConfig {
 
 	public String getRdmApiUrl() {
 		return rdmApiUrl;
+	}
+
+	public int getClosureUpdateInterval() {
+		return closureUpdateInterval;
+	}
+
+	public String getClosureApiUrl() {
+		return closureApiUrl;
 	}
 
 
