@@ -1,0 +1,73 @@
+name: Pull request checks
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+
+env:
+  JAVA_VERSION: "17"
+  JAVA_VERSION_SONAR: "21"
+
+jobs:
+  quality_profile:
+    name: Compile, test, and analyze
+    runs-on: ubuntu-latest
+
+    # GitHub does not provide repository secrets to workflows from forks.
+    # Skip this private-dependency job for fork-originated pull requests.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v6
+        with:
+          distribution: corretto
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      # This must run after setup-java because setup-java can create
+      # or replace ~/.m2/settings.xml.
+      - name: Configure LOC Maven access
+        uses: bcgov/ols-util/.github/actions/setup-loc-maven@5fb17c36c02189b703f41d6b287a6561aee47b6e
+        with:
+          artifactory-username: ${{ secrets.LOC_ARTIFACTORY_USERNAME }}
+          artifactory-password: ${{ secrets.LOC_ARTIFACTORY_PASSWORD }}
+
+      - name: Compile and run unit tests
+        run: mvn --batch-mode --update-snapshots clean install
+
+      - name: Set up JDK ${{ env.JAVA_VERSION_SONAR }} for Sonar
+        uses: actions/setup-java@v6
+        with:
+          distribution: corretto
+          java-version: ${{ env.JAVA_VERSION_SONAR }}
+          overwrite-settings: false
+
+      - name: Cache Sonar packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: |
+            ${{ runner.os }}-sonar
+
+      - name: Run Sonar analysis
+        run: >
+          mvn --batch-mode
+          org.sonarsource.scanner.maven:sonar-maven-plugin:5.7.0.6970:sonar
+          -Dsonar.host.url="${{ vars.SONAR_HOST_URL }}"
+          -Dsonar.organization="${{ vars.SONAR_ORG }}"
+          -Dsonar.projectKey="${{ vars.SONAR_PROJECT_KEY }}"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
