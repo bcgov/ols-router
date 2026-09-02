@@ -2,11 +2,13 @@ package ca.bc.gov.ols.router.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 
+@Tag("Prod")
 class AzimuthTest {
 
 	GeometryFactory gf = new GeometryFactory();
