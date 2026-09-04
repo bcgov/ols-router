@@ -29,7 +29,7 @@ public class ClosureFetcher {
 		List<Restriction> allClosures = new ArrayList<Restriction>();
 		int offset = 0;
 		while(true) {
-			Reader pageReader = fetchPage(closureApiUrl + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
+			Reader pageReader = fetchPage(closureApiUrl + "?format=json&limit=" + OFFSET_INCREMENT + "&offset=" + offset);
 			offset += OFFSET_INCREMENT;
 			List<Restriction> closures = parser.parseRestrictions(pageReader);
 			if(closures.isEmpty()) {
