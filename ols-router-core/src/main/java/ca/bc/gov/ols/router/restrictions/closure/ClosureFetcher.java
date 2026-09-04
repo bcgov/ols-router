@@ -19,7 +19,6 @@ public class ClosureFetcher {
 	private final static Logger logger = LoggerFactory.getLogger(ClosureFetcher.class.getCanonicalName());
 	
 	private String closureApiUrl;
-	private static final String CLOSURES_ACTIVE_ENDPOINT = "/view/closures_active";
 	private static final int OFFSET_INCREMENT = 500;
 	
 	public ClosureFetcher(RouterConfig config) {
@@ -30,10 +29,10 @@ public class ClosureFetcher {
 		List<Restriction> allClosures = new ArrayList<Restriction>();
 		int offset = 0;
 		while(true) {
-			Reader pageReader = fetchPage(closureApiUrl + CLOSURES_ACTIVE_ENDPOINT + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
+			Reader pageReader = fetchPage(closureApiUrl + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
 			offset += OFFSET_INCREMENT;
 			List<Restriction> closures = parser.parseRestrictions(pageReader);
-			if(closures.isEmpty()) {
+			if(closures.isEmpty() || closures.size() < OFFSET_INCREMENT) { // the limit does not work yet, so we only fetch the first page for now
 				break;
 			}
 			allClosures.addAll(closures);
@@ -45,7 +44,7 @@ public class ClosureFetcher {
 		List<Restriction> changedClosures = new ArrayList<Restriction>();
 		int offset = 0;
 		while(true) {
-			Reader pageReader = fetchPage(closureApiUrl + CLOSURES_ACTIVE_ENDPOINT + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset + 
+			Reader pageReader = fetchPage(closureApiUrl + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset + 
 					"&filter=LAST_UPDATE_TIMESTAMP BETWEEN '2024-02-10' AND '9999-12-31'");
 			offset += OFFSET_INCREMENT;
 			List<Restriction> closures = parser.parseRestrictions(pageReader);
