@@ -46,6 +46,10 @@ public interface RoutingEngine {
 
 	public abstract RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status);
 
+	public abstract RoutingEngine getUpdatedRdmEngine(DataUpdateManager dum, SystemStatus status);
+
+	public abstract RoutingEngine getUpdatedRoadClosureEngine(DataUpdateManager dum, SystemStatus status);
+
 	public abstract List<StatusMessage> getMessages(Type type);
 
 }

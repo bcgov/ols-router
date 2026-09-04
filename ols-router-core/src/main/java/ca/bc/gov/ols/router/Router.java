@@ -87,6 +87,14 @@ public class Router {
 	public void update() {
 		engine = engine.getUpdatedEngine(dum, status);
 	}
+
+	public synchronized void updateRdmRestrictions() {
+		engine = engine.getUpdatedRdmEngine(dum, status);
+	}
+
+	public synchronized void updateRoadClosures() {
+		engine = engine.getUpdatedRoadClosureEngine(dum, status);
+	}
 	
 	public RouterConfig getConfig() {
 		return config;

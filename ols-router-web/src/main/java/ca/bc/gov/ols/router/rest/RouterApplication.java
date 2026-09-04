@@ -45,15 +45,15 @@ public class RouterApplication {
 		
 		RouterConfig config = router.getConfig();
 		
-		taskScheduler.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			public void run() {
-				logger.info("scheduled job running!");
-				router.update();
-
-			}
+		taskScheduler.scheduleAtFixedRate(() -> {
+			logger.info("scheduled RDM update running!");
+			router.updateRdmRestrictions();
 		}, Instant.now(), Duration.ofSeconds(config.getRdmUpdateInterval()));
+
+		taskScheduler.scheduleAtFixedRate(() -> {
+			logger.info("scheduled road closure update running!");
+			router.updateRoadClosures();
+		}, Instant.now(), Duration.ofSeconds(config.getClosureUpdateInterval()));
 	}
 
 	@Bean

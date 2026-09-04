@@ -583,6 +583,15 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 	 */
 	@Override
 	public synchronized RoutingEngine getUpdatedEngine(DataUpdateManager dum, SystemStatus status) {
+		RoutingEngine updatedEngine = getUpdatedRdmEngine(dum, status);
+		if(updatedEngine == this) {
+			return this;
+		}
+		return updatedEngine.getUpdatedRoadClosureEngine(dum, status);
+	}
+
+	@Override
+	public synchronized RoutingEngine getUpdatedRdmEngine(DataUpdateManager dum, SystemStatus status) {
 		BasicGraph newGraph = new BasicGraph(graph);
 		try {
 			RestrictionLookupBuilder rlb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
@@ -599,6 +608,12 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 			logger.warn("IO Error trying to update router data: {}", ioe.getMessage());
 			return this;
 		}
+		return new BasicGraphRoutingEngine(this, newGraph);
+	}
+
+	@Override
+	public synchronized RoutingEngine getUpdatedRoadClosureEngine(DataUpdateManager dum, SystemStatus status) {
+		BasicGraph newGraph = new BasicGraph(graph);
 		try {
 			RestrictionLookupBuilder clb = new RestrictionLookupBuilder(graph, graph.getInternalGraph());
 			List<Restriction> newClosures = dum.fetchRoadClosures();

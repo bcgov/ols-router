@@ -32,9 +32,13 @@ public class ClosureFetcher {
 			Reader pageReader = fetchPage(closureApiUrl + "?limit=" + OFFSET_INCREMENT + "&offset=" + offset);
 			offset += OFFSET_INCREMENT;
 			List<Restriction> closures = parser.parseRestrictions(pageReader);
-			if(closures.isEmpty() || closures.size() < OFFSET_INCREMENT) { // the limit does not work yet, so we only fetch the first page for now
-				break;
+			if(closures.isEmpty()) {
+                break;
 			}
+            if(closures.size() < OFFSET_INCREMENT) { // the limit does not work yet, so we only fetch the first page for now
+                allClosures.addAll(closures);
+                break;
+            }
 			allClosures.addAll(closures);
 		}
 		return allClosures;
