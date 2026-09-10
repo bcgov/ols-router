@@ -32,6 +32,8 @@ public interface RouterDataSource {
 
 	Reader getRestrictionReader() throws IOException;
 
+	Reader getRoadClosureReader() throws IOException;
+
 	RowReader getTurnClassReader() throws IOException;
 
 	Reader getOpen511Reader() throws IOException;

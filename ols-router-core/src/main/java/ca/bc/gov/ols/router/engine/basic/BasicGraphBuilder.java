@@ -99,6 +99,7 @@ public class BasicGraphBuilder implements GraphBuilder, SegmentIdLookup {
 	private TIntObjectMap<ArrayList<TurnRestrictionVis>> turnRestrictionsByEdgeId;
 	private RestrictionLookupBuilder itnRestrictionLookupBuilder;
 	private RestrictionLookupBuilder rdmRestrictionLookupBuilder;
+	private RestrictionLookupBuilder closureRestrictionLookupBuilder;
 	private EventLookup eventLookup;
 	private TrafficLookupBuilder trafficLookupBuilder;
 	private VisLayers layers;
@@ -115,6 +116,7 @@ public class BasicGraphBuilder implements GraphBuilder, SegmentIdLookup {
 		edgeIdBySegId = new IntObjectArrayMap<int[]>(RouterConfig.EXPECTED_EDGES);
 		itnRestrictionLookupBuilder = new RestrictionLookupBuilder(this, this.internalGraph);
 		rdmRestrictionLookupBuilder = new RestrictionLookupBuilder(this, this.internalGraph);
+		closureRestrictionLookupBuilder = new RestrictionLookupBuilder(this, this.internalGraph);
 		turnRestrictionsByEdgeId = new TIntObjectHashMap<ArrayList<TurnRestrictionVis>>();
 		layers = new VisLayers();
 		ferryEdges = new ArrayList<Integer>();
@@ -204,6 +206,11 @@ public class BasicGraphBuilder implements GraphBuilder, SegmentIdLookup {
 	@Override
 	public void addRestrictions(List<Restriction> restrictions) {
 		rdmRestrictionLookupBuilder.addRestrictions(restrictions);
+	}
+
+	@Override
+	public void addRoadClosures(List<Restriction> closures) {
+		closureRestrictionLookupBuilder.addRestrictions(closures);
 	}
 
 	@Override
@@ -631,6 +638,7 @@ public class BasicGraphBuilder implements GraphBuilder, SegmentIdLookup {
 		//restrictionLookup.analyze(graph);
 		graph.setRestrictionLookup(RestrictionSource.ITN, itnRestrictionLookupBuilder.build());
 		graph.setRestrictionLookup(RestrictionSource.RDM, rdmRestrictionLookupBuilder.build());
+		graph.setRestrictionLookup(RestrictionSource.CLOSURE, closureRestrictionLookupBuilder.build());
 		graph.setTrafficLookup(trafficLookupBuilder.build());
 		graph.setLocalDistortionField(localDistortionField);
 		buildTurnRestrictionLayer();

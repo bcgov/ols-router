@@ -20,7 +20,8 @@ public enum RouteOption {
 	TRAFFIC("tf"),
 	TURN_COSTS("tc"),
 	TURN_RESTRICTIONS("tr"),
-	XING_COSTS("xc");
+	XING_COSTS("xc"),
+	ROAD_CLOSURE("rc");
 	
 	private static final Logger logger = LoggerFactory.getLogger(RouteOption.class.getCanonicalName());
 	

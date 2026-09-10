@@ -489,6 +489,16 @@ public class GraphHopperRoutingEngine implements RoutingEngine {
 	}
 
 	@Override
+	public RoutingEngine getUpdatedRdmEngine(DataUpdateManager dum, SystemStatus status) {
+		return this;
+	}
+
+	@Override
+	public RoutingEngine getUpdatedRoadClosureEngine(DataUpdateManager dum, SystemStatus status) {
+		return this;
+	}
+
+	@Override
 	public List<StatusMessage> getMessages(Type type) {
 		return Collections.emptyList();
 	}

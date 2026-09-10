@@ -31,6 +31,8 @@ public class RouterApplication {
 	private Router router;
 	private GeometryReprojector reprojector = new GeotoolsGeometryReprojector();
 
+	// Schedule the RDM update job to run at fixed intervals based on the configuration
+
 	public static void main(String[] args) {
 		SpringApplication.run(RouterApplication.class, args);
 	}
@@ -40,17 +42,18 @@ public class RouterApplication {
 		RouterFactory routerFactory = new RouterFactory();
 		routerFactory.setGeometryReprojector(reprojector);
 		router = routerFactory.getRouter();
+		
 		RouterConfig config = router.getConfig();
 		
-		taskScheduler.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			public void run() {
-				logger.info("scheduled job running!");
-				router.update();
-
-			}
+		taskScheduler.scheduleAtFixedRate(() -> {
+			logger.info("scheduled RDM update running!");
+			router.updateRdmRestrictions();
 		}, Instant.now(), Duration.ofSeconds(config.getRdmUpdateInterval()));
+
+		taskScheduler.scheduleAtFixedRate(() -> {
+			logger.info("scheduled road closure update running!");
+			router.updateRoadClosures();
+		}, Instant.now(), Duration.ofSeconds(config.getClosureUpdateInterval()));
 	}
 
 	@Bean

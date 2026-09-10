@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.locationtech.jts.geom.Point;
 
+import ca.bc.gov.ols.enums.RoadClass;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
@@ -56,6 +57,7 @@ public class ApiResponse {
 	protected RestrictionSource restrictionSource;
 	protected Map<RestrictionType,Double> restrictionValues;
 	protected Set<Integer> excludeRestrictions;
+	protected Set<RoadClass> excludedRoadClasses;
 	protected boolean listRestrictions;
 	
 
@@ -87,6 +89,7 @@ public class ApiResponse {
 		restrictionSource = params.getRestrictionSource();
 		restrictionValues = params.getRestrictionValues();
 		excludeRestrictions = params.getExcludeRestrictions();
+		excludedRoadClasses = params.getExcludedRoadClasses();
 		listRestrictions = params.isListRestrictions();
 	}
 	
@@ -220,6 +223,10 @@ public class ApiResponse {
 
 	public Set<Integer> getExcludeRestrictions() {
 		return excludeRestrictions;
+	}
+
+	public Set<RoadClass> getExcludedRoadClasses() {
+		return excludedRoadClasses;
 	}
 
 	public boolean isListRestrictions() {

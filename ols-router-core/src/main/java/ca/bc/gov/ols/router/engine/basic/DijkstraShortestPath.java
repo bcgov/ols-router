@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 import ca.bc.gov.ols.router.api.RoutingParameters;
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.RoadEvent;
+import ca.bc.gov.ols.router.data.enums.RestrictionSource;
+import ca.bc.gov.ols.router.data.enums.RestrictionType;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.RoutingCriteria;
 import ca.bc.gov.ols.router.data.enums.TurnDirection;
@@ -34,7 +36,7 @@ public class DijkstraShortestPath {
 	private QueryGraph graph;
 	private RoutingParameters params;
 	private final boolean useLDF, useGDF, useTraffic, useXingCosts, useTurnRestrictions, useTurnCosts,
-			useTimeDependency, useEvents, useScheduling;
+			useTimeDependency, useEvents, useScheduling, useRoadClosure;
 	
 	public DijkstraShortestPath(QueryGraph graph, RoutingParameters params) {
 		this.graph = graph;
@@ -48,6 +50,29 @@ public class DijkstraShortestPath {
 		useTimeDependency = params.isEnabled(RouteOption.TIME_DEPENDENCY);
 		useEvents = params.isEnabled(RouteOption.EVENTS);
 		useScheduling = params.isEnabled(RouteOption.SCHEDULING);
+		useRoadClosure = params.isEnabled(RouteOption.ROAD_CLOSURE);
+	}
+	
+	// check if the edge is restricted by a road closure restriction. If so, return true, otherwise false.
+	private boolean isRoadClosureRestricted(int edgeId) {
+		if(!useRoadClosure) {
+			return false;
+		}
+		for(Constraint constraint : graph.lookupRestriction(RestrictionSource.CLOSURE, edgeId)) {
+			if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+					&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// check if the edge is restricted by a road class restriction. If so, return true, otherwise false.
+	private boolean isRoadClassExcluded(int edgeId) {
+		if(params.getExcludedRoadClasses().isEmpty()) {
+			return false;
+		}
+		return params.getExcludedRoadClasses().contains(graph.getRoadClass(edgeId));
 	}
 	
 	public EdgeList findShortestPath(WayPoint startWp, WayPoint endWp, double timeOffset) {	
@@ -123,9 +148,12 @@ public class DijkstraShortestPath {
 				for(int endEdgeId : endWp.incomingEdgeIds()) {
 					// shortcut the case where start and end node are the same
 					// or are on the same seg and within minRoutingDistance
+					// skip the shortcut if the segment is closed, since we don't know where along
+					// the segment the closure applies, so a normal graph search must be used instead
 					if( startNodeId == endNodeId 
 							|| (graph.getBaseEdgeId(startEdgeId) == graph.getBaseEdgeId(endEdgeId)
-								&& distance < params.getMinRoutingDistance())) {
+								&& distance < params.getMinRoutingDistance()
+								&& !isRoadClosureRestricted(startEdgeId) && !isRoadClosureRestricted(endEdgeId))) {
 						costByEndWpIdx[endWpIdx] = new DijkstraWalker(null, 0, 0, distance, 0, null);
 						pathsFinished++;
 						continue waypointCheck;
@@ -138,9 +166,25 @@ public class DijkstraShortestPath {
 		boolean[] edgeIdVisited = new boolean[graph.numEdges()];
 		Queue<DijkstraWalker> queue = new PriorityQueue<DijkstraWalker>();
 		int checkedEdgeCount = 0;
+		int closedStartEdgeCount = 0;
+		int excludedStartEdgeCount = 0;
+		int closedEdgeCount = 0;
+		boolean stoppedForSafetyLimit = false;
 
 		// add all the start edges to the Q and cost map
 		for(int startEdgeId : startWp.outgoingEdgeIds()) {
+			boolean closed = isRoadClosureRestricted(startEdgeId);
+			boolean excluded = isRoadClassExcluded(startEdgeId);
+			if(closed || excluded) {
+				if(closed) {
+					closedStartEdgeCount++;
+					System.out.println(">>>>>>>> Skipping closed start edge " + startEdgeId);
+				}
+				if(excluded) {
+					excludedStartEdgeCount++;
+				}
+				continue;
+			}
 			double length = graph.getLength(startEdgeId);
 			double time = length * 3.6 / speedFunction.apply(startEdgeId, startTime);
 			double cost = costFunction.apply(startEdgeId, time, length);
@@ -156,6 +200,7 @@ public class DijkstraShortestPath {
 					cost, time, length, 0, null);
 			queue.add(startWalker);
 		}
+		int initialQueueSize = queue.size();
 		
 		// traverse network looking for the cheapest paths
 		DijkstraWalker walker;
@@ -166,6 +211,7 @@ public class DijkstraShortestPath {
 			// escape from infinite loop!
 			if(checkedEdgeCount > graph.numEdges() * 2) {
 				logger.error("Infinite routing loop encountered, investigation required!");
+				stoppedForSafetyLimit = true;
 				break;
 			}
 
@@ -177,9 +223,36 @@ public class DijkstraShortestPath {
 			//	continue;
 			//}
 
+
+
+			// IMPORTANT: We now check for road closure restrictions. Road closure is always a hard restriction, 
+			// and it is not necessary to check for other restrictions if a road closure is present.
+			
+
+			// The following code is commented out because we are not currently using ITN restrictions for road closures,
+			// but it is left here for future reference.
+			// List<? extends Constraint> itnConstraints =
+			// 		graph.lookupRestriction(RestrictionSource.ITN, walker.edge().id);
+
+			// for(Constraint constraint : itnConstraints) {
+			// 	if(constraint.getType() == RestrictionType.ROAD_CLOSURE
+			// 			&& Collections.disjoint(params.getExcludeRestrictions(), constraint.getIds())) {
+			// 		continue nextEdge;
+			// 	}
+			// }
+
+			boolean closed = isRoadClosureRestricted(walker.edge().id);
+			if(closed || isRoadClassExcluded(walker.edge().id)) {
+				if(closed) {
+					closedEdgeCount++;
+					System.out.println(">>>>>>>> Skipping closed edge " + walker.edge().id);
+				}
+				continue nextEdge;
+			}
+
 			// filter the edge based on restrictions
 			if(!params.getRestrictionValues().isEmpty()) {
-				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), walker.edge().id);
+				List<? extends Constraint> constraints = graph.lookupRestriction(params.getRestrictionSource(), walker.edge().id);	
 				for(Constraint c : constraints) {
 					if(c.prevents(params) && Collections.disjoint(params.getExcludeRestrictions(), c.getIds())) {
 						continue nextEdge;
@@ -312,6 +385,23 @@ public class DijkstraShortestPath {
 
 		}
 		logger.debug("{} edges checked to find the the shortest path", checkedEdgeCount);
+		if(pathsFinished == 0) {
+			System.out.println(">>>>>>>> No route found: checkedEdges=" + checkedEdgeCount
+					+ " initialQueueSize=" + initialQueueSize
+					+ " closedStartEdges=" + closedStartEdgeCount
+					+ " excludedStartEdges=" + excludedStartEdgeCount
+					+ " closedExploredEdges=" + closedEdgeCount
+					+ " stoppedForSafetyLimit=" + stoppedForSafetyLimit);
+			for(int endWpIdx = 0; endWpIdx < endWps.length; endWpIdx++) {
+				WayPoint endWp = endWps[endWpIdx];
+				if(endWp != null) {
+					for(int endEdgeId : endWp.incomingEdgeIds()) {
+						System.out.println(">>>>>>>> End point " + endWpIdx + " edge " + endEdgeId
+								+ " closed=" + isRoadClosureRestricted(endEdgeId));
+					}
+				}
+			}
+		}
 		
 		// make a list of all the toEdgeIndexes
 		Integer[] endWpIdxs = new Integer[endWps.length];

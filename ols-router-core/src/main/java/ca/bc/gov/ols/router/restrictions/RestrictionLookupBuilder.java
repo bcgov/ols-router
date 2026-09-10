@@ -78,8 +78,13 @@ public class RestrictionLookupBuilder {
 		}
 		// negative azimuth means both directions
 		if(r.azimuth < 0) {
+			if(r.type == RestrictionType.ROAD_CLOSURE) {
+				for(int edgeId : edgeIds) {	
+					System.out.println(">>>>>>>>> Adding restriction " + r.id + " (segment id = " + r.segmentId + ") to edge " + edgeId);
+				}
+			}
 			// both directions
-			for(int edgeId : edgeIds) {
+			for(int edgeId : edgeIds) {	
 				addRestriction(edgeId, r);
 			}
 		} else {

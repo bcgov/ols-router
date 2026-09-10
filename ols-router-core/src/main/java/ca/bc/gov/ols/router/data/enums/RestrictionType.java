@@ -13,6 +13,7 @@ public class RestrictionType {
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionType.class.getCanonicalName());
 	
 	private static final HashMap<String, RestrictionType> typeMap = new HashMap<String, RestrictionType>();
+	public static final RestrictionType ROAD_CLOSURE = new RestrictionType("ROAD_CLOSURE", "Road Closure", "", false); // road is closed to all traffic
 	public static final RestrictionType HORIZONTAL = new RestrictionType("HORIZONTAL", "Width", "m", true);
 	public static final RestrictionType VERTICAL = new RestrictionType("VERTICAL", "Height", "m", true);
 	public static final RestrictionType LENGTH = new RestrictionType("LENGTH", "Length", "m", true);

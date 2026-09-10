@@ -5,7 +5,8 @@ import org.slf4j.LoggerFactory;
 
 public enum RestrictionSource {
 	ITN, // Integrated Transport Network - the road network provided by GeoBC
-	RDM; // Restriction Data Manager - restriction API provided by MOTI
+	RDM, // Restriction Data Manager - restriction API provided by MOTI
+	CLOSURE; // Road Closures - closure data provided as a separate feed
 	
 	private static final Logger logger = LoggerFactory.getLogger(RestrictionSource.class.getCanonicalName());
 	

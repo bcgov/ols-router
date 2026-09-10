@@ -1,4 +1,4 @@
-package ca.bc.gov.ols.router.restrictions.rdm;
+package ca.bc.gov.ols.router.restrictions.closure;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -15,14 +15,18 @@ import com.google.gson.stream.JsonToken;
 
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
+import ca.bc.gov.ols.router.restrictions.rdm.Restriction;
+import ca.bc.gov.ols.router.restrictions.rdm.RestrictionBuilder;
 import ca.bc.gov.ols.rowreader.JsonRowReader;
 
-public class RdmParser {
-	private final static Logger logger = LoggerFactory.getLogger(RdmParser.class.getCanonicalName());
+// Parses road closures, which use the same record format as RDM restrictions, but are
+// sourced from their own file/feed and are always tagged with RestrictionSource.CLOSURE.
+public class ClosureParser {
+	private final static Logger logger = LoggerFactory.getLogger(ClosureParser.class.getCanonicalName());
 	
 	GeometryFactory gf;
 	
-	public RdmParser(GeometryFactory gf) {
+	public ClosureParser(GeometryFactory gf) {
 		this.gf = gf;
 	}
 
@@ -34,13 +38,12 @@ public class RdmParser {
 		while(jr.hasNext()) {
 			Restriction r = parseRestriction(jr);
 			count++;
-			// road closures are now sourced from their own feed, so skip them here
 			if(r != null) {
 				restrictions.add(r);
 			}
 		}
 		jr.close();
-		logger.info("Read {} RDM restrictions from file.", count);
+		logger.info("Read {} Road Closures from file.", count);
 		return restrictions;
 	}
 	
@@ -99,7 +102,7 @@ public class RdmParser {
 			}
 		}
 		jr.endObject();
-		rb.source(RestrictionSource.RDM);
+		rb.source(RestrictionSource.CLOSURE);
 		return rb.build();
 	}
 	

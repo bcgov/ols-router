@@ -98,6 +98,8 @@ public class JsonConverterHelper extends ConverterHelper {
 		outputMap(jw, response.getRestrictionValues());
 		jw.name("excludeRestrictions");
 		outputList(jw, response.getExcludeRestrictions());
+		jw.name("excludedRoadClasses");
+		outputList(jw, response.getExcludedRoadClasses());
 	}
 	
 	protected void writeFields(RouterDistanceResponse response) throws IOException {

@@ -159,6 +159,12 @@ public class QueryGraph {
 		for(RestrictionSource source : RestrictionSource.values()) {
 			List<Constraint> constraints = baseGraph.lookupRestriction(source, baseEdgeId);
 			for(Constraint c : constraints) {
+				if(source == RestrictionSource.CLOSURE && c.getLocation() == null) {
+					for(MapList<RestrictionSource,Constraint> splitRestriction : splitRestrictions) {
+						splitRestriction.add(source, c);
+					}
+					continue;
+				}
 				int closestSplitIndex = 0;
 				double closestSplitDistance = Double.POSITIVE_INFINITY;
 				for(int splitLineIndex = 0; splitLineIndex < splitLines.size(); splitLineIndex++) {
