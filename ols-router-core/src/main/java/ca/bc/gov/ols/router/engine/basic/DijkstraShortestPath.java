@@ -166,10 +166,23 @@ public class DijkstraShortestPath {
 		boolean[] edgeIdVisited = new boolean[graph.numEdges()];
 		Queue<DijkstraWalker> queue = new PriorityQueue<DijkstraWalker>();
 		int checkedEdgeCount = 0;
+		int closedStartEdgeCount = 0;
+		int excludedStartEdgeCount = 0;
+		int closedEdgeCount = 0;
+		boolean stoppedForSafetyLimit = false;
 
 		// add all the start edges to the Q and cost map
 		for(int startEdgeId : startWp.outgoingEdgeIds()) {
-			if(isRoadClosureRestricted(startEdgeId) || isRoadClassExcluded(startEdgeId)) {
+			boolean closed = isRoadClosureRestricted(startEdgeId);
+			boolean excluded = isRoadClassExcluded(startEdgeId);
+			if(closed || excluded) {
+				if(closed) {
+					closedStartEdgeCount++;
+					System.out.println(">>>>>>>> Skipping closed start edge " + startEdgeId);
+				}
+				if(excluded) {
+					excludedStartEdgeCount++;
+				}
 				continue;
 			}
 			double length = graph.getLength(startEdgeId);
@@ -187,6 +200,7 @@ public class DijkstraShortestPath {
 					cost, time, length, 0, null);
 			queue.add(startWalker);
 		}
+		int initialQueueSize = queue.size();
 		
 		// traverse network looking for the cheapest paths
 		DijkstraWalker walker;
@@ -197,6 +211,7 @@ public class DijkstraShortestPath {
 			// escape from infinite loop!
 			if(checkedEdgeCount > graph.numEdges() * 2) {
 				logger.error("Infinite routing loop encountered, investigation required!");
+				stoppedForSafetyLimit = true;
 				break;
 			}
 
@@ -226,8 +241,12 @@ public class DijkstraShortestPath {
 			// 	}
 			// }
 
-			if(isRoadClosureRestricted(walker.edge().id) || isRoadClassExcluded(walker.edge().id)) {
-				System.out.println(">>>>>>>> Skipping edge " + walker.edge().id + " due to road closure or excluded road class restriction");
+			boolean closed = isRoadClosureRestricted(walker.edge().id);
+			if(closed || isRoadClassExcluded(walker.edge().id)) {
+				if(closed) {
+					closedEdgeCount++;
+					System.out.println(">>>>>>>> Skipping closed edge " + walker.edge().id);
+				}
 				continue nextEdge;
 			}
 
@@ -366,6 +385,23 @@ public class DijkstraShortestPath {
 
 		}
 		logger.debug("{} edges checked to find the the shortest path", checkedEdgeCount);
+		if(pathsFinished == 0) {
+			System.out.println(">>>>>>>> No route found: checkedEdges=" + checkedEdgeCount
+					+ " initialQueueSize=" + initialQueueSize
+					+ " closedStartEdges=" + closedStartEdgeCount
+					+ " excludedStartEdges=" + excludedStartEdgeCount
+					+ " closedExploredEdges=" + closedEdgeCount
+					+ " stoppedForSafetyLimit=" + stoppedForSafetyLimit);
+			for(int endWpIdx = 0; endWpIdx < endWps.length; endWpIdx++) {
+				WayPoint endWp = endWps[endWpIdx];
+				if(endWp != null) {
+					for(int endEdgeId : endWp.incomingEdgeIds()) {
+						System.out.println(">>>>>>>> End point " + endWpIdx + " edge " + endEdgeId
+								+ " closed=" + isRoadClosureRestricted(endEdgeId));
+					}
+				}
+			}
+		}
 		
 		// make a list of all the toEdgeIndexes
 		Integer[] endWpIdxs = new Integer[endWps.length];

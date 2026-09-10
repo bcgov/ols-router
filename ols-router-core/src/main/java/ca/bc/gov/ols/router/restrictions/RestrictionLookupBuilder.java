@@ -80,7 +80,7 @@ public class RestrictionLookupBuilder {
 		if(r.azimuth < 0) {
 			if(r.type == RestrictionType.ROAD_CLOSURE) {
 				for(int edgeId : edgeIds) {	
-					System.out.println(">>>>>>>>> Adding restriction " + r.id + " to edge " + edgeId);
+					System.out.println(">>>>>>>>> Adding restriction " + r.id + " (segment id = " + r.segmentId + ") to edge " + edgeId);
 				}
 			}
 			// both directions
