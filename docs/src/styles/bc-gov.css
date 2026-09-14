@@ -1,0 +1,198 @@
+/* BC Government Visual Identity - Custom Starlight Theme */
+
+/* BC Sans Font Family */
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-Italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-LightItalic.woff2') format('woff2');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BCSans';
+  src: url('/ols-router/fonts/BCSans-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* BC Government Color Palette */
+:root {
+  /* Primary BC Gov Blue */
+  --sl-color-primary: #003366;
+  --sl-color-primary-high: #1a4f8b;
+  --sl-color-primary-low: #001f3f;
+
+  /* Secondary Colors */
+  --sl-color-accent: #fcba19;
+  --sl-color-accent-high: #e5a800;
+  --sl-color-accent-low: #b38600;
+
+  /* Background Colors */
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: #f2f2f2;
+  --sl-color-bg-sidebar: #f8f9fa;
+  --sl-color-bg-code: #f5f5f5;
+
+  /* Text Colors */
+  --sl-color-text: #313132;
+  --sl-color-text-light: #606060;
+  --sl-color-text-lighter: #707070;
+
+  /* Border Colors */
+  --sl-color-gray-5: #e0e0e0;
+  --sl-color-gray-6: #c0c0c0;
+  --sl-color-gray-7: #a0a0a0;
+
+  /* Font Family */
+  --sl-font: 'BCSans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  --sl-font-mono: 'Source Code Pro', 'Consolas', 'Monaco', monospace;
+}
+
+/* Override Starlight Header */
+.sl-nav {
+  background-color: var(--sl-color-primary);
+}
+
+.sl-nav a {
+  color: #ffffff;
+}
+
+.sl-nav a:hover {
+  color: var(--sl-color-accent);
+}
+
+/* Sidebar Styling */
+.sl-sidebar-nav {
+  font-family: var(--sl-font);
+}
+
+/* Footer */
+.sl-footer {
+  background-color: var(--sl-color-bg-nav);
+  border-top: 1px solid var(--sl-color-gray-5);
+}
+
+/* Content Links */
+a {
+  color: var(--sl-color-primary);
+}
+
+a:hover {
+  color: var(--sl-color-primary-high);
+}
+
+/* Buttons */
+.sl-button-primary {
+  background-color: var(--sl-color-primary);
+}
+
+.sl-button-primary:hover {
+  background-color: var(--sl-color-primary-high);
+}
+
+/* Code Blocks */
+.sl-code-block {
+  background-color: var(--sl-color-bg-code);
+  border: 1px solid var(--sl-color-gray-5);
+}
+
+div.expressive-code .frame pre {
+  background-color: var(--sl-color-gray-5);
+  border: 1px solid var(--sl-color-gray-4);
+  margin-block: 0.5rem;
+}
+
+div.expressive-code pre > code {
+  text-wrap: wrap;
+  word-break: break-all;
+}
+
+/* Table Styling */
+table {
+  border-collapse: collapse;
+}
+
+th {
+  background-color: var(--sl-color-primary);
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+td {
+  border: 1px solid var(--sl-color-gray-5);
+  padding: 0.5rem 0.75rem;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sl-font);
+  color: var(--sl-color-primary);
+}
+
+/* Logo in Header */
+.sl-logo {
+  height: 32px;
+  width: auto;
+}
+
+/* Card Styling for BC Gov Style */
+.card {
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 4px;
+}
+
+/* Note/Warning Boxes */
+.note {
+  border-left: 4px solid var(--sl-color-primary);
+  background-color: var(--sl-color-bg-nav);
+}
+
+.caution {
+  border-left: 4px solid #c92100;
+  background-color: #fef7f7;
+}
+
+.warning {
+  border-left: 4px solid #ec7b1f;
+  background-color: #fef9f3;
+}
+
+.tip {
+  border-left: 4px solid #1e8449;
+  background-color: #f0faf4;
+}
