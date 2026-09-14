@@ -47,3 +47,8 @@ local.properties
 *.iml
 local_data
 .vscode
+
+# Docs
+docs/node_modules/
+docs/.astro/
+docs/dist/
