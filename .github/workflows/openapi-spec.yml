@@ -1,0 +1,183 @@
+name: OpenAPI Spec
+
+on:
+  workflow_dispatch:
+    inputs:
+      bypass_lint:
+        description: "Bypass SDX lint failures (spec is still generated)"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  JAVA_VERSION: "17"
+  NODE_VERSION: "24"
+  # ── API Metadata ──────────────────────────────────────────────────────────
+  API_TITLE: "BC Route Planner REST API"
+  API_DESCRIPTION: >-
+    Finds shortest/fastest route between a start point and one or more stop
+    points on British Columbia's public road network. \n
+    Please read our [data collection notice](https://github.com/bcgov/api-specs/blob/master/COLLECTION_NOTICE.md#collection-notice). \n\n
+    [API keys](https://api.gov.bc.ca/devportal/api-directory/740) are unique
+    and can be acquired with a GitHub or IDIR account. \n\n
+
+  # ── Servers ───────────────────────────────────────────────────────────────
+  SERVER_PROD_URL: "https://router.api.gov.bc.ca"
+  SERVER_PROD_DESC: "Production environment"
+  SERVER_TEST_URL: "https://routertst.api.gov.bc.ca"
+  SERVER_TEST_DESC: "Test environment"
+  SERVER_DLV_URL: "https://router-dev.api.gov.bc.ca"
+  SERVER_DLV_DESC: "Development environment"
+
+  # ── Contact / License / Docs ──────────────────────────────────────────────
+  CONTACT_NAME: "Contact DataBC"
+  CONTACT_URL: "https://dpdd.atlassian.net/servicedesk/customer/portal/1/group/7/"
+  LICENSE_NAME: "Copyright Province of British Columbia - Access only"
+  LICENSE_URL: "https://www2.gov.bc.ca/gov/content?id=1AAACC9C65754E4D89A118B875E0FBDA"
+  TOS_URL: "http://www2.gov.bc.ca/gov/content?id=D1EE0A405E584363B205CD4353E02C88"
+  EXTERNAL_DOCS_DESC: "Developer Guide"
+  EXTERNAL_DOCS_URL: "https://github.com/bcgov/ols-router/blob/gh-pages/router-developer-guide.md"
+
+jobs:
+  generate-and-lint:
+    name: Generate & Lint OpenAPI Spec
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK
+        uses: actions/setup-java@v6
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      # This must run after setup-java because setup-java can create
+      # or replace ~/.m2/settings.xml.
+      - name: Configure LOC Maven access
+        uses: bcgov/ols-util/.github/actions/setup-loc-maven@5fb17c36c02189b703f41d6b287a6561aee47b6e
+        with:
+          artifactory-username: ${{ secrets.LOC_ARTIFACTORY_USERNAME }}
+          artifactory-password: ${{ secrets.LOC_ARTIFACTORY_PASSWORD }}
+
+      - name: Install dependencies (skip core tests)
+        run: mvn install -pl ols-router-core -DskipTests -B
+
+      - name: Extract API version from pom.xml
+        id: version
+        run: |
+          VERSION=$(grep '<version>' pom.xml | head -1 | sed 's/.*<version>\([^<]*\)<\/version>.*/\1/')
+          echo "api_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "API version: $VERSION"
+
+      - name: Generate OpenAPI spec
+        run: >-
+          mvn test
+          -pl ols-router-web
+          -Popenapi-spec
+          -B
+
+      - name: Verify spec file exists
+        run: |
+          if [ ! -f ols-router-web/target/openapi.json ]; then
+            echo "::error::OpenAPI spec was not generated at ols-router-web/target/openapi.json"
+            exit 1
+          fi
+          echo "OpenAPI spec generated successfully"
+          wc -c ols-router-web/target/openapi.json
+
+      - name: Enrich OpenAPI spec with metadata
+        run: |
+          SPEC=ols-router-web/target/openapi.json
+
+          ENRICH_JQ=$(mktemp)
+          cat > "$ENRICH_JQ" << 'JQEOF'
+          .info = {
+              "title": $title,
+              "description": $desc,
+              "version": $version,
+              "license": { "name": $license_name, "url": $license_url },
+              "termsOfService": $tos_url,
+              "contact": { "name": $contact_name, "url": $contact_url }
+            }
+            | .servers = [
+                { "url": $prod_url, "description": $prod_desc },
+                { "url": $test_url, "description": $test_desc },
+                { "url": $dlv_url,  "description": $dlv_desc }
+              ]
+            | .externalDocs = { "description": $ext_desc, "url": $ext_url }
+            | .tags = [
+                { "name": "directions", "description": "Turn-by-turn directions resources" },
+                { "name": "distance",   "description": "Distance and travel time resources" },
+                { "name": "route",      "description": "Route geometry resources" }
+              ]
+            | .components.securitySchemes.apikey = {
+                "type": "apiKey",
+                "in": "header",
+                "name": "apikey",
+                "description": "API key required for SDX Gateway access"
+              }
+            | .security = [ { "apikey": [] } ]
+          JQEOF
+
+          jq \
+            --arg title "$API_TITLE" \
+            --arg version "${{ steps.version.outputs.api_version }}" \
+            --arg desc "$API_DESCRIPTION" \
+            --arg contact_name "$CONTACT_NAME" \
+            --arg contact_url "$CONTACT_URL" \
+            --arg license_name "$LICENSE_NAME" \
+            --arg license_url "$LICENSE_URL" \
+            --arg tos_url "$TOS_URL" \
+            --arg ext_desc "$EXTERNAL_DOCS_DESC" \
+            --arg ext_url "$EXTERNAL_DOCS_URL" \
+            --arg prod_url "$SERVER_PROD_URL" \
+            --arg prod_desc "$SERVER_PROD_DESC" \
+            --arg test_url "$SERVER_TEST_URL" \
+            --arg test_desc "$SERVER_TEST_DESC" \
+            --arg dlv_url "$SERVER_DLV_URL" \
+            --arg dlv_desc "$SERVER_DLV_DESC" \
+            -f "$ENRICH_JQ" \
+            "$SPEC" > "$SPEC.tmp" && mv "$SPEC.tmp" "$SPEC"
+
+          rm -f "$ENRICH_JQ"
+
+      - name: Fix escaped newlines in API description
+        run: |
+          python3 -c "
+          import json
+          with open('ols-router-web/target/openapi.json') as f: spec = json.load(f)
+          spec['info']['description'] = spec['info']['description'].replace('\\\\n', '\\n')
+          with open('ols-router-web/target/openapi.json', 'w') as f: json.dump(spec, f, indent=2)
+          "
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: .github/workflows/util/package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci --ignore-scripts
+        working-directory: .github/workflows/util
+
+      - name: Validate OpenAPI structure
+        continue-on-error: ${{ inputs.bypass_lint }}
+        run: npm run lint:openapi
+        working-directory: .github/workflows/util
+
+      - name: Lint against SDX Spectral rules
+        continue-on-error: ${{ inputs.bypass_lint }}
+        run: npm run lint:openapi:warn
+        working-directory: .github/workflows/util
+
+      - name: Upload OpenAPI spec
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: openapi-spec
+          path: ols-router-web/target/openapi.json
+          retention-days: 30
