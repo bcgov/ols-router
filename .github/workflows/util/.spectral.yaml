@@ -11,7 +11,7 @@
 
 extends:
   - https://raw.githubusercontent.com/bcgov/itk-api-governance/main/dist/spectral/strict-ruleset.yaml
-  - ./sdx-warn-ruleset.yaml
+  - https://raw.githubusercontent.com/bcgov/itk-api-governance/main/dist/spectral/sdx-ruleset.yaml
 
   # ==========================================================================
   # BC Government itk-api-governance: soften strict rules for initial adoption
