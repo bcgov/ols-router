@@ -1,5 +1,6 @@
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
+import starlightOpenAPI, { openAPISidebarGroups } from "starlight-openapi";
 
 export default defineConfig({
 	site: "https://bcgov.github.io",
@@ -12,6 +13,15 @@ export default defineConfig({
 				alt: "BC Government Logo",
 			},
 			customCss: ["./src/styles/bc-gov.css"],
+			plugins: [
+				starlightOpenAPI([
+					{
+						base: "api",
+						schema: "public/openapi.json",
+						sidebar: { label: "OpenAPI Reference" },
+					},
+				]),
+			],
 			social: [
 				{
 					icon: "github",
@@ -45,6 +55,7 @@ export default defineConfig({
 						"reference/technical-terms",
 					],
 				},
+				...openAPISidebarGroups,
 			],
 		}),
 	],

@@ -3,9 +3,12 @@ package ca.bc.gov.ols.router.status;
 import java.time.ZonedDateTime;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "The current status of the routing service, including its version and dataset timestamps.")
 public class SystemStatus {
 	
 	public final String version = RouterConfig.VERSION;

@@ -6,12 +6,18 @@ package ca.bc.gov.ols.router.rest.controllers;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +55,15 @@ public class RoutingController {
 	@Autowired
 	private Router router;
 
+	@Operation(
+		summary = "Service root endpoint",
+		description = "Returns a sample distance calculation between two points in downtown Victoria "
+				+ "to verify the service is operational.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "A sample distance response confirming the service is operational.")
+	})
 	@RequestMapping(value = "/", method = {RequestMethod.GET})
 	public RouterDistanceResponse routerDefault() {
 		RoutingParameters params = new RoutingParameters();
@@ -60,6 +75,16 @@ public class RoutingController {
 		return router.distance(params);
 	}
 
+	@Operation(
+		summary = "Ping endpoint",
+		description = "Verifies the service is operational by performing a distance calculation. "
+				+ "Returns HTTP 200 when the router can produce a result, otherwise HTTP 503.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The service is operational."),
+		@ApiResponse(responseCode = "503", description = "The service is not operational.")
+	})
 	@RequestMapping(value = "/ping", method = {RequestMethod.GET})
 	public ResponseEntity<String> ping() {
 		RoutingParameters params = new RoutingParameters();
@@ -75,26 +100,64 @@ public class RoutingController {
 		return ResponseEntity.status(HttpStatus.OK).body(null);
 	}
 
+	@Operation(
+		summary = "Distance between points",
+		description = "Returns the length and duration of the shortest or fastest route "
+				+ "between the given points. The vehicle type can optionally be specified in the path.",
+		tags = {"Distance"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The route length and travel time between the given points.")
+	})
 	@RequestMapping(value = {"/distance","/{vehicleType}/distance"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterDistanceResponse distance(RoutingParameters params, BindingResult bindingResult) {
+	public RouterDistanceResponse distance(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.distance(params);
 	}
 
+	@Operation(
+		summary = "Route between points",
+		description = "Returns the geometry of the shortest or fastest route between the given points, "
+				+ "along with its length and duration. The vehicle type can optionally be specified in the path.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The route geometry, length, and travel time between the given points.")
+	})
 	@RequestMapping(value = {"/route","/{vehicleType}/route"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterRouteResponse route(RoutingParameters params, BindingResult bindingResult) {
+	public RouterRouteResponse route(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.route(params);
 	}
 
+	@Operation(
+		summary = "Turn-by-turn directions",
+		description = "Returns turn-by-turn directions for the shortest or fastest route between the given points, "
+				+ "including the route geometry, length, and duration. "
+				+ "The vehicle type can optionally be specified in the path.",
+		tags = {"Directions"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Turn-by-turn directions for the route between the given points.")
+	})
 	@RequestMapping(value = {"/directions","/{vehicleType}/directions"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterDirectionsResponse directions(RoutingParameters params, BindingResult bindingResult) {
+	public RouterDirectionsResponse directions(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		validateRouteRequest(params, bindingResult);
 		return router.directions(params);
 	}
 
+	@Operation(
+		summary = "Optimal route through multiple points",
+		description = "Returns the optimal route that visits all of the given points in the most efficient order, "
+				+ "along with the route geometry, length, and duration. "
+				+ "The vehicle type can optionally be specified in the path.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The optimal route visiting all of the given points.")
+	})
 	@RequestMapping(value = {"/optimalRoute","/{vehicleType}/optimalRoute"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterOptimalRouteResponse optimalRouteGet(RoutingParameters params, BindingResult bindingResult) {
+	public RouterOptimalRouteResponse optimalRouteGet(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		validateOptimalRouteRequest(params, bindingResult);
 		
 		StopWatch sw = new StopWatch();
@@ -106,8 +169,18 @@ public class RoutingController {
 		return response;
 	}
 
+	@Operation(
+		summary = "Optimal route directions",
+		description = "Returns turn-by-turn directions for the optimal route that visits all of the given points "
+				+ "in the most efficient order, including the route geometry, length, and duration. "
+				+ "The vehicle type can optionally be specified in the path.",
+		tags = {"Directions"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "Turn-by-turn directions for the optimal route visiting all of the given points.")
+	})
 	@RequestMapping(value = {"/optimalDirections","/{vehicleType}/optimalDirections"}, method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterOptimalDirectionsResponse optimalDirections(RoutingParameters params, BindingResult bindingResult) {
+	public RouterOptimalDirectionsResponse optimalDirections(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		validateOptimalRouteRequest(params, bindingResult);
 		StopWatch sw = new StopWatch();
 		sw.start();
@@ -118,8 +191,17 @@ public class RoutingController {
 		return response;
 	}
 
+	@Operation(
+		summary = "Distance for all pairs of points",
+		description = "Returns the length and duration of the shortest or fastest route between each "
+				+ "pair of the given from and to points.",
+		tags = {"Distance"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The route lengths and travel times between each pair of from and to points.")
+	})
 	@RequestMapping(value = "/distance/betweenPairs", method = {RequestMethod.GET, RequestMethod.POST})
-	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(RoutingParameters params, BindingResult bindingResult) {
+	public RouterDistanceBetweenPairsResponse distanceBetweenPairs(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -159,6 +241,14 @@ public class RoutingController {
 		return response;
 	}
 
+	@Operation(
+		summary = "Default routing parameters",
+		description = "Returns the default values of the routing parameters configured for the service.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The default routing parameter values.")
+	})
 	@RequestMapping(value = "/defaults", method = {RequestMethod.GET})
 	public DefaultsResponse defaults() {
 		return new DefaultsResponse(router.getConfig());
@@ -191,8 +281,17 @@ public class RoutingController {
 		}
 	}
 
+	@Operation(
+		summary = "Isochrone zones",
+		description = "Returns one or more isochrone zones showing the area reachable from the given point "
+				+ "within the specified time or distance.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "One or more isochrone zones as polygons.")
+	})
 	@RequestMapping(value = "/isochrones", method = {RequestMethod.GET, RequestMethod.POST})
-	public IsochroneResponse isochrones(RoutingParameters params, BindingResult bindingResult) {
+	public IsochroneResponse isochrones(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -223,8 +322,17 @@ public class RoutingController {
 		return response;
 	}
 
+	@Operation(
+		summary = "Loop around a point",
+		description = "Returns a loop route highlighting the boundary of the area reachable from the given point "
+				+ "within the specified time or distance.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The loop route geometry as a polygon.")
+	})
 	@RequestMapping(value = "/loop", method = {RequestMethod.GET})
-	public IsochroneResponse loop(RoutingParameters params, BindingResult bindingResult) {
+	public IsochroneResponse loop(@ParameterObject RoutingParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -247,8 +355,17 @@ public class RoutingController {
 		return response;
 	}
 	
+	@Operation(
+		summary = "Navigation information",
+		description = "Returns navigation information for the road network within the given bounding box, "
+				+ "such as turn restrictions and speed limits.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The navigation information for the requested bounding box.")
+	})
 	@RequestMapping(value = "/navInfo", method = {RequestMethod.GET})
-	public NavInfoResponse navInfo(NavInfoParameters params, BindingResult bindingResult) {
+	public NavInfoResponse navInfo(@ParameterObject NavInfoParameters params, BindingResult bindingResult) {
 		RouterConfig config = router.getConfig();
 		if(bindingResult.hasErrors()) {
 			throw new InvalidParameterException(bindingResult);
@@ -266,13 +383,33 @@ public class RoutingController {
 		return response;
 	}
 
+	@Operation(
+		summary = "System status",
+		description = "Returns the current status of the routing service, including its version "
+				+ "and the status of its datasets.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The current system status.")
+	})
 	@RequestMapping(value = "/status", method = {RequestMethod.GET})
 	public SystemStatus status() {
 		return router.getStatus();
 	}
 
+	@Operation(
+		summary = "Status messages by type",
+		description = "Returns the status messages of the given type.",
+		tags = {"Route"}
+	)
+	@ApiResponses({
+		@ApiResponse(responseCode = "200", description = "The status messages of the requested type.")
+	})
 	@RequestMapping(value = "/status/{type}", method = {RequestMethod.GET})
-	public List<StatusMessage> statusByType(@PathVariable StatusMessage.Type type) {
+	public List<StatusMessage> statusByType(
+			@Parameter(description = "The type of status messages to return.", required = true,
+					example = "RDM")
+			@PathVariable StatusMessage.Type type) {
 		return router.getMessages(type);
 	}
 }

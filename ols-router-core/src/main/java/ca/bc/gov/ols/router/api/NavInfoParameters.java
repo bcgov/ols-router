@@ -13,17 +13,31 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
+import io.swagger.v3.oas.annotations.Parameter;
+
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.NavInfoType;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 
 public class NavInfoParameters {
 
+	@Parameter(description = "The EPSG code of the spatial reference system (SRS) to use for output geometries.",
+			schema = @io.swagger.v3.oas.annotations.media.Schema(type = "integer", defaultValue = "4326"),
+			example = "4326")
 	private int outputSRS = 4326;
+	@Parameter(description = "A bounding box (xmin,ymin,xmax,ymax) that limits the area of the request, "
+			+ "in the format \"xmin,ymin,xmax,ymax\". Must be in the same SRS as the outputSRS parameter.",
+			example = "-123.13,49.28,-123.11,49.29")
 	private double[] bbox;
+	@Parameter(hidden = true)
 	private Envelope envelope;
+	@Parameter(description = "The date and time of departure, used to evaluate time-dependent "
+			+ "navigation information.",
+			schema = @io.swagger.v3.oas.annotations.media.Schema(type = "string", format = "date-time"))
 	private Instant departure = Instant.now();
+	@Parameter(description = "The source of the restriction data to use.")
 	private RestrictionSource restrictionSource = null;
+	@Parameter(description = "A comma-separated list of the types of navigation information to return.")
 	private Set<NavInfoType> types = EnumSet.allOf(NavInfoType.class);
 	
 	public int getOutputSRS() {
@@ -38,6 +52,11 @@ public class NavInfoParameters {
 		this.bbox = bbox;
 	}
 
+	public double[] getBbox() {
+		return bbox;
+	}
+
+	@Parameter(hidden = true)
 	public Envelope getEnvelope() {
 		return envelope;
 	}

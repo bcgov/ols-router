@@ -12,6 +12,8 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.LineString;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.directions.AbstractTravelDirection;
 import ca.bc.gov.ols.router.directions.Direction;
@@ -20,6 +22,7 @@ import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "A response containing turn-by-turn directions for the route between the given points.")
 public class RouterDirectionsResponse extends RouterRouteResponse {
 
 	private List<Direction> directions;
