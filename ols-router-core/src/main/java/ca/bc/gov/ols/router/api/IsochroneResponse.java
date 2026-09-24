@@ -10,8 +10,11 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.Geometry;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "A response containing one or more isochrone zones as polygons.")
 public class IsochroneResponse extends ApiResponse {
 	private List<Geometry> polygons;
 	private int zoneSize = 0;

@@ -15,6 +15,8 @@ import java.util.Set;
 
 import org.locationtech.jts.geom.Point;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.router.data.enums.RestrictionSource;
 import ca.bc.gov.ols.router.data.enums.RestrictionType;
@@ -25,6 +27,7 @@ import ca.bc.gov.ols.router.engine.basic.Attribute;
 import ca.bc.gov.ols.router.engine.basic.GlobalDistortionField;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "The base response containing common properties echoed back for every route request.")
 public class ApiResponse {
 
 	private LocalDateTime timeStamp;

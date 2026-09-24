@@ -6,8 +6,11 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.data.vis.VisFeature;
 
+@Schema(description = "A response containing navigation information for the road network within a bounding box.")
 public class NavInfoResponse {
 
 	private final int srsCode;

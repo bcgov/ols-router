@@ -10,9 +10,13 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.LineString;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "A response containing the geometry, length, and duration of the optimal route "
+		+ "that visits all of the given points.")
 public class RouterOptimalRouteResponse extends RouterRouteResponse implements RouterOptimizedResponse {
 
 	private long routingExecutionTime;

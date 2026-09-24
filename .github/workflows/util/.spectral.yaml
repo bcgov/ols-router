@@ -11,7 +11,7 @@
 
 extends:
   - https://raw.githubusercontent.com/bcgov/itk-api-governance/main/dist/spectral/strict-ruleset.yaml
-  - https://raw.githubusercontent.com/bcgov/itk-api-governance/main/dist/spectral/sdx-ruleset.yaml
+  - ./sdx-warn-ruleset.yaml
 
   # ==========================================================================
   # BC Government itk-api-governance: soften strict rules for initial adoption
@@ -38,9 +38,8 @@ extends:
   schema-description-min-length: warn
   operation-id-camel-case: warn
 
-  # ==========================================================================
+rules:
   # SDX API Standard - Project-specific rules
-  # ==========================================================================
   # These rules are NOT covered by the upstream sdx-ruleset.yaml.
 
   # SDX: OAD must use OpenAPI 3.x or newer. Swagger 2.0 is not supported.

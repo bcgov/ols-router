@@ -130,17 +130,6 @@ a:hover {
   border: 1px solid var(--sl-color-gray-5);
 }
 
-div.expressive-code .frame pre {
-  background-color: var(--sl-color-gray-5);
-  border: 1px solid var(--sl-color-gray-4);
-  margin-block: 0.5rem;
-}
-
-div.expressive-code pre > code {
-  text-wrap: wrap;
-  word-break: break-all;
-}
-
 /* Table Styling */
 table {
   border-collapse: collapse;
@@ -174,6 +163,42 @@ h1, h2, h3, h4, h5, h6 {
 .card {
   border: 1px solid var(--sl-color-gray-5);
   border-radius: 4px;
+}
+
+/* OpenAPI Spec Section Panels */
+.sl-openapi-section-panel {
+  background-color: #f8f8f8 !important;
+}
+
+/* OpenAPI Spec Buttons */
+.sl-openapi-operation-description-button {
+  background-color: #f8f8f8 !important;
+}
+
+/* OpenAPI Spec Selects */
+.sl-openapi-snippet-picker select,
+.sl-openapi-snippet-picker-value,
+.sl-openapi-content-picker-select select,
+.sl-openapi-content-picker-select-value {
+  background-color: #f8f8f8 !important;
+}
+
+/* OpenAPI Spec Inputs */
+.sl-openapi-operation-url input {
+  background-color: #f8f8f8 !important;
+}
+
+/* OpenAPI Spec Code Blocks */
+.sl-openapi-operation-description .expressive-code,
+.sl-openapi-snippets .expressive-code,
+.sl-openapi-section .expressive-code {
+  --ec-codeBackground: #f8f8f8;
+}
+
+.sl-openapi-operation-description pre,
+.sl-openapi-snippets pre,
+.sl-openapi-section pre {
+  background-color: #f8f8f8 !important;
 }
 
 /* Note/Warning Boxes */

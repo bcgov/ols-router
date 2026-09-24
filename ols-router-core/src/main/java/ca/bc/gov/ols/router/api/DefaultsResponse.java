@@ -2,11 +2,14 @@ package ca.bc.gov.ols.router.api;
 
 import java.util.Set;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.RouteOption;
 import ca.bc.gov.ols.router.data.enums.VehicleType;
 import ca.bc.gov.ols.router.engine.basic.GlobalDistortionField;
 
+@Schema(description = "The default values of the routing parameters configured for the service.")
 public class DefaultsResponse {
 	
 	RouterConfig config;

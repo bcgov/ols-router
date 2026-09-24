@@ -11,12 +11,15 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.LineString;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.directions.Direction;
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.router.notifications.Notification;
 import ca.bc.gov.ols.rowreader.DateType;
 
-
+@Schema(description = "A response containing turn-by-turn directions for the optimal route that visits "
+		+ "all of the given points.")
 public class RouterOptimalDirectionsResponse extends RouterDirectionsResponse implements RouterOptimizedResponse{
 
 	private long routingExecutionTime;

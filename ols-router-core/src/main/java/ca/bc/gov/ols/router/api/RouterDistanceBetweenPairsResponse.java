@@ -10,10 +10,14 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.Point;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.config.RouterConfig;
 import ca.bc.gov.ols.router.data.enums.DistanceUnit;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "A response containing the length and duration of the routes between each pair of "
+		+ "from and to points.")
 public class RouterDistanceBetweenPairsResponse extends ApiResponse {
 
 	protected List<Point> fromPoints;

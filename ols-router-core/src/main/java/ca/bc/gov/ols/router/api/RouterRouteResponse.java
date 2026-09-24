@@ -10,9 +10,12 @@ import java.util.Map;
 
 import org.locationtech.jts.geom.LineString;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import ca.bc.gov.ols.router.directions.Partition;
 import ca.bc.gov.ols.rowreader.DateType;
 
+@Schema(description = "A response containing the geometry, length, and duration of the route between the given points.")
 public class RouterRouteResponse extends RouterDistanceResponse {
 
 	private LineString path;
