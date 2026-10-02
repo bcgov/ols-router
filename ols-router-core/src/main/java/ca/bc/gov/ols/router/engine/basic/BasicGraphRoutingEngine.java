@@ -226,6 +226,9 @@ public class BasicGraphRoutingEngine implements RoutingEngine {
 		for(int i = 1; i < wayPoints.length; i++) {
 			DijkstraShortestPath dsp = new DijkstraShortestPath(queryGraph, params);
 			edgeLists[i-1] = dsp.findShortestPath(wayPoints[i-1], wayPoints[i], timeOffset);
+			if(edgeLists[i-1] == null) {
+				throw new IllegalArgumentException("No route found between waypoints.");
+			}
 			if(edgeLists[i-1].time(0) == Double.MAX_VALUE) {
 				throw new IllegalArgumentException("Point (" + wayPoints[i].point() + ") is inaccessible.");
 			}
